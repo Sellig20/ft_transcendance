@@ -1,0 +1,91 @@
+version: '3.9'
+
+networks:
+  trans:
+
+
+services:
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                    DATABASE                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+  database:
+    image: postgres
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: robin
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    networks:
+      - trans
+    volumes:
+      - ./docker-data/postgres-data:/var/lib/postgresql/data
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin_container
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: test@test.fr
+  #     PGADMIN_DEFAULT_PASSWORD: test
+  #     TZ: "Europe/Paris"
+  #   logging:
+  #     driver: none
+  #   volumes:
+  #     - ./docker-data/pgadmin-data:/pgadmin4/servers.json
+  #   ports:
+  #     - 5050:80
+  #   networks:
+  #     - trans
+  #   depends_on:
+  #     - database
+  #     - front-end
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# #                   BACK-END                          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+  # back-end:
+  #   depends_on:
+  #     - database
+  #   networks:
+  #     - five-stars
+  #   build: projet_five/back-end
+  #   container_name: back-end
+  #   image:  back-end
+  #   # environment:
+  #     # - DATABASE_URL=${DATABASE_URL}
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - "./projet_five/back-end/five_stars:/five_stars"
+  #   restart: always
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                   FRONT-END                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  front-end:
+    depends_on:
+     - database
+    #  - back-end
+    build:
+      context: ./docker-data
+      dockerfile: ./front.dockerfile
+    container_name: front-end
+    image: front-end
+    ports:
+      - "8080:8080"
+      # - "19006:19006"
+    volumes:
+      - ./front-react:/app
+    # restart: always
+    networks:
+      - trans
+
+# Déclaration du volume ici
+volumes:
+  postgres-data:
