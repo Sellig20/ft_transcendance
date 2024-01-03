@@ -1,0 +1,94 @@
+
+version: '3.1' #version de compose
+
+services: #quels dockers il doit creer
+
+  #nom du service
+  postgre:
+    container_name: postgre
+    #image trouvee sur hub.docker.com en tapant postgre. Choisie au hasard
+    image: postgres:15-alpine3.17
+    #dossier partage entre mon ordi et le docker
+    volumes: 
+      - db_data:/var/lib/postgresql
+    #aucun fail
+    restart: always
+    #la prem = obligatoire / la deux = utile pour root
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - db_data_nt
+  
+  # testpostgre:
+  #   container_name: testpostgre
+  #   #image trouvee sur hub.docker.com en tapant postgre. Choisie au hasard
+  #   image: postgres:15-alpine3.17
+  #   ports:
+  #     - 5434:5432
+  #   #dossier partage entre mon ordi et le docker
+  #   volumes: 
+  #     - db_data:/var/lib/postgresql
+  #   #aucun fail
+  #   restart: always
+  #   #la prem = obligatoire / la deux = utile pour root
+  #   environment:
+  #     DATABASE_TEST_URL: postgresql://example:example@testpostgre:5434/baby?schema=public
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   networks:
+  #     - db_data_nt
+
+  frontend:
+    container_name: frontend
+    #port sur lequel il se redirige
+    ports:
+      - 3000:3000
+    #arrivee dans le docker directement a frontend
+    working_dir: /frontend
+    #image trouvee sur hub.docker.com en tapant postgre.et Choisie au hasard
+    image: node:21.2-bullseye-slim
+    #dossier partage entre mon ordi et le docker
+    volumes:
+      - ./frontend:/frontend
+    restart: always
+
+    #commande de debug
+    # command: sh -c "tail -f /dev/null"
+
+    #commande qui lance mon application dans le docker
+    command: sh -c "npm install && npm start"
+  
+  backend:
+    container_name: backend
+    #docker fait une redirection de port de A a B
+    ports:
+      - 3001:3001
+      - 5555:5555
+    working_dir: /backend
+    image: node:21.2-bullseye-slim
+    volumes:
+      - ./backend:/backend
+    restart: always
+
+    #commande de debugggg
+    # command: sh -c "tail -f /dev/null"
+
+    #commande qui lance mon serveur dans le docker
+    command: sh -c "npm install && npx prisma db push && yarn start dev"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET:   ${JWT_SECRET}
+    networks:
+      - db_data_nt
+
+
+volumes:
+  #docker qui le cree
+  db_data: {}
+
+networks:
+  db_data_nt: {}
+  backend_nt: {}
