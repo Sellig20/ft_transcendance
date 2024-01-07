@@ -48,21 +48,23 @@ services:
 # #                   BACK-END                          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-  # back-end:
-  #   depends_on:
-  #     - database
-  #   networks:
-  #     - five-stars
-  #   build: projet_five/back-end
-  #   container_name: back-end
-  #   image:  back-end
-  #   # environment:
-  #     # - DATABASE_URL=${DATABASE_URL}
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - "./projet_five/back-end/five_stars:/five_stars"
-  #   restart: always
+  back-end:
+    depends_on:
+      - database
+    networks:
+      - trans
+    build:
+      context: ./docker-data
+      dockerfile: ./back.dockerfile
+    container_name: back-end
+    image:  back-end
+    # environment:
+      # - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./back-end:/app"
+    # restart: always
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -71,7 +73,7 @@ services:
   front-end:
     depends_on:
      - database
-    #  - back-end
+     - back-end
     build:
       context: ./docker-data
       dockerfile: ./front.dockerfile
@@ -81,11 +83,11 @@ services:
       - "8080:8080"
       # - "19006:19006"
     volumes:
-      - ./front-react:/app
+      - ./front-end:/app
     # restart: always
     networks:
       - trans
 
 # Déclaration du volume ici
-volumes:
-  postgres-data:
+# volumes:
+#   postgres-data:
