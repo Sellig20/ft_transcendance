@@ -10,10 +10,11 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
+
 WORKDIR /app
 # RUN npm global add @vue/cli
+# RUN npm install
 
 EXPOSE 8000
 
-
-ENTRYPOINT ["/bin/sh", "-c", "npm install && npm run start -- --port 8000 --host"]
+ENTRYPOINT ["/bin/sh", "-c", "npm install && npm run start"]
