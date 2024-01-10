@@ -16,9 +16,10 @@ COPY . .
 RUN ls -la
 RUN npm install
 
+# RUN ping database
 # RUN npx prisma migrate dev
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/sh", "-c", "npm run start"]
+ENTRYPOINT ["/bin/sh", "-c", "sleep 1 && npx prisma migrate dev && npm run start"]
 # ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]
