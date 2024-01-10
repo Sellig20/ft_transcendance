@@ -3,6 +3,9 @@ version: '3.9'
 networks:
   trans:
 
+# Déclaration du volume ici
+volumes:
+  data:
 
 services:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -11,11 +14,11 @@ services:
 
   database:
     image: postgres
-    container_name: postgres_container
+    container_name: database
     environment:
-      POSTGRES_USER: robin
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: testdb
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "5432:5432"
     networks:
@@ -61,8 +64,8 @@ services:
       dockerfile: ../docker-data/back.dockerfile
     container_name: back-end
     image:  back-end
-    # environment:
-      # - DATABASE_URL=${DATABASE_URL}
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
     ports:
       - "8000:8000"
     volumes:
@@ -89,7 +92,3 @@ services:
     # restart: always
     networks:
       - trans
-
-# Déclaration du volume ici
-volumes:
-  data:
