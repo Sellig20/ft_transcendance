@@ -1,7 +1,7 @@
 all: up
 
 up:
-	docker compose up --build --force-recreate #-d
+	docker compose up --build --force-recreate #>> logs.txt #-d
 
 down:
 	docker compose down -v

@@ -10,11 +10,15 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
-
 WORKDIR /app
-# RUN npm global add @vue/cli
-# RUN npm install
+COPY . .
+# COPY package*.json ./
+RUN ls -la
+RUN npm install
+
+# RUN npx prisma migrate dev
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/sh", "-c", "npm install && npm run start"]
+ENTRYPOINT ["/bin/sh", "-c", "npm run start"]
+# ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]

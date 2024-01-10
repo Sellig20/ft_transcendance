@@ -10,9 +10,16 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# RUN npm install -g npm@10.2.5
+
 # RUN npm global add @vue/cli
 
-EXPOSE 8080
+WORKDIR /app
+COPY . .
+# COPY package*.json ./
+RUN ls -la
+RUN npm install
 
-ENTRYPOINT ["/bin/sh", "-c", "npm install && npm run dev -- --port 8080 --host"]
+EXPOSE 80
+
+ENTRYPOINT ["/bin/sh", "-c", "npm run dev -- --port 80 --host"]

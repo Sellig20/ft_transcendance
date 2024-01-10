@@ -57,8 +57,8 @@ services:
     networks:
       - trans
     build:
-      context: ./docker-data
-      dockerfile: ./back.dockerfile
+      context: ./back-end
+      dockerfile: ../docker-data/back.dockerfile
     container_name: back-end
     image:  back-end
     # environment:
@@ -78,12 +78,12 @@ services:
      - database
      - back-end
     build:
-      context: ./docker-data
-      dockerfile: ./front.dockerfile
+      context: ./front-end
+      dockerfile: ../docker-data/front.dockerfile
     container_name: front-end
     image: front-end
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
       - ./front-end:/app
     # restart: always
