@@ -11,15 +11,15 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+COPY package*.json ./
+RUN npm install --loglevel verbose
 COPY . .
-# COPY package*.json ./
 RUN ls -la
-RUN npm install
 
 # RUN ping database
 # RUN npx prisma migrate dev
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/sh", "-c", "sleep 1 && npx prisma migrate dev && npm run start"]
+ENTRYPOINT ["/bin/sh", "-c", "sleep 5 && npx prisma migrate dev --name init && npm run start"]
 # ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]
