@@ -14,12 +14,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --loglevel verbose
 COPY . .
-RUN ls -la
 
 # RUN ping database
 # RUN npx prisma migrate dev
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/sh", "-c", "sleep 5 && npx prisma migrate dev --name init && npm run start"]
-# ENTRYPOINT ["/bin/sh", "-c", "npm run start:dev"]
+ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start"]
+# ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start:dev"]

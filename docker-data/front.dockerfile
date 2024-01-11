@@ -18,7 +18,6 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --loglevel verbose
 COPY . .
-RUN ls -la
 
 EXPOSE 80
 

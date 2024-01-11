@@ -3,7 +3,7 @@
 test.http
 /objs
 /.vscode
-test.txt
+cub3D
 
 # Object files
 *.o
