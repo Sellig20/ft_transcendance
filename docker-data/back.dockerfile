@@ -20,5 +20,5 @@ COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start"]
-# ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start:dev"]
+# ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start"]
+ENTRYPOINT ["/bin/sh", "-c", "sleep 2 && npx prisma migrate dev --name init && npm run start:dev"]

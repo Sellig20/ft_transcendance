@@ -1,0 +1,24 @@
+11 Janv
+
+1 Faire deux pages pour tester le react router et comment créer les components
+
+2 Faire les components visuels pour le login et tester 
+
+3 set up Nestjs pour se connecter au front (Un ping) 
+
+4 essayer de faire un début de l'API pour se conncter (42 passport)
+
+5 Si docker fonctionne faire des tests sur le fonctionnement de prisma 
+
+6 Bonus une vidéo de deux heures.
+
+PAGE :
+
+Landing page (login) coponent 2FA en plus 
+
+Selection page : play or chat 
+
+me page : pour setup de 2fa / change avatar / friend list / stat display 
+
+
+
