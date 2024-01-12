@@ -22,11 +22,12 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_HOST=${POSTGRES_HOST}
     ports:
-      - "5432:5432"
+      - "5434:5434"
     networks:
       - trans
     volumes:
       - data:/var/lib/postgresql/data
+    command: -p ${POSTGRES_PORT}
     # volumes:
     #   - ./docker-data:/var/lib/postgresql/data
     
