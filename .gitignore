@@ -5,6 +5,7 @@ test.http
 /.vscode
 test.txt
 /restaurant
+todo
 
 # Object files
 *.o
