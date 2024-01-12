@@ -15,10 +15,9 @@ RUN apt-get update && \
 # RUN npm global add @vue/cli
 
 WORKDIR /app
+COPY package*.json ./
+RUN npm install --loglevel verbose
 COPY . .
-# COPY package*.json ./
-RUN ls -la
-RUN npm install
 
 EXPOSE 80
 

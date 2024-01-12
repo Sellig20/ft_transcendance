@@ -81,7 +81,7 @@ services:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   front-end:
     depends_on:
-    #  - database
+     - database
      - back-end
     build:
       context: ./front-end
@@ -92,6 +92,6 @@ services:
       - "80:80"
     volumes:
       - ./front-end:/app
-    # restart: always
     networks:
       - trans
+    restart: always
