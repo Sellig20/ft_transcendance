@@ -3,7 +3,8 @@
 test.http
 /objs
 /.vscode
-cub3D
+test.txt
+/restaurant
 
 # Object files
 *.o
