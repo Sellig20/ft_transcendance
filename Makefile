@@ -17,6 +17,9 @@ clean:	down
 
 re : 	clean up
 
+dbin : 
+	PGPASSWORD=pass psql -p 5434 -h localhost -d db_test -U postgresql
+
 db: 
 	docker exec -it db bash
 
