@@ -9,6 +9,6 @@ import { UserModule } from './user/user.module';
 		isGlobal: true,
 		ignoreEnvFile: true
 	}), AuthModule, PrismaModule, UserModule],
-//   providers: [AuthService],
+
 })
 export class AppModule {}
