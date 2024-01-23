@@ -17,7 +17,9 @@ model User {
 
   email String @unique
   username String @unique
-  hash  String
+  TFA_secret_hash  String?
+  TFA_activated Boolean @default(false)
+
 
   firstName String?
   lastName String?
