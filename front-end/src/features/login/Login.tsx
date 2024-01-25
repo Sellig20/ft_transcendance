@@ -1,32 +1,30 @@
-import { useState } from "react"
-
+// import { useState } from "react"
+import login from './login.service'	
 
 
 const Login: React.FC = () => {
-	const [input, setInput] = useState({
-		name: "",
-		password: ""
-	})
+// 	const [input, setInput] = useState({
+// 		name: "",
+// 		password: ""
+// 	})
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setInput({
-			...input,
-			[event.target.name]: event.target.value
-		})
+	// const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setInput({
+	// 		...input,
+	// 		[event.target.name]: event.target.value
+	// 	})
+	// }
+	const hanldeFTlogin =  () => {
+		window.location.href = 'http://localhost:8000/auth/42'
 	}
-	const handleLogininfo = (e: React.FormEvent<HTMLFormElement>) => {
-		
+	const handletest = () => {
+		login.gettest()
 	}
 
 	return (
 		<div>
-			<form onSubmit={handleLogininfo}>
-				<input onChange={handleChange} name="name" value={input.name} />
-				<br />
-				<input onChange={handleChange} name="password" value={input.password} />
-				<br />
-				<button>login</button>
-			</form>
+			<button onClick={hanldeFTlogin}>login 42</button>
+			<button onClick={handletest}>TEST</button>
 		</div>
 	)
 }

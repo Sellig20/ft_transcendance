@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id Int @id @unique @default(autoincrement())
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
@@ -23,12 +23,10 @@ model User {
 
   firstName String?
   lastName String?
+  
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  authorId  Int?
+model Message {
+	id Int @id @unique @default(autoincrement())
+
 }

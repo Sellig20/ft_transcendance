@@ -12,12 +12,12 @@ export class AuthController {
 		private userService: UsersService) { }
 
 	@Public()
-	@UseGuards(FTGuard)
+	// @UseGuards(FTGuard)
 	@Get('42')
 	auth42() { }
 
 	@Public()
-	@UseGuards(FTGuard)
+	// @UseGuards(FTGuard)
 	@Get('42-redirect')
 	auth42Redirect(@Req() req) {
 		console.log('hello went through the redirect :) ');
