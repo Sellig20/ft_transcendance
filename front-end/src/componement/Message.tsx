@@ -1,6 +1,7 @@
 import { MessageProps } from "../PropsType/Props";
 
-export function Message({
+export function Message(
+{
 	id,
 	content,
 	sender
