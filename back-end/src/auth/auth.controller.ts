@@ -19,11 +19,12 @@ export class AuthController {
 	@Public()
 	@UseGuards(FTGuard)
 	@Get('42-redirect')
-	auth42Redirect(@Req() req, @Res() response: Response) {
+	async auth42Redirect(@Req() req, @Res() res) {
 		console.log('hello went through the redirect :) ');
-		const url = new URL('http://localhost:8000/')
-		url.
-		return this.authService.signin(req.user);
+		const url = new URL('http://localhost:80/auth')
+		const token = await this.authService.signin(req.user);
+		url.searchParams.append('code', token.access_token)
+		return res.redirect(url.href)
 	}
 
 	
