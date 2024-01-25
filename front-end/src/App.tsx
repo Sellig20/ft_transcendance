@@ -1,5 +1,6 @@
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 import Login from './features/login/Login';
+import Home frome 
 
 const App = () => {
 
@@ -9,6 +10,8 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/signin" element={<Login />} />
+					<Route element={<ProtectedRoute />} />
+						<Route path='/home' element={<Home />}/>
 				</Routes>
 			</Router>
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard } from './guard/FTGuard';
 import { Public } from './utils/custo.deco';
@@ -12,15 +12,17 @@ export class AuthController {
 		private userService: UsersService) { }
 
 	@Public()
-	// @UseGuards(FTGuard)
+	@UseGuards(FTGuard)
 	@Get('42')
 	auth42() { }
 
 	@Public()
-	// @UseGuards(FTGuard)
+	@UseGuards(FTGuard)
 	@Get('42-redirect')
-	auth42Redirect(@Req() req) {
+	auth42Redirect(@Req() req, @Res() response: Response) {
 		console.log('hello went through the redirect :) ');
+		const url = new URL('http://localhost:8000/')
+		url.
 		return this.authService.signin(req.user);
 	}
 
