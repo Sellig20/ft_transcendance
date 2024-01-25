@@ -3,17 +3,6 @@ import login from './login.service'
 
 
 const Login: React.FC = () => {
-// 	const [input, setInput] = useState({
-// 		name: "",
-// 		password: ""
-// 	})
-
-	// const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setInput({
-	// 		...input,
-	// 		[event.target.name]: event.target.value
-	// 	})
-	// }
 	const hanldeFTlogin =  () => {
 		window.location.href = 'http://localhost:8000/auth/42'
 	}
