@@ -1,5 +1,5 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about it in the docs: https://pris.ly/d/prisma-s
 
 generator client {
   provider = "prisma-client-js"
@@ -11,23 +11,22 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id Int @id @unique @default(autoincrement())
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  email String
-  hash  String
+  email String @unique
+  username String @unique
+  TFA_secret_hash  String?
+  TFA_activated Boolean @default(false)
+
 
   firstName String?
   lastName String?
+  
 }
 
-model Bookmark {
-  id Int @id @default(autoincrement())
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  
-  title String
-  description String?
-  link  String
+model Message {
+	id Int @id @unique @default(autoincrement())
+
 }

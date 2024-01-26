@@ -11,9 +11,12 @@
     "nodemon": "^3.0.2",
     "pactum": "^3.5.1",
     "prisma": "^5.6.0",
-    "regenerator-runtime": "^0.14.0"
+    "regenerator-runtime": "^0.14.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
   },
   "dependencies": {
+    "@nestjs/config": "^3.1.1",
     "@nestjs/platform-socket.io": "^10.3.1",
     "@nestjs/swagger": "^7.2.0",
     "@nestjs/websockets": "^10.3.1",
@@ -21,10 +24,12 @@
     "argon2": "^0.27.2",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
+    "passport": "^0.7.0",
     "procps": "^0.4.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^9.1.0",
     "react-router-dom": "^6.21.3",
     "socket.io-client": "^4.7.4",
     "swagger-ui": "^5.10.5"

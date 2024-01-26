@@ -69,7 +69,11 @@ services:
     container_name: back-end
     image:  back-end
     environment:
+      - FT_API_CLIENT_ID=${FT_API_CLIENT_ID}
+      - FT_API_SECRET=${FT_API_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=${DATABASE_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
     ports:
       - "8000:8000"
     volumes:
