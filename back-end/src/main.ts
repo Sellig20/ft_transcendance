@@ -11,7 +11,6 @@ import { AppModule } from './app.module';
 // import { NestFactory } from '@nestjs/core';
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import { AppModule } from './app.module';
-// <<<<<<< HEAD
 // import { IoAdapter } from '@nestjs/platform-socket.io';
 // import { join } from 'path';
 
@@ -39,7 +38,6 @@ import { AppModule } from './app.module';
 //     }),
 //   );
 //   await app.listen(3001);
-// =======
 import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';

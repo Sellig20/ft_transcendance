@@ -12,7 +12,6 @@ import { Module } from '@nestjs/common';
 
 // import { ConfigModule } from '@nestjs/config';
 // import { Module } from '@nestjs/common';
-// <<<<<<< HEAD
 // // import { PrismaModule } from './prisma/prisma.module';
 // // import { AuthModule } from './auth/auth.module';
 // // import { UserModule } from './user/user.module';
@@ -34,7 +33,6 @@ import { Module } from '@nestjs/common';
 //   //   UserModule,
 //   //   PrismaModule],
 //   //   providers: [AppGateway],
-// =======
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
