@@ -8,14 +8,13 @@ function useIsAuth() {
 	const navigate = useNavigate()
 	useEffect(() => {
 		if (count.current === 0)
-		login.getLoginStatus().then(login => {
-			if (login) {
-				return true;
-			}
-			else {
-				navigate('/')
-			}
-		})
+			login.getLoginStatus().then( () => {
+			return;
+		}).catch(error => {
+			console.log(error);
+			//set un error message pour les personnes nn loggee ? 
+			navigate('/');
+		});
 		count.current++;
 	}, [])
 }
