@@ -30,7 +30,6 @@ export class UserController {
 		return userfront
 	}
 
-	@Public()
 	@Get('/test')
 	hello() {
 		return { msg: 'yep yep' };

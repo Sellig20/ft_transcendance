@@ -32,11 +32,14 @@ export class AuthController {
 	async generate(@Req() req){
 		const otpUrl = await this.authService.TfaSecretGen(req.user)
 		const img = await this.authService.generateQrcodeDataUrl(otpUrl);
-		return (`<img src="${img}" alt="QR Code" />`)
+		return (img)
 	}
 
 	@Post('2fa/turn-on')
 	async turnOnTfa(@Req() req, @Body() body) {
+
+		console.log(body, typeof body.TFACode);
+		
 		const isCodeValid = await this.authService.isTFAvalid(
 			body.TFACode,
 			req.user.id
@@ -65,6 +68,6 @@ export class AuthController {
 
 	@Get('login')
 	salope(@Req() req) {
-		return req.user;
+		return;
 	}
 }

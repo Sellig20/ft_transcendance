@@ -26,7 +26,6 @@ const gettest = async () => {
 
 const getLoginStatus = async () => {
 	const req = await api.get('auth/login');
-	console.log('checked if connected: ', req.data, 'and my token is :', localStorage.getItem("token"));
 	return req.data
 }
 export default {
