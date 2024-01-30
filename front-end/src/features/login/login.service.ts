@@ -31,15 +31,15 @@ const getLoginStatus = async () => {
 	return req.data
 }
 
-const postTFAauth = async (code: string) => {
-	const req = await api.post('auth/2fa/authenticate', {TFACode: code});
-	return req.data
+const postTFAauth = async (code: string, userId: number) => {
+	const req = await api.post('auth/2fa/authenticate', {TFACode: code, idFront: userId});
+	return req.data;
 }
 
 const getTfaOff = async () => {
-	const req = await api.get('auth/2fa/off')
+	const req = await api.get('auth/2fa/off');
 	localStorage.removeItem("token");
-	localStorage.setItem("token", req.data.access_token)
+	localStorage.setItem("token", req.data.access_token);
 	return req.data
 }
 

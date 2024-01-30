@@ -4,6 +4,7 @@ import { FTGuard } from './guard/FTGuard';
 import { Public } from './utils/custo.deco';
 import { UsersService } from 'src/user/user.service';
 import { JWTAUthGuard } from './guard/JWTGuard'
+import { log } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -22,12 +23,17 @@ export class AuthController {
 	async auth42Redirect(@Req() req, @Res() res) {
 		console.log('hello went through the redirect :)');
 		const url = new URL('http://localhost:80/auth');
-		if (req.user.TFA_activated)
+		console.log('in this ft guard', req.user);
+		if (req.user.TFA_activated) {
 			url.searchParams.append('tfa', 'ON');
-		else
+			url.searchParams.append('code', 'none');
+			url.searchParams.append('userId', req.user.id);
+		}
+		else {
 			url.searchParams.append('tfa', 'OFF');
-		const token = await this.authService.signin(req.user);
-		url.searchParams.append('code', token.access_token);
+			const token = await this.authService.signin(req.user);
+			url.searchParams.append('code', token.access_token);
+		} 
 		return res.redirect(url.href);
 	}
 
@@ -55,6 +61,7 @@ export class AuthController {
 
 	@Get('2fa/off')
 	async turnOffTfa(@Req() req) {
+		console.log(req.user);
 		await this.userService.setTfaOff(req.user.id);
 		await this.userService.setTfaSecret(req.user.id, "")
 		const token = await this.authService.signin(req.user);
@@ -63,21 +70,22 @@ export class AuthController {
 	}
 
 	@Public()
-	@UseGuards(JWTAUthGuard)
 	@Post('2fa/authenticate')
 	async authenticate(@Req() req, @Body() body) {
+		console.log(body.idFront, typeof body.idFront);
 		const isCodeValid = await this.authService.isTFAvalid(
 			body.TFACode,
-			req.user.id
+			body.idFront
 			)
 		if (!isCodeValid) {
 			throw new UnauthorizedException('Wrong authentification code');
 		}
-		return await this.authService.signinTFA(req.user);
+		const user = await this.userService.findUserId(body.idFront)
+		return await this.authService.signinTFA(user);
 	}
 
 	@Get('login')
 	salope(@Req() req) {
-		return;
+		return req.user;
 	}
 }

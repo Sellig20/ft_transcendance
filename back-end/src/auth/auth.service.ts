@@ -20,7 +20,8 @@ export class AuthService {
 			username: user.username,
 			sub: user.id,
 			TFA_activated: false,
-			isTFAauth: false
+			isTFAauth: false,
+			id: user.id,
 		};
 		return {
 			access_token: this.jwt.sign(payload),
@@ -28,12 +29,16 @@ export class AuthService {
 	}
 
 	async signinTFA(user: any) {
+		// console.log('user in tfa signin: ', user);
+		
 		const payload = {
 			username: user.username,
 			sub: user.id,
 			TFA_activated: true,
 			isTFAauth: true,
 		}
+		// console.log('payload to be sent: ', payload);
+		
 		return {
 			access_token: this.jwt.sign(payload),
 		};

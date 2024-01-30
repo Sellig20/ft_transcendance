@@ -14,16 +14,11 @@ const Auth = () => {
 	const [code, setCode] = useState("")
 
 
-	// const user = useSelector((state: Rootstate) => state.logedin.connected);
 	// useIsNotAuth();
 	useEffect(() => {
 
-		// if (user || localStorage.getItem("token")){
-		// 	userService.getUser().then(user => dispatch(addUser(user)));
-		// 	navigate('/home')
-		// 	return;
-		// }
-		// console.log('hello');
+		if (localStorage.getItem("token"))
+			navigate('/home')
 		
 		if (count.current === 0) {
 			
@@ -31,14 +26,14 @@ const Auth = () => {
 			const tmp = queryparms.get('code');
 			const tfa = queryparms.get('tfa');
 
-			if (tmp)
-				localStorage.setItem("token", tmp);
 			if (tfa === 'OFF') {
+				if (tmp)
+					localStorage.setItem("token", tmp);
 				userService.getUser().then(user => dispatch(addUser(user)));
-				navigate('/home')
+				navigate('/home');
 			}
 			else {
-				setTfa(true)
+				setTfa(true);
 			}
 		}
 		count.current++;
@@ -47,13 +42,22 @@ const Auth = () => {
 
 	const handleTfa = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const { access_token } = await loginService.postTFAauth(code);
-		if (access_token) {
-			localStorage.setItem("token", access_token);
-			const user = await userService.getUser()
-			dispatch(addUser(user))
-			navigate('/home')
-			// console.log(access_token);
+		const queryparms = new URLSearchParams(window.location.search);
+		const urlcode = queryparms.get('code');
+		const tfa = queryparms.get('tfa');
+		const userId = queryparms.get('userId');
+
+		if (tfa === 'ON' && urlcode === 'none' && userId) {
+			const { access_token } = await loginService.postTFAauth(code, Number(userId));
+			if (access_token) {
+				localStorage.setItem("token", access_token);
+				const user = await userService.getUser();
+				dispatch(addUser(user));
+				navigate('/home');
+				// console.log(access_token);
+			}
+			else 
+				navigate('/');
 		}
 	}
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
