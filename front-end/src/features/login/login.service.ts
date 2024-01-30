@@ -26,11 +26,28 @@ const gettest = async () => {
 
 const getLoginStatus = async () => {
 	const req = await api.get('auth/login');
+	console.log(req);
+	
 	return req.data
 }
+
+const postTFAauth = async (code: string) => {
+	const req = await api.post('auth/2fa/authenticate', {TFACode: code});
+	return req.data
+}
+
+const getTfaOff = async () => {
+	const req = await api.get('auth/2fa/off')
+	localStorage.removeItem("token");
+	localStorage.setItem("token", req.data.access_token)
+	return req.data
+}
+
 export default {
 	get42: get42,
 	gettest: gettest,
 	getUser: getUser,
-	getLoginStatus: getLoginStatus
+	getLoginStatus: getLoginStatus,
+	postTFAauth: postTFAauth,
+	getTfaOff: getTfaOff
 }

@@ -11,7 +11,7 @@ function useIsAuth() {
 			login.getLoginStatus().then( () => {
 			return;
 		}).catch(error => {
-			console.log(error);
+			// console.log(error);
 			//set un error message pour les personnes nn loggee ? 
 			navigate('/');
 		});

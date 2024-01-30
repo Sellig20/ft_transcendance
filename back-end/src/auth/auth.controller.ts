@@ -20,11 +20,15 @@ export class AuthController {
 	@UseGuards(FTGuard)
 	@Get('42-redirect')
 	async auth42Redirect(@Req() req, @Res() res) {
-		console.log('hello went through the redirect :) ');
-		const url = new URL('http://localhost:80/auth')
+		console.log('hello went through the redirect :)');
+		const url = new URL('http://localhost:80/auth');
+		if (req.user.TFA_activated)
+			url.searchParams.append('tfa', 'ON');
+		else
+			url.searchParams.append('tfa', 'OFF');
 		const token = await this.authService.signin(req.user);
-		url.searchParams.append('code', token.access_token)
-		return res.redirect(url.href)
+		url.searchParams.append('code', token.access_token);
+		return res.redirect(url.href);
 	}
 
 	
@@ -38,8 +42,6 @@ export class AuthController {
 	@Post('2fa/turn-on')
 	async turnOnTfa(@Req() req, @Body() body) {
 
-		console.log(body, typeof body.TFACode);
-		
 		const isCodeValid = await this.authService.isTFAvalid(
 			body.TFACode,
 			req.user.id
@@ -48,8 +50,16 @@ export class AuthController {
 			throw new UnauthorizedException('Wrong authentification code');
 		}
 		await this.userService.setTfaOn(req.user.id)
-		// console.log( await this.userService.findUserId(req.user.userId));
 		return ({ msg: '2FA ON' })
+	}
+
+	@Get('2fa/off')
+	async turnOffTfa(@Req() req) {
+		await this.userService.setTfaOff(req.user.id);
+		await this.userService.setTfaSecret(req.user.id, "")
+		const token = await this.authService.signin(req.user);
+
+		return token;
 	}
 
 	@Public()

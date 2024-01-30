@@ -45,4 +45,15 @@ export class UsersService {
 			}
 		})
 	}
+
+	async setTfaOff(userID: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				TFA_activated: false
+			}
+		})
+	}		
 }

@@ -1,9 +1,15 @@
+import { useSelector } from 'react-redux';
 import useIsAuth from '../hook/useIsAuth'
 import { useNavigate } from 'react-router-dom'
+import { Rootstate } from '../../app/store';
 
 
 
 const Home = () => {
+
+	const user = useSelector((state: Rootstate) => state.logedin);
+	console.log(user);
+	
 	const navigate = useNavigate();
 	useIsAuth()
 
