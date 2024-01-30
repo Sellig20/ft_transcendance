@@ -1,8 +1,8 @@
-// import { useState } from "react"
 import login from './login.service'	
 
 
 const Login: React.FC = () => {
+
 	const hanldeFTlogin =  () => {
 		window.location.href = 'http://localhost:8000/auth/42'
 	}

@@ -15,6 +15,11 @@ export class JWTstrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: any) {
+
+	const user = await this.userService.findUserId(payload.id);
+	if (user.TFA_activated)
+		payload.TFA_activated = true;
+	
     console.log('In JWT strat \n', payload);
 	return {...payload, id: payload.sub};
   }

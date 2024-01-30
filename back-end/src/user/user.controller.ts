@@ -26,11 +26,11 @@ export class UserController {
 		userfront.email = temp.email;
 		userfront.id = temp.id;
 		userfront.username = temp.username;
+		userfront.tfa_status = temp.TFA_activated
 		
 		return userfront
 	}
 
-	@Public()
 	@Get('/test')
 	hello() {
 		return { msg: 'yep yep' };
