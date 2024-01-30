@@ -14,7 +14,7 @@ export function Chat() {
 	const send = (
 		value: string
 	) => {
-		socket?.emit("MP", value);
+		socket?.emit("MP", {recipient:"socketid", data:value})
 		console.log("value:", value);
 	}
 

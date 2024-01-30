@@ -11,22 +11,43 @@ datasource db {
 }
 
 model User {
-  id Int @id @unique @default(autoincrement())
+  id           Int          @id @unique @default(autoincrement())
+  channel_list Channel[]
+  friends      FriendShip[]
+  Message      Message[]
+  socket       String?
+
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  email String @unique
-  username String @unique
-  TFA_secret_hash  String?
-  TFA_activated Boolean @default(false)
-
+  email           String  @unique
+  username        String  @unique
+  TFA_secret_hash String?
+  TFA_activated   Boolean @default(false)
 
   firstName String?
-  lastName String?
-  
+  lastName  String?
+}
+
+model Channel {
+  id        Int       @id @unique @default(autoincrement())
+  name      String?
+  personal  Boolean?
+  user_list User[]
+  messages  Message[]
+}
+
+model FriendShip {
+  id       String @id @unique @default(cuid())
+  friend   User?  @relation(fields: [friendId], references: [id])
+  friendId Int?
 }
 
 model Message {
-	id Int @id @unique @default(autoincrement())
-
+  id        Int       @id @unique @default(autoincrement())
+  sender    User      @relation(fields: [userId], references: [id])
+  recipient Channel   @relation(fields: [channelId], references: [id])
+  date      DateTime? @default(now())
+  userId    Int
+  channelId Int
 }
