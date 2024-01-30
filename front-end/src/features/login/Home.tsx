@@ -1,13 +1,10 @@
-import { Outlet, useNavigate } from "react-router-dom"
+import { Outlet} from "react-router-dom"
+import useIsAuth from '../hook/useIsAuth'
 
 
 
 const Home = () => {
-	// const navigate = useNavigate();
-	// const { isAuthenticated } = useAuth();
-	// if (!isAuthenticated){
-	// 	navigate('/');
-	// }
+	useIsAuth()
 	return(
 		<div>
 			you are home

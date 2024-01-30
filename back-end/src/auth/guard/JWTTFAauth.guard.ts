@@ -24,16 +24,16 @@ export class Jwt2faAuthGuard extends AuthGuard('jwt2') {
 		return super.canActivate(context);
 	}
 
-	handleRequest(
-		err: any,
-		user: any,
-		info: any,
-		context: ExecutionContext,
-		status?: any,
-	) {
-		if (err || !user) {
-			throw err || new UnauthorizedException("jwt authguard error");
-		}
-		return user;
-	}
+	// handleRequest(
+	// 	err: any,
+	// 	user: any,
+	// 	info: any,
+	// 	context: ExecutionContext,
+	// 	status?: any,
+	// ) {
+	// 	if (err || !user) {
+	// 		throw err || new UnauthorizedException("jwt authguard error");
+	// 	}
+	// 	return user;
+	// }
 }
