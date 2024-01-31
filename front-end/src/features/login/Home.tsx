@@ -7,7 +7,7 @@ import { Rootstate } from '../../app/store';
 
 const Home = () => {
 
-	const user = useSelector((state: Rootstate) => state.logedin);
+	const user = useSelector((state: Rootstate) => state.user);
 	console.log(user);
 	
 	const navigate = useNavigate();
