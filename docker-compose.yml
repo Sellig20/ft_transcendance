@@ -31,26 +31,25 @@ services:
     # volumes:
     #   - ./docker-data:/var/lib/postgresql/data
     
-
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin_container
+  # prisma:
+  #   image: prismagraphql/prisma:1.34
   #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: test@test.fr
-  #     PGADMIN_DEFAULT_PASSWORD: test
-  #     TZ: "Europe/Paris"
-  #   logging:
-  #     driver: none
-  #   volumes:
-  #     - ./docker-data/pgadmin-data:/pgadmin4/servers.json
-  #   ports:
-  #     - 5050:80
-  #   networks:
-  #     - trans
   #   depends_on:
-  #     - database
-  #     - front-end
+  #     back-end:
+  #       condition: service_started
+  #   ports:
+  #     - '4466:4466'
+  #   environment:
+  #     PRISMA_CONFIG: |
+  #       port: 4466
+  #       managementApiSecret: mysecret42
+  #       databases:
+  #         default:
+  #           connector: postgres
+  #           host: database
+  #           port: 5434
+  #           user: postgresql
+  #           password: pass
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -76,6 +75,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
     ports:
       - "8000:8000"
+      - "8001:8001"
     volumes:
       - "./back-end:/app"
     restart: always
