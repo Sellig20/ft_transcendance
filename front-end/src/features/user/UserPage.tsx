@@ -4,13 +4,13 @@ import useIsAuth from '../hook/useIsAuth'
 import userService from './user.service'
 import { useDispatch, useSelector } from 'react-redux'
 import { Rootstate } from '../../app/store'
-import { changeTfa } from './user.store'
+import { changeTfa } from '../login/login'
 import loginService from '../login/login.service'
 
 const UserPage: React.FunctionComponent = () => {
 	useIsAuth()
 	const dispatch = useDispatch();
-	const user = useSelector((state: Rootstate) => state.user)
+	const user = useSelector((state: Rootstate) => state.logedin)
 	console.log(user);
 	
 	const [img, setImg] = useState("")

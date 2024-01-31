@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { useDispatch} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import userService from './login.service'
-import { addUser } from "../user/user.store";
+import { addUser } from "./login";
 import loginService from "./login.service";
+import { Rootstate } from "../../app/store";
 
 const Auth = () => {
 	const navigate = useNavigate();

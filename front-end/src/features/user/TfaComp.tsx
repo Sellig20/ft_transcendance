@@ -1,7 +1,7 @@
 import { useState } from "react";
 import userService from "./user.service";
 import { useDispatch } from "react-redux";
-import { changeCo, changeTfa } from "./user.store";
+import { changeCo, changeTfa } from "../login/login";
 import { useNavigate } from "react-router-dom";
 
 
