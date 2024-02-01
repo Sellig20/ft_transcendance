@@ -15,7 +15,9 @@ export class UsersService {
 				id: userID,
 			},
 		});
-		return user;
+		if (user)
+			return user;
+		return null
 	}
 	async findUserByMail(mail: string) {
 		const user = await this.prisma.user.findFirst({
@@ -46,6 +48,17 @@ export class UsersService {
 			}
 		})
 	}
+
+	async setTfaOff(userID: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				TFA_activated: false
+			}
+		})
+	}		
 
 	async setSocket(userID: number, socketToUp: string) {
 		await this.prisma.user.update({
