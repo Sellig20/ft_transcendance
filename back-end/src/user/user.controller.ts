@@ -1,8 +1,8 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, PayloadTooLargeException, Req, Res } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Public } from 'src/auth/utils/custo.deco';
 import { FrontUserDto } from './UserDto';
-import { log } from 'console';
+import hashService from '../auth/utils/hash'
+import { Public } from 'src/auth/utils/custo.deco';
 
 @Controller('user')
 export class UserController {
@@ -31,8 +31,16 @@ export class UserController {
 		return userfront
 	}
 
-	@Get('/test')
-	hello() {
+	@Public()
+	@Get('/cipher')
+	async hello() {
+		let normalString = 'bonjour'
+		console.log('on va cipher: ', normalString);
+		normalString = await hashService.hash(normalString);
+		console.log('string cryptee: ', normalString);
+		normalString = await hashService.decipher(normalString);
+		console.log('string decryptee: ', normalString);
+		
 		return { msg: 'yep yep' };
 	}
 }
