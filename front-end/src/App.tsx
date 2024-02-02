@@ -9,6 +9,7 @@ import Navbar from './features/navbar/Navbar';
 import { useSelector } from 'react-redux';
 import { Rootstate } from './app/store';
 
+import { Chat } from './features/chat/Chat'
 const App = () => {
 	
 	const isAuth = useSelector((state: Rootstate) => state.user.connected);
@@ -20,7 +21,7 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />
-					{/* <Route path="/chat" element={<Chat />} /> */}
+					<Route path="/chat" element={<Chat />} />
 					<Route element={<ProtectedRoute />} />
 						<Route path='/home' element={<Home />} />
 						<Route path='/user' element={<UserPage />} />
