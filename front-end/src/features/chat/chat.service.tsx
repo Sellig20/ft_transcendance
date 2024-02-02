@@ -11,7 +11,13 @@ const getUserById = async (iduser: number) => {
 	return request.data
 }
 
+const findAllChannelJoinedByIdUser = async (iduser: number) => {
+	const request = await api.get(`/chat/findAllChannelJoinedByIdUser/${iduser}`)
+	return request.data
+}
+
 export default {
 	getUserById: getUserById,
+	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser
 
 }

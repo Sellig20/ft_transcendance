@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { useState, useEffect, useRef} from 'react'
 import { Message } from './componement/Message';
-import { ChannelCard } from './componement/ChannelCard';
+import { ChannelCards } from './componement/ChannelCards';
 import { io, Socket } from "socket.io-client";
 import api from '../api/api';
 import chatService from './chat.service'
@@ -15,10 +15,15 @@ export function Chat() {
 	const [inputbarre, setInputbarre] = useState<string>("");
 	const [inputAddFriend, setInputAddFriend] = useState<string>("");
 
-	// const [channelJoined, setChannelJoined] = useState<any>();
+	const [channelJoined, setChannelJoined] = useState<any>();
 	// const [IdUser, setIdUser] = useState<number>();
 
 	// setChannelJoined(chatService.getChannelJoinedByUserId(2));
+
+	const callApi = async (
+	) => {
+		await chatService.findAllChannelJoinedByIdUser(1).then(channelj => setChannelJoined(channelj));
+	}
 
 	const send = (
 		value: string
@@ -31,8 +36,9 @@ export function Chat() {
 	// depuis react 18 sur la fonction use effect
 	// donc j'utilise le count pour pas que la requete "io(_)" soit faite sur le premier load de page.
 	useEffect(() => {
-		if (count.current !== 0)
+		if (count.current === 0)
 		{
+			callApi()
 			const newSocket = io("http://localhost:8001")
 			setSocket(newSocket)
 		}
@@ -148,6 +154,8 @@ export function Chat() {
 		}
 	];
 
+	
+
 	return (
 		<div>
 			<div>
@@ -156,12 +164,13 @@ export function Chat() {
 
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				<div id='panel' className='bg-info w-25'>
-				<div className='card bg-secondary'>
+					{/* <div className='card bg-secondary'>
 						Louis
 					</div>
 					<div className='card bg-secondary'>
 						Robin
-					</div>
+					</div> */}
+					<ChannelCards channelInfo={channelJoined}/>
 					<div id="addfriend" className="h-100 d-inline-block">
 						<input type="text" className="form-control" name="inputAddfriend" value={inputAddFriend} onChange={handleAddFriendInput}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
