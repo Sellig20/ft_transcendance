@@ -5,6 +5,7 @@ import Home from './features/login/Home';
 import ProtectedRoute from './features/login/ProtectedRoute';
 import Navbar from './features/navbar/Navbar';
 import UserSetting from './features/user/UserStetting';
+import NotFound from './features/NotFound/NotFound';
 // import { Chat } from './features/Chat'
 import { useSelector } from 'react-redux';
 import { Rootstate } from './app/store';
@@ -21,9 +22,11 @@ const App = () => {
 					<Route path="/" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />
 					{/* <Route path="/chat" element={<Chat />} /> */}
-					<Route element={<ProtectedRoute />} />
+					<Route element={<ProtectedRoute />} >
 						<Route path='/home' element={<Home />} />
 						<Route path='/user' element={<UserSetting />} />
+					</Route>
+					<Route path='*' element={<NotFound/>}/>
 				</Routes>
 			</Router>
 

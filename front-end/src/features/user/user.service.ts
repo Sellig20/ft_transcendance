@@ -11,8 +11,14 @@ const genQrcode = async () => {
 	return request.data
 }
 
+const changeUserName = async (name: string) => {
+	const response = await api.post('/user/name', {name: name})
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
+	changeUserName: changeUserName
 
 }

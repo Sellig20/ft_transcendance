@@ -1,12 +1,16 @@
-import { Controller, Get, PayloadTooLargeException, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FrontUserDto } from './UserDto';
 import hashService from '../auth/utils/hash'
 import { Public } from 'src/auth/utils/custo.deco';
+import { UsersService } from './user.service';
 
 @Controller('user')
 export class UserController {
-	constructor(private prisma: PrismaService) { }
+	constructor(
+		private prisma: PrismaService,
+		private userservice: UsersService
+		) { }
 
 	@Get()
 	async getAnyUser() {
@@ -29,6 +33,14 @@ export class UserController {
 		userfront.tfa_status = temp.TFA_activated
 		
 		return userfront
+	}
+
+	@Post('/name')
+	async changeUserName(@Req() req, @Body() body) {
+		const user = req.user;
+		const resulst = this.userservice.changeName(user.id, body.name);
+		console.log(resulst);
+		return resulst
 	}
 
 	@Public()

@@ -1,12 +1,9 @@
 import { Outlet } from 'react-router-dom';
+import React from 'react';
 import useIsAuth from '../hook/useIsAuth';
 
-const ProtectedRoute = () => {
+const ProtectedRoute: React.FC = () => {
 	useIsAuth()
-	return(
-		<div>
-			<Outlet/>
-		</div>
-	)
+	return <Outlet/>
 }
 export default ProtectedRoute

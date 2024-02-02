@@ -79,6 +79,18 @@ export class UsersService {
 		})
 		return user;
 	}
+	
+	async changeName(id: number, name: string) {
+		const resulst = await this.prisma.user.update({
+			where: {
+				id: id
+			},
+			data: {
+				username: name
+			}
+		});
+		return resulst
+	}
 
 	async createTest() {
 		const user1: User = await this.prisma.user.create({

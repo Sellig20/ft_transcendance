@@ -27,6 +27,12 @@ const UserSetting = () => {
 		}
 	}
 
+	const hanldeUsername =  async () => {
+		const rep = await userService.changeUserName(username)
+		console.log(rep);
+		
+	}
+
 	//   const handleImageUpload = (event) => {
 	//     setImage(URL.createObjectURL(event.target.files[0]));
 	//   };
@@ -57,11 +63,11 @@ const UserSetting = () => {
 			<div className="mb-3 row">
 				<label htmlFor="usernameInput" className="col-sm-2 col-form-label">Username</label>
 				<div className="col-sm-10">
-					<input type="text" className="form-control col-2" id="usernameInput" value={username} onChange={(e) => setUsername(e.target.value)} />
+					<input type="text" className="form-control col-2" style={{ maxWidth: '300px' }} id="usernameInput" value={username} onChange={(e) => setUsername(e.target.value)} />
 				</div>
 			</div>
 
-			<button type="submit" className="btn btn-primary">Save Changes</button>
+			<button className="btn btn-primary" onClick={hanldeUsername} >Save Changes</button>
 		</div>
 	);
 }

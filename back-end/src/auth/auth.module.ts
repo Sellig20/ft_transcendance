@@ -30,10 +30,10 @@ import { JWTAUthGuard } from './guard/JWTGuard';
     FTstrategy,
     JWTstrategy,
 	Jwt2faStrategy,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: Jwt2faAuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: Jwt2faAuthGuard,
+    },
   ],
 })
 export class AuthModule {}

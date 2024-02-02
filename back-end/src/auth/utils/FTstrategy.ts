@@ -24,7 +24,7 @@ export class FTstrategy extends PassportStrategy(Strategy, '42') {
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
     let user = await this.prisma.user.findFirst({
       where: {
-        username: profile.username,
+        email: profile.emails[0].value,
       },
     });
     if (!user) {
