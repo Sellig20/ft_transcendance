@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { LoggingMiddleware } from './logger/loggerBasic';
 import { MyGateway } from './chat/chat.gateway';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   controllers: [],
@@ -17,6 +18,7 @@ import { MyGateway } from './chat/chat.gateway';
     AuthModule,
     PrismaModule,
     UserModule,
+    ChatModule,
   ],
 })
 
