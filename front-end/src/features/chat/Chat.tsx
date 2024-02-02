@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import { useState, useEffect, useRef} from 'react'
-import { Message } from '../../componement/Message';
+import { Message } from './componement/Message';
+import { ChannelCard } from './componement/ChannelCard';
 import { io, Socket } from "socket.io-client";
 import api from '../api/api';
 import chatService from './chat.service'
@@ -14,8 +15,8 @@ export function Chat() {
 	const [inputbarre, setInputbarre] = useState<string>("");
 	const [inputAddFriend, setInputAddFriend] = useState<string>("");
 
-	const [channelJoined, setChannelJoined] = useState<any>();
-	const [IdUser, setIdUser] = useState<number>();
+	// const [channelJoined, setChannelJoined] = useState<any>();
+	// const [IdUser, setIdUser] = useState<number>();
 
 	// setChannelJoined(chatService.getChannelJoinedByUserId(2));
 
