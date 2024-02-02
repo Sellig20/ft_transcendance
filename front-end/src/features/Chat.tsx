@@ -9,7 +9,9 @@ export function Chat() {
 	const [socket, setSocket] = useState<Socket>()
 	const count = useRef(0)
 	const [messageSocket, setMessageSocket] = useState<string[]>([]);
+
 	const [inputbarre, setInputbarre] = useState<string>("");
+	const [inputAddFriend, setInputAddFriend] = useState<string>("");
 
 	const send = (
 		value: string
@@ -83,22 +85,31 @@ export function Chat() {
 		// 	});
 	};
 
+	const HandleAddFriendButton = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		event.preventDefault();
+		if (inputAddFriend != "")
+		{
+			console.log(inputAddFriend);
+			// action
+			setInputAddFriend("");
+		}
+	};
+
 	const handleMessage = (
 		event : React.MouseEvent<HTMLButtonElement>
 	) => {
-		
 		let  message_cpy = event.target.value;
-
-		// console.log("msg'", message,"'");
-		
-		
-		// console.log("post_msg'", message,"'");
-		
 		setInputbarre(message_cpy);
-		if (message_cpy === "caca")
-		{
-			console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		}
+	};
+
+	const handleAddFriendInput = (
+		event : React.MouseEvent<HTMLButtonElement>
+	) => {
+		let  value_cpy = event.target.value;
+		setInputAddFriend(value_cpy);
+		console.log(value_cpy);
 	};
 	
 	let message_db: MessageProps[] = [
@@ -147,30 +158,47 @@ export function Chat() {
 	];
 
 	return (
-		<div className="ps-5 pb-5 pe-5 pt-5">
+		<div>
 			<div>
 				<h1>App: CHAT</h1>
 			</div>
-			{message_db.map( message => {
-				return(
-						<div key={message.id}>
-							<Message id={message.id} content={message.content} sender={message.sender} recipient={message.recipient}/>
-						</div>
-				)
-			})}
-			<div className="d-flex justify-content-end">
-				<input type="text" className="form-control" name="inputSend" value={inputbarre} onChange={handleMessage}/>
-				<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
-				
-			</div>
-			<div>
-			{
-				messageSocket.map((messageSocket, index) => (
-					<div key={index}>
-						{messageSocket}
+
+			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
+				<div id='panel' className='bg-info w-25'>
+				<div className='card bg-secondary'>
+						Louis
 					</div>
-				))
-			}
+					<div className='card bg-secondary'>
+						Robin
+					</div>
+					<div className="h-100 d-inline-block">
+						<input type="text" className="form-control" name="inputAddfriend" value={inputAddFriend} onChange={handleAddFriendInput}/>
+						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
+					</div>
+				</div>
+				<div id='chat' className='bg-danger w-75'>
+					{message_db.map( message => {
+						return(
+								<div key={message.id}>
+									<Message id={message.id} content={message.content} sender={message.sender} recipient={message.recipient}/>
+								</div>
+						)
+					})}
+					<div className="d-flex justify-content-end">
+						<input type="text" className="form-control" name="inputSend" value={inputbarre} onChange={handleMessage}/>
+						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
+						
+					</div>
+					<div>
+					{
+						messageSocket.map((messageSocket, index) => (
+							<div key={index}>
+								{messageSocket}
+							</div>
+						))
+					}
+					</div>
+				</div>
 			</div>
 		</div>
   );

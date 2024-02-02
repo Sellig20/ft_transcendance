@@ -1,12 +1,19 @@
 import { OnModuleInit } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
+import { UsersService } from 'src/user/user.service';
+// import { AuthService } from 'src/user/user.service';
 
 @WebSocketGateway(8001, { cors: '*'})
 export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
-
+    
+    constructor(
+		// private authService: AuthService,
+		private userService: UsersService) { }
+    
     @WebSocketServer()
     server: Server;
+
 
     private userArray: string[] = [];
 
@@ -42,31 +49,39 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         }
     }
     
-    handleConnection(client: Socket, ...args: any[]) {
+    async handleConnection(client: Socket, ...args: any[]) {
         console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
         this.addUser(client.id);
         this.printAllUser(this.userArray);
+
+        // ajout du socket a la table user
+        // await this.userService.setSocket(id du user connecte, client.id)
+        // await this.userService.setSocket(1, client.id)
+        // await this.userService.createTest();
     }
 
-    handleDisconnect(client: Socket){
+    async handleDisconnect(client: Socket){
         console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
         this.removeUser(client.id);
         this.printAllUser(this.userArray);
 
+        // ajout du socket a la table user
+        // await this.userService.setSocket(id du user connecte, client.id)
+        // await this.userService.setSocket(1, null)
     }
 
 
     @SubscribeMessage('MP')
     handleMessage(client: any, message: any): void {
-        // if (message === "test")
-        // {
-            this.server.to(this.userArray[0]).emit("MP", "message de test pour client 1");   
-        // }
-        // else
-        // {
+        if (message === "a")
+        {
+            this.server.to(this.userArray[0]).emit("MP", "ca marche");   
+        }
+        else
+        {
             console.log("from:", message.to, "-->", message.data);
             this.server.emit("MP", message.data);   
             this.server.to(message.recipient).emit("MP", message.data);   
-        // }
+        }
     }
 }
