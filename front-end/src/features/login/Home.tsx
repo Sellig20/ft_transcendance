@@ -24,8 +24,9 @@ const Home = () => {
 	}
 
 	return(
+
 		<div>
-			you are home
+			en sah c'est beau
 			<button onClick={handleUser}>settings</button>
 			<button onClick={handleGame}>game</button>
 			<button onClick={handleChat}>chat</button>

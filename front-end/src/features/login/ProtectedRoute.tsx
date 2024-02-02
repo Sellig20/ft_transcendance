@@ -4,7 +4,9 @@ import useIsAuth from '../hook/useIsAuth';
 const ProtectedRoute = () => {
 	useIsAuth()
 	return(
-		<Outlet/>
+		<div>
+			<Outlet/>
+		</div>
 	)
 }
 export default ProtectedRoute
