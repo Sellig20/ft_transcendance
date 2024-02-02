@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
+export type Channel = any;
 
 @Injectable()
 export class UsersService {
@@ -58,4 +59,64 @@ export class UsersService {
 			}
 		})
 	}		
+
+	async setSocket(userID: number, socketToUp: string) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				socket: socketToUp
+			}
+		})
+	}
+
+	async findSocket(userID: number) {
+		const user = await this.prisma.user.findMany({
+			where: {
+				id: userID
+			}
+		})
+		return user;
+	}
+
+	async createTest() {
+		const user1: User = await this.prisma.user.create({
+			data: {
+				username: 'robin',
+				email: 'mail1',
+			},
+		})
+
+		const user2: User = await this.prisma.user.create({
+			data: {
+				username: 'louis',
+				email: 'mail2',
+			},
+		})
+
+		const user3: User = await this.prisma.user.create({
+			data: {
+				username: 'jeanne',
+				email: 'mail3',
+			},
+		})
+
+		const channel1: User = await this.prisma.channel.create({
+			data: {
+				name: 'channel1',
+				personal: false,
+				user_list: {connect: {
+					id:1
+				}},
+			},
+		})
+
+		const channel2: User = await this.prisma.channel.create({
+			data: {
+				name: 'channel2',
+				personal: true,
+			},
+		})
+	}
 }
