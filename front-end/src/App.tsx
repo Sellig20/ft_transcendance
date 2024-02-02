@@ -3,8 +3,8 @@ import Login from './features/login/Login';
 import Auth from './features/login/Auth'
 import Home from './features/login/Home';
 import ProtectedRoute from './features/login/ProtectedRoute';
-import UserPage from './features/user/UserPage'
 import Navbar from './features/navbar/Navbar';
+import UserSetting from './features/user/UserStetting';
 // import { Chat } from './features/Chat'
 import { useSelector } from 'react-redux';
 import { Rootstate } from './app/store';
@@ -23,7 +23,7 @@ const App = () => {
 					{/* <Route path="/chat" element={<Chat />} /> */}
 					<Route element={<ProtectedRoute />} />
 						<Route path='/home' element={<Home />} />
-						<Route path='/user' element={<UserPage />} />
+						<Route path='/user' element={<UserSetting />} />
 				</Routes>
 			</Router>
 

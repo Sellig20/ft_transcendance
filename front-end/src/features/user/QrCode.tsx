@@ -29,11 +29,25 @@ const TfaComp: React.FunctionComponent<{img: string}> = (img) => {
 
 	return (
 		<>
-			<img src={img.img} alt="QR Code" />
-			<form onSubmit={handleTfaTurnOn}>
-				<input onChange={handleChange} type="number" name="code" value={code} />
-				<button type="submit">validate</button>
-			</form>
+			<div className="mb-3">
+				<img src={img.img} alt="QR Code" className="img-fluid mb-3" />
+				<form onSubmit={handleTfaTurnOn} className="d-flex">
+					<div className="col-auto">
+						<input
+							onChange={handleChange}
+							type="number"
+							name="code"
+							value={code}
+							className="form-control"
+							maxLength={6}
+							placeholder="123456"
+							aria-label="TFA code"
+							aria-describedby="tfaCode"
+						/>
+					</div>
+					<button type="submit" className="btn btn-primary">Validate</button>
+				</form>
+			</div>
 		</>
 	)
 }
