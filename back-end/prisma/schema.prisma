@@ -11,12 +11,12 @@ datasource db {
 }
 
 model User {
-  id           Int          @id @unique @default(autoincrement())
-  username     String       @unique
-  email        String       @unique
+  id           Int       @id @unique @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
   channel_list Channel[]
-  friends      FriendShip[]
   Message      Message[]
+  friends      Int[]     @unique
   socket       String?
 
   createAt DateTime @default(now())
@@ -34,12 +34,6 @@ model Channel {
   personal  Boolean?  @default(true)
   user_list User[]
   messages  Message[]
-}
-
-model FriendShip {
-  id       String @id @unique @default(cuid())
-  friend   User?  @relation(fields: [friendId], references: [id])
-  friendId Int?
 }
 
 model Message {
