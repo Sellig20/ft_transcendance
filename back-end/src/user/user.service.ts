@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { VirtualTimeScheduler } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 // This should be a real class/interface representing a user entity
@@ -79,17 +80,25 @@ export class UsersService {
 		})
 		return user;
 	}
-	
+
 	async changeName(id: number, name: string) {
-		const resulst = await this.prisma.user.update({
-			where: {
-				id: id
-			},
-			data: {
-				username: name
+		let result
+		try {
+			result = await this.prisma.user.update({
+				where: {
+					id: id
+				},
+				data: {
+					username: name
+				}
+			});
+		} catch (error) {
+			if (error.code === 'P2002') {
+				console.log('There is a unique constraint violation');
 			}
-		});
-		return resulst
+			throw (error)
+		}
+		return result
 	}
 
 	async createTest() {

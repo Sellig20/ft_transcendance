@@ -38,9 +38,9 @@ export class UserController {
 	@Post('/name')
 	async changeUserName(@Req() req, @Body() body) {
 		const user = req.user;
-		const resulst = this.userservice.changeName(user.id, body.name);
-		console.log(resulst);
-		return resulst
+		const result = await this.userservice.changeName(user.id, body.name);
+		console.log(result);
+		return result
 	}
 
 	@Public()
