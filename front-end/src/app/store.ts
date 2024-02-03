@@ -1,4 +1,4 @@
-import {configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import UserReducer from "../features/user/user.store";
 import storage from "redux-persist/lib/storage";
 import { thunk } from "redux-thunk"; 

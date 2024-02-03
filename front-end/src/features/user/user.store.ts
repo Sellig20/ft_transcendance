@@ -25,10 +25,20 @@ export const UserSlice = createSlice({
 		},
 		changeCo: (state, action: PayloadAction<boolean>) => {
 			state.tfa_status = action.payload
+		},
+		logout: (state) => {
+			state.email = "";
+			state.id = null;
+			state.username = "";
+			state.tfa_status = false;
+			state.connected = false;
+			localStorage.removeItem('persist:root');
 		}
 	}
 })
 
-export const { addUser, changeTfa, changeCo } = UserSlice.actions
+
+ 
+export const { addUser, changeTfa, changeCo, logout } = UserSlice.actions
 
 export default UserSlice.reducer

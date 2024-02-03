@@ -1,9 +1,17 @@
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
+import { logout } from '../user/user.store';
 
 const Navbar = () => {
 
-
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		dispatch(logout());
+		localStorage.removeItem("token");
+		navigate('/');
+	}
 
 	const handleUser = () => {
 		navigate('/user');
@@ -22,6 +30,9 @@ const Navbar = () => {
 		<nav className="navbar navbar-expand-lg navbar-light bg-light">
 			<div className="container-fluid justify-content-center">
 				<ul className="nav nav-tabs">
+					<li className="nav-item">
+						<a className="nav-link" onClick={handleLogout} >Logout</a>
+					</li>
 					<li className="nav-item">
 						<a className="nav-link" onClick={handleHome} >Home</a>
 					</li>
