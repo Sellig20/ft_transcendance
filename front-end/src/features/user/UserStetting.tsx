@@ -28,9 +28,8 @@ const UserSetting = () => {
 	}
 
 	const hanldeUsername =  async () => {
-		const rep = await userService.changeUserName(username)
+		let rep = await userService.changeUserName(username)
 		console.log(rep);
-		
 	}
 
 	//   const handleImageUpload = (event) => {

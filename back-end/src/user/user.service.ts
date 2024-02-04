@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { VirtualTimeScheduler } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ForbiddenException } from '@nestjs/common';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
@@ -96,7 +97,8 @@ export class UsersService {
 			if (error.code === 'P2002') {
 				console.log('There is a unique constraint violation');
 			}
-			throw (error)
+			throw new ForbiddenException('Error in update', { cause: new Error(), description: 'username must be unique' });
+
 		}
 		return result
 	}
