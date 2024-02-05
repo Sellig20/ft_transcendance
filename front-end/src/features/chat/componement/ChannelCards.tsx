@@ -27,9 +27,18 @@ export const ChannelCards = ({ channelInfo } : {
 		console.log("= a null");
 		return ;
 	}
+	if (channelInfo.length === 0)
+	{
+		console.log("= a 0");
+		return(
+			<div>
+				no channel joined...
+			</div>
+		);
+	}
 	console.log("print channel card props:", channelInfo[0].channel_list);
 	const nbrChannel = channelInfo[0].channel_list.length;
-	const channel_list = channelInfo[0].channel_list
+	const channel_list = channelInfo[0].channel_list;
 	channel_list.forEach((element: any) => {
 		console.log(element)
 	});
