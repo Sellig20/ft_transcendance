@@ -61,4 +61,25 @@ export class UsersService {
 			}
 		})
 	}
+	
+	async changeName(id: number, name: string) {
+		let result
+		try {
+			result = await this.prisma.user.update({
+				where: {
+					id: id
+				},
+				data: {
+					username: name
+				}
+			});
+		} catch (error) {
+			if (error.code === 'P2002') {
+				console.log('There is a unique constraint violation');
+			}
+			throw new ForbiddenException('Error in update', { cause: new Error(), description: 'username must be unique' });
+
+		}
+		return result
+	}
 }
