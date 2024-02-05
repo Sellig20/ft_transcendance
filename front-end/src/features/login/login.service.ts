@@ -25,9 +25,12 @@ const gettest = async () => {
 }
 
 const getLoginStatus = async () => {
-	const req = await api.get('auth/login');
-	console.log(req);
-	
+	let req;
+	try {
+		req = await api.get('auth/login');
+	} catch (error) {
+		return null
+	}
 	return req.data
 }
 

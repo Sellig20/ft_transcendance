@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
 import { UsersService } from 'src/user/user.service';
 import { toDataURL } from 'qrcode'
+import encryptService from '../auth/utils/hash'
 
 @Injectable()
 export class AuthService {
@@ -47,8 +48,8 @@ export class AuthService {
 	async TfaSecretGen(user: any) {
 		const secret = authenticator.generateSecret();
 		const otpauthUrl = authenticator.keyuri('test', 'trans', secret);
-		// console.log('in tfgen secret \n : --------------------------', user);
-		await this.userservice.setTfaSecret(user.id, secret);
+		const hash = encryptService.hash(secret);
+		await this.userservice.setTfaSecret(user.id, hash);
 
 		return otpauthUrl;
 	}
@@ -59,9 +60,10 @@ export class AuthService {
 
 	async isTFAvalid(TFAcode: string, userId: number) {
 		const user = await this.userservice.findUserId(userId)
+		const decrypte = encryptService.decipher(user.TFA_secret_hash);
 		return authenticator.verify({
 			token: TFAcode,
-			secret: user.TFA_secret_hash,
+			secret: decrypte,
 		});
 	}
 	//   readToken(token: { access_token: string }) {

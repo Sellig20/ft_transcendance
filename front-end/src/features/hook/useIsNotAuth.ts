@@ -7,7 +7,7 @@ import { Rootstate } from "../../app/store";
 
 function useIsNotAuth() {
 
-	const user = useSelector((state: Rootstate) => state.logedin.connected)
+	const user = useSelector((state: Rootstate) => state.user.connected)
 	const count = useRef(0);
 	const navigate = useNavigate()
 	useEffect(() => {

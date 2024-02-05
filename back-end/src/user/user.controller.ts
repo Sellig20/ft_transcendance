@@ -1,12 +1,16 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Public } from 'src/auth/utils/custo.deco';
 import { FrontUserDto } from './UserDto';
-import { log } from 'console';
+import hashService from '../auth/utils/hash'
+import { Public } from 'src/auth/utils/custo.deco';
+import { UsersService } from './user.service';
 
 @Controller('user')
 export class UserController {
-	constructor(private prisma: PrismaService) { }
+	constructor(
+		private prisma: PrismaService,
+		private userservice: UsersService
+		) { }
 
 	@Get()
 	async getAnyUser() {
@@ -31,8 +35,24 @@ export class UserController {
 		return userfront
 	}
 
-	@Get('/test')
-	hello() {
+	@Post('/name')
+	async changeUserName(@Req() req, @Body() body) {
+		const user = req.user;
+		const result = await this.userservice.changeName(user.id, body.name);
+		console.log(result);
+		return result
+	}
+
+	@Public()
+	@Get('/cipher')
+	async hello() {
+		let normalString = 'bonjour'
+		console.log('on va cipher: ', normalString);
+		normalString = await hashService.hash(normalString);
+		console.log('string cryptee: ', normalString);
+		normalString = await hashService.decipher(normalString);
+		console.log('string decryptee: ', normalString);
+		
 		return { msg: 'yep yep' };
 	}
 }
