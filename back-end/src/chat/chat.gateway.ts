@@ -2,6 +2,7 @@ import { OnModuleInit } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { UsersService } from 'src/user/user.service';
+import { ChatService } from 'src/chat/chat.service';
 // import { AuthService } from 'src/user/user.service';
 
 @WebSocketGateway(8001, { cors: '*'})
@@ -9,11 +10,11 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     
     constructor(
 		// private authService: AuthService,
-		private userService: UsersService) { }
+		private userService: UsersService,
+        private chatService: ChatService) { }
     
     @WebSocketServer()
     server: Server;
-
 
     private userArray: string[] = [];
 
@@ -55,9 +56,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         this.printAllUser(this.userArray);
 
         // ajout du socket a la table user
-        // await this.userService.setSocket(id du user connecte, client.id)
-        // await this.userService.setSocket(1, client.id)
-        // await this.userService.createTest();
+        // await this.chatService.setSocket(id du user connecte, client.id)
+        // await this.chatService.setSocket(1, client.id)
     }
 
     async handleDisconnect(client: Socket){
@@ -66,16 +66,18 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         this.printAllUser(this.userArray);
 
         // ajout du socket a la table user
-        // await this.userService.setSocket(id du user connecte, client.id)
-        // await this.userService.setSocket(1, null)
+        // await this.chatService.setSocket(id du user connecte, client.id)
+        // await this.chatService.setSocket(1, null)
     }
 
 
     @SubscribeMessage('MP')
-    handleMessage(client: any, message: any): void {
-        if (message === "a")
+    async handleMessage(client: any, message: any) {
+        if (message.data === "a")
         {
-            this.server.to(this.userArray[0]).emit("MP", "ca marche");   
+            this.server.to(this.userArray[0]).emit("MP", "ca marche");
+            console.log("---create test database---")
+            await this.chatService.createTest();
         }
         else
         {

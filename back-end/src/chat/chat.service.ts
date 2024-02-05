@@ -1,0 +1,202 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+// This should be a real class/interface representing a user entity
+export type User = any;
+export type Channel = any;
+export type Message = any;
+
+@Injectable()
+export class ChatService {
+	constructor(private prisma: PrismaService) { }
+	
+	async findUserById(userID: number) {
+		const user = await this.prisma.user.findFirst({
+			where: {
+				id: userID,
+			},
+		});
+		if (user)
+			return user;
+		return null
+	}
+
+	async setSocket(userID: number, socketToUp: string) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				socket: socketToUp
+			}
+		})
+	}
+
+	async findSocket(userID: number) {
+		const user = await this.prisma.user.findMany({
+			where: {
+				id: userID
+			}
+		})
+		return user;
+	}
+
+	async findAllInfoInChannelById(channelId: number)
+	{
+		const messages = await this.prisma.channel.findMany({
+			where: {
+				id: channelId
+			},
+			select : {
+				name: true,
+				messages: true,
+				user_list: {select: {
+					id: true,
+					username: true,
+					friends: true,
+					socket: true,
+				}}
+			}
+
+		})
+		return messages;
+	}
+
+	async findAllChannelJoinedByIdUser(userId: number)
+	{
+		const channels = await this.prisma.user.findMany({
+			where: {
+				id: userId
+			},
+			select : {
+				channel_list: {select: {
+					id: true,
+					name: true,
+					personal: true,
+				}}
+			}
+
+		})
+		return channels;
+	}
+
+	async findAllSocketOnChannelByIdChannel(channelId: number)
+	{
+		const channels = await this.prisma.channel.findMany({
+			where: {
+				id: channelId
+			},
+			select : {
+				user_list: {select: {
+					id: true,
+					username: true,
+					socket: true,
+				}}
+			}
+
+		})
+		return channels;
+	}
+
+// ---------------------- TEST FUNCTION -------------------------
+
+	async createTest() {
+		const user1: User = await this.prisma.user.create({
+			data: {
+				username: 'robin',
+				email: 'mail1',
+			},
+		})
+
+		const user2: User = await this.prisma.user.create({
+			data: {
+				username: 'louis',
+				email: 'mail2',
+			},
+		})
+
+		const user3: User = await this.prisma.user.create({
+			data: {
+				username: 'jeanne',
+				email: 'mail3',
+			},
+		})
+
+		const channel1: User = await this.prisma.channel.create({
+			data: {
+				name: 'channel1',
+				personal: false,
+				user_list: {connect: [{id:1}, {id:2}, {id:3}]}
+				// user_list: {connect: {id:1}}
+			},
+		})
+
+		const channel2: User = await this.prisma.channel.create({
+			data: {
+				name: 'channel2',
+				personal: true,
+				user_list: {connect: [{id:1}, {id:2}]}
+			},
+		})
+
+		const message1: User = await this.prisma.message.create({
+			data: {
+				content: 'content_message1',
+				sender: {connect: {id:1}},
+				recipient: {connect: {id:2}}
+			},
+		})
+
+		const message2: User = await this.prisma.message.create({
+			data: {
+				content: 'content_message2',
+				sender: {connect: {id:2}},
+				recipient: {connect: {id:2}}
+			},
+		})
+
+		const message3: User = await this.prisma.message.create({
+			data: {
+				content: 'content_message3',
+				sender: {connect: {id:1}},
+				recipient: {connect: {id:1}}
+			},
+		})
+
+		const message4: User = await this.prisma.message.create({
+			data: {
+				content: 'content_message4',
+				sender: {connect: {id:2}},
+				recipient: {connect: {id:1}}
+			},
+		})
+
+		const message5: User = await this.prisma.message.create({
+			data: {
+				content: 'content_message5',
+				sender: {connect: {id:3}},
+				recipient: {connect: {id:1}}
+			},
+		})
+
+		const setfriendship1: User = await this.prisma.user.update({
+			where: {id: 1},
+			data: {
+				friends: {
+					push: [2]
+				}
+			}
+		})
+
+		const setfriendship2: User = await this.prisma.user.update({
+			where: {id: 2},
+			data: {
+				friends: {
+					push: [1]
+				}
+			}
+		})
+		
+
+	}
+}

@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react'
 import { useState, useEffect, useRef} from 'react'
-import { Message } from '../componement/Message';
+import { Message } from './componement/Message';
+import { ChannelCard } from './componement/ChannelCard';
 import { io, Socket } from "socket.io-client";
-import axios from 'axios'
+import api from '../api/api';
+import chatService from './chat.service'
 
 export function Chat() {
 	
@@ -12,6 +14,11 @@ export function Chat() {
 
 	const [inputbarre, setInputbarre] = useState<string>("");
 	const [inputAddFriend, setInputAddFriend] = useState<string>("");
+
+	// const [channelJoined, setChannelJoined] = useState<any>();
+	// const [IdUser, setIdUser] = useState<number>();
+
+	// setChannelJoined(chatService.getChannelJoinedByUserId(2));
 
 	const send = (
 		value: string
@@ -65,24 +72,13 @@ export function Chat() {
 			setInputbarre("");
 		}
 
-
-		// const axios = require('axios');
-		// axios.get('/user?ID=12345')
-		// 	.then(function (reponse) {
-		// 		// en cas de réussite de la requête
-
-		// 		console.log("a");
-		// 		console.log(reponse);
-		// 	})
-		// 	.catch(function () {
-		// 		// en cas d’échec de la requête
-		// 		// console.log(error);
-		// 		console.log("b");
-		// 	})
-		// 	.finally(function () {
-		// 		// dans tous les cas
-		// 		console.log("c");
-		// 	});
+	};
+	
+	const handleMessage = (
+		event : React.MouseEvent<HTMLButtonElement>
+		) => {
+		let  message_cpy = event.target.value;
+		setInputbarre(message_cpy);
 	};
 
 	const HandleAddFriendButton = (
@@ -97,22 +93,17 @@ export function Chat() {
 		}
 	};
 
-	const handleMessage = (
-		event : React.MouseEvent<HTMLButtonElement>
-	) => {
-		let  message_cpy = event.target.value;
-		setInputbarre(message_cpy);
-	};
 
-	const handleAddFriendInput = (
+	const handleAddFriendInput = async (
 		event : React.MouseEvent<HTMLButtonElement>
 	) => {
 		let  value_cpy = event.target.value;
 		setInputAddFriend(value_cpy);
-		console.log(value_cpy);
+
+		// console.log(await chatService.getUserById(2));
 	};
 	
-	let message_db: MessageProps[] = [
+	let message_db: any[] = [
 		{
 			id: 0,
 			content: 'message1',
@@ -171,7 +162,7 @@ export function Chat() {
 					<div className='card bg-secondary'>
 						Robin
 					</div>
-					<div className="h-100 d-inline-block">
+					<div id="addfriend" className="h-100 d-inline-block">
 						<input type="text" className="form-control" name="inputAddfriend" value={inputAddFriend} onChange={handleAddFriendInput}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
 					</div>

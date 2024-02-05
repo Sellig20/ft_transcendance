@@ -1,12 +1,10 @@
-import { MessageProps } from "../PropsType/Props";
 
-export function Message(
-{
-	id,
-	content,
-	sender
-}: MessageProps) 
-{
+
+export const Message = ({ id, content, sender } : {
+	id: number,
+	content: string, 
+	sender: string
+}) => {
 	// console.log("message id:", id, " message:", content);
 	if (sender == "robin")
 	{
