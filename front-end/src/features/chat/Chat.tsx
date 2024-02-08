@@ -1,10 +1,12 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { useState, useEffect, useRef} from 'react'
-import { Message } from './componement/Message';
 import { ChannelCards } from './componement/ChannelCards';
+import { PrintChannel } from './componement/PrintChannel';
 import { io, Socket } from "socket.io-client";
-import api from '../api/api';
 import chatService from './chat.service'
+
+import { useSelector } from 'react-redux';
+import { Rootstate } from '../../app/store';
 
 export function Chat() {
 	
@@ -12,38 +14,48 @@ export function Chat() {
 	const count = useRef(0)
 	const [messageSocket, setMessageSocket] = useState<string[]>([]);
 
-	const [inputbarre, setInputbarre] = useState<string>("");
-	const [inputAddFriend, setInputAddFriend] = useState<string>("");
+	const inputMessageRef = useRef(null);
+	const inputFriendRef = useRef(null);
 
-	const [channelJoined, setChannelJoined] = useState<any>();
-	// const [IdUser, setIdUser] = useState<number>();
 
-	// setChannelJoined(chatService.getChannelJoinedByUserId(2));
-
+	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
+	const [channelSelect, setchannelSelect] = useState<any>(); // channel en cours d'affichage
+	const [userinfo, setUserinfo] = useState<any>(null); // info du user connected
+	const userid = useSelector((state: Rootstate) => state.user.id);
+	
 	const callApi = async (
-	) => {
-		await chatService.findAllChannelJoinedByIdUser(1).then(channelj => setChannelJoined(channelj));
+		userid: any
+		) => {
+		await chatService.getUserById(userid).then(userinfo => setUserinfo(userinfo));
+		await chatService.findAllChannelJoinedByIdUser(userid).then(channelj => setChannelJoined(channelj));
+		// choper les infos du user connecte
+		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
 	}
-
-	const send = (
-		value: string
-	) => {
-		socket?.emit("MP", {recipient:"socketid", data:value})
-		console.log("value:", value);
-	}
-
+	
 	// ici c'est de la magie noir avec le count juste parce que le strict mode reload le componemen 2 foist
 	// depuis react 18 sur la fonction use effect
 	// donc j'utilise le count pour pas que la requete "io(_)" soit faite sur le premier load de page.
 	useEffect(() => {
 		if (count.current === 0)
 		{
-			callApi()
+			callApi(userid);
+			console.log("userinfo", userinfo)
+			console.log("channel joined", channelJoined)
 			const newSocket = io("http://localhost:8001")
 			setSocket(newSocket)
+			// fetch la socket du reducer
+			// sdfsdfsdfg
 		}
 		count.current++;
 	}, [setSocket])
+	
+	const send = (
+		value: string
+	) => {
+		socket?.emit("MP", {to: socket?.id, recipient: "socket du destinataire", data:value})
+		console.log("value:", value);
+	}
+
 
 	const messageListener = (
 		messageprop: string
@@ -60,55 +72,59 @@ export function Chat() {
 
 
 
-	const buttonHandler = (
+	const buttonHandler = async (
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
 		// let buttonname = event.currentTarget.name;
 		event.preventDefault();
-	
-		// const button: HTMLButtonElement = event.currentTarget;
-		// setClickedButton(button.name);
-		// console.log(buttonname);
-		// console.log(message);
+		if (inputMessageRef.current.value === null)
+			return ;
+
+		const input = inputMessageRef.current.value
 		console.log("socket id:", socket?.id);
-		if (inputbarre != "")
+		if (input != "")
 		{
-			send(inputbarre);
-			console.log(messageSocket);
-			setInputbarre("");
+			send(input);
+			await chatService.findAllInfoInChannelById(1).then(messageChann => setchannelSelect(messageChann));
+			// console.log(messageSocket);
+			inputMessageRef.current.value = "";
 		}
 
-	};
-	
-	const handleMessage = (
-		event : React.MouseEvent<HTMLButtonElement>
-		) => {
-		let  message_cpy = event.target.value;
-		setInputbarre(message_cpy);
+
+		// setUpdated(inputMessageRef.current.value);
+		// // const button: HTMLButtonElement = event.currentTarget;
+		// // setClickedButton(button.name);
+		// // console.log(buttonname);
+		// // console.log(message);
+
 	};
 
+	const handleChannel = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		event.preventDefault();
+		const id_chann = event.currentTarget.id
+		console.log("clicked on a channel, id_channel =", id_chann);
+		// setchannelSelectInfo() faire requete
+		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => setchannelSelect(messageChann));
+
+	};
+	
 	const HandleAddFriendButton = (
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
 		event.preventDefault();
-		if (inputAddFriend != "")
+		if (inputFriendRef.current.value === null)
+			return ;
+
+		const input = inputFriendRef.current.value
+		if (input != "")
 		{
-			console.log(inputAddFriend);
-			// action
-			setInputAddFriend("");
+			console.log("click on friend button, value=", input);
+			inputFriendRef.current.value = "";
 		}
 	};
 
-
-	const handleAddFriendInput = async (
-		event : React.MouseEvent<HTMLButtonElement>
-	) => {
-		let  value_cpy = event.target.value;
-		setInputAddFriend(value_cpy);
-
-		// console.log(await chatService.getUserById(2));
-	};
-	
 	let message_db: any[] = [
 		{
 			id: 0,
@@ -154,7 +170,6 @@ export function Chat() {
 		}
 	];
 
-	
 	return (
 		<div>
 			<div>
@@ -163,28 +178,23 @@ export function Chat() {
 
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				<div id='panel' className='bg-info w-25'>
-					{/* <div className='card bg-secondary'>
-						Louis
-					</div>
-					<div className='card bg-secondary'>
-						Robin
-					</div> */}
-					<ChannelCards channelInfo={channelJoined}/>
+					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
 					<div id="addfriend" className="h-100 d-inline-block">
-						<input type="text" className="form-control" name="inputAddfriend" value={inputAddFriend} onChange={handleAddFriendInput}/>
+						<input type="text" className="form-control" name="inputAddfriend" id="inputAddfriend" ref={inputFriendRef}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
 					</div>
 				</div>
 				<div id='chat' className='bg-danger w-75'>
-					{message_db.map( message => {
+					<PrintChannel channelinfo={channelSelect}/>
+					{/* {message_db.map( message => {
 						return(
 								<div key={message.id}>
 									<Message id={message.id} content={message.content} sender={message.sender} recipient={message.recipient}/>
 								</div>
 						)
-					})}
+					})} */}
 					<div className="d-flex justify-content-end">
-						<input type="text" className="form-control" name="inputSend" value={inputbarre} onChange={handleMessage}/>
+						<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
 						
 					</div>
