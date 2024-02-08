@@ -20,7 +20,7 @@ export class JWTstrategy extends PassportStrategy(Strategy, 'jwt') {
 	if (user.TFA_activated)
 		payload.TFA_activated = true;
 	
-    console.log('In JWT strat \n', payload);
+    // console.log('In JWT strat \n', payload);
 	return {...payload, id: payload.sub};
   }
 }
