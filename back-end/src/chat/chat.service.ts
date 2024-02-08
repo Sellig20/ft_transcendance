@@ -48,6 +48,7 @@ export class ChatService {
 			select : {
 				name: true,
 				messages: true,
+				personal: true,
 				user_list: {select: {
 					id: true,
 					username: true,

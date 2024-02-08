@@ -4,12 +4,12 @@ import chatService from '../chat.service'
 
 
 const Message = ({ id, content, sender } : {
-	id: number,
+	id: string,
 	content: string, 
 	sender: string
 }) => {
 	// console.log("message id:", id, " message:", content);
-	if (sender == "robin")
+	if (sender == "1")
 	{
 		return (
 			<>
@@ -61,48 +61,52 @@ const Message = ({ id, content, sender } : {
 	}
 }
 
-// const get_channinfo = async (
-// 	id: number
-// ) => {
-// 	let r;
-// 	await chatService.findAllChannelJoinedByIdUser(2).then(channelj => r=channelj);
-// 	return (r);
-// };
-
 export const PrintChannel = ({ channelinfo } : {
 	channelinfo: any
 }) => {
 	if (channelinfo === null || channelinfo === undefined)
 	{
-		console.log("no channel selected");
 		return(
 			<div>
 				no channel selected...
 			</div>
 		);
 	}
-	console.log("channel_info = ", channelinfo);
-	// if (channinfo.messages.length === 0)
-	// {
-	// 	return(
-	// 		<div>
-	// 			send message to start conversation !
-	// 		</div>
-	// 	);
-	// }
+	console.log("channel_messages OK = ", channelinfo);
+	const channel = channelinfo[0]
+	console.log(channel.messages);
+	if (channel.messages.length === 0)
+	{
+		return(
+			<div>
+				send message to start conversation !
+			</div>
+		);
+	}
 	return (
 		<div>
-			info_channel recu
-			{/* {
-				channel_list.map((element: any) => {
+			{channel.name}
+			:
+			{
+				channel.user_list.map((element: any) => {
 					// console.log("caca");
 					return (
 						<div key={element.id}>
-							<Card name={element.name} isPerso={element.personal} id={element.id}/>
+							{element.username}
 						</div>
 					)
 				})
-			} */}
+			}
+			{
+				channel.messages.map((element: any) => {
+					// console.log("caca");
+					return (
+						<div key={element.id}>
+							<Message id={element.id} content={element.content} sender={element.userId}/>
+						</div>
+					)
+				})
+			}
 		</div>
 	);
 }

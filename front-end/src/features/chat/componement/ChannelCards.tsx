@@ -5,15 +5,17 @@ const Card = ({ name, isPerso, id} : {
 	isPerso: boolean
 	id: number
 }) => {
-	// console.log(name, isPerso);
+	let perso = "public"
 	let color: string = "card bg-secondary";
 	if (isPerso === true)
-		color = "card bg-secondary-subtle"
-	// `
+	{
+		color = "card bg-success-subtle"
+		perso = "perso"
+	}
 	return (
 		<div key={id}>
 			<div className={color}>
-				{name}
+				{name} {perso}
 			</div>
 		</div>
 	);
@@ -41,7 +43,7 @@ export const ChannelCards = ({ channelInfo, clickHandler } : {
 			</div>
 		);
 	}
-	// console.log("print channel card props:", channelInfo[0].channel_list);
+	console.log("channel_id_info OK", channelInfo);
 	const nbrChannel = channelInfo[0].channel_list.length;
 	const channel_list = channelInfo[0].channel_list;
 	// channel_list.forEach((element: any) => {

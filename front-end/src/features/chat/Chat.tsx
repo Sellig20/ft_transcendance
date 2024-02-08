@@ -124,51 +124,6 @@ export function Chat() {
 		}
 	};
 
-	let message_db: any[] = [
-		{
-			id: 0,
-			content: 'message1',
-			sender: 'robin',
-			recipient : 'louis'
-		},
-		{
-			id: 1,
-			content: 'message2',
-			sender: 'louis',
-			recipient : 'robin'
-		},
-		{
-			id: 2,
-			content: 'message3',
-			sender: 'robin',
-			recipient : 'louis'
-		},
-		{
-			id: 3,
-			content: 'message3',
-			sender: 'robin',
-			recipient : 'louis'
-		},
-		{
-			id: 4,
-			content: 'message3',
-			sender: 'robin',
-			recipient : 'louis'
-		},
-		{
-			id: 5,
-			content: 'message3',
-			sender: 'robin',
-			recipient : 'louis'
-		},
-		{
-			id: 6,
-			content: 'message3',
-			sender: 'louis',
-			recipient : 'louis'
-		}
-	];
-
 	return (
 		<div>
 			<div>
