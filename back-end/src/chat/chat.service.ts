@@ -11,14 +11,12 @@ export class ChatService {
 	constructor(private prisma: PrismaService) { }
 	
 	async findUserById(userID: number) {
-		const user = await this.prisma.user.findFirst({
+		const user = await this.prisma.user.findMany({
 			where: {
 				id: userID,
 			},
-		});
-		if (user)
-			return user;
-		return null
+		})
+		return user;
 	}
 
 	async setSocket(userID: number, socketToUp: string) {
