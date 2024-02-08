@@ -9,6 +9,7 @@ import NotFound from './features/NotFound/NotFound';
 // import { Chat } from './features/Chat'
 import { useSelector } from 'react-redux';
 import { Rootstate } from './app/store';
+import { ToastContainer } from 'react-toastify';
 
 import { Chat } from './features/chat/Chat'
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
 		<div>
 			<Router>
 				{isAuth && <Navbar/>}
+				<ToastContainer/>
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />

@@ -16,7 +16,6 @@ const changeUserName = async (name: string) => {
 	try {
 		response = await api.post('/user/name', {name: name})
 	} catch (error){
-		console.log(error);
 		return error;
 	}
 	return response.data

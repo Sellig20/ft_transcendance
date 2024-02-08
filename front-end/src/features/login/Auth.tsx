@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import userService from './login.service'
 import { addUser } from "../user/user.store";
 import loginService from "./login.service";
+import { toast } from "react-toastify";
 
 const Auth = () => {
 	const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Auth = () => {
 				if (tmp)
 					localStorage.setItem("token", tmp);
 				userService.getUser().then(user => dispatch(addUser(user)));
+				toast.success("you are logged in", {autoClose: false});
 				navigate('/home');
 			}
 			else {
