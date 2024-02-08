@@ -85,7 +85,6 @@ export function Chat() {
 		if (input != "")
 		{
 			send(input);
-			await chatService.findAllInfoInChannelById(1).then(messageChann => setchannelSelect(messageChann));
 			// console.log(messageSocket);
 			inputMessageRef.current.value = "";
 		}
