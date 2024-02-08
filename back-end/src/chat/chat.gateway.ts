@@ -83,7 +83,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         {
             console.log("from:", message.to, "-->", message.data);
             this.server.emit("MP", message.data);   
-            this.server.to(message.recipient).emit("MP", message.data);   
+            this.server.to(message.recipient).emit("MP", message.data);
         }
     }
 }
