@@ -11,10 +11,33 @@ export class ChatService {
 	constructor(private prisma: PrismaService) { }
 	
 	async findUserById(userID: number) {
-		const user = await this.prisma.user.findMany({
+		const user = await this.prisma.user.findFirst({
 			where: {
 				id: userID,
 			},
+			select: {
+				channel_list: {select: {
+					id: true,
+					name: true,
+					personal: true
+				}},
+				friends: true,
+				createAt: true,
+				username: true,
+				id: true,
+			}
+		})
+		return user;
+	}
+
+	async findSocketUserById(userID: number) {
+		const user = await this.prisma.user.findFirst({
+			where: {
+				id: userID,
+			},
+			select: {
+				socket: true
+			}
 		})
 		return user;
 	}
@@ -25,27 +48,32 @@ export class ChatService {
 				id: userID
 			},
 			data: {
+				socket: {
+					push: socketToUp
+				}
+			}
+		})
+	}
+
+	async setSocketUserById(userID: any, socketToUp: any) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
 				socket: socketToUp
 			}
 		})
 	}
 
-	async findSocket(userID: number) {
-		const user = await this.prisma.user.findMany({
-			where: {
-				id: userID
-			}
-		})
-		return user;
-	}
-
 	async findAllInfoInChannelById(channelId: number)
 	{
-		const messages = await this.prisma.channel.findMany({
+		const messages = await this.prisma.channel.findFirst({
 			where: {
 				id: channelId
 			},
 			select : {
+				id: true,
 				name: true,
 				messages: true,
 				personal: true,

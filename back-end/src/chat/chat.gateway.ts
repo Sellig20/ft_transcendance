@@ -16,7 +16,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     @WebSocketServer()
     server: Server;
 
-    private userArray: string[] = [];
+    private userArray: any[] = [];
 
     onModuleInit() {
         this.server.on('-- ON MODULE INIT -- connection', (socket) => {
@@ -25,35 +25,61 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         })
     }
 
-    private printAllUser(liste: string[]): void {
+    private printAllUser(liste: any[]): void {
         if (this.userArray.length === 0)
             console.log(`[PRINT USERS]: NO SOCKETS CONNECTED`)
         else
         {
             this.userArray.forEach((item, index) => {
-                console.log(`[PRINT USERS]: ${item} | USER INDEX : ${index}`);
+                console.log(`[PRINT USERS]: ${item.iduser} ${item.idsocket} | USER INDEX : ${index}`);
             })
         }
     }
 
-    private addUser(item: string): void {
-        this.userArray.push(item);
-        const index = this.userArray.indexOf(item);
+    private addUser(idUser: string, idSocket:string): void {
+        this.userArray.push({idsocket: idSocket, iduser: idUser});
+        // const index = this.userArray.indexOf(item);
     }
 
-    private removeUser(item: string): void {
+    private async removeUser(idsocket: string): Promise<void> {
         if (this.userArray.length !== 0)
         {
-            const index = this.userArray.indexOf(item);
-            console.log(`[REMOVE USER LIST] SOCKET ID: ${item}`);
-            this.userArray.splice(index, 1);
+            let indexx = -1;
+            this.userArray.map((item, index) => {
+                console.log("[DEBUGGG]", item.idsocket)
+                if(idsocket === item.idsocket)
+                    indexx = index
+            })
+            if(indexx !== -1)
+            {
+                console.log(`[REMOVE USER LIST] SOCKET ID: ${idsocket}`);
+                await this.chatService.findSocketUserById(Number(this.userArray[indexx].iduser)).then(res => {
+                    let list_socket = res.socket
+                    list_socket.map((item, index) => {
+                        // console.log(item, index)
+                        if (item === idsocket)
+                        list_socket.splice(index, 1)
+                    })
+                    // console.log(list_socket)
+                    this.chatService.setSocketUserById(Number(this.userArray[indexx].iduser), list_socket)
+                    this.userArray.splice(indexx, 1);
+                })
+            }
         }
     }
+
+    // async findSocketChannels(channel_id: number) {
+    //     // cherche tout les socket du channel
+    //     // await this.chatService.getAllSocketInChannel(channelId).then(res =>
+            
+
+    //     //     )
+    // }
     
     async handleConnection(client: Socket, ...args: any[]) {
         console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
-        this.addUser(client.id);
-        this.printAllUser(this.userArray);
+        // this.addUser(client.id);
+        // this.printAllUser(this.userArray);
 
         // ajout du socket a la table user
         // await this.chatService.setSocket(id du user connecte, client.id)
@@ -64,9 +90,6 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
         this.removeUser(client.id);
         this.printAllUser(this.userArray);
-
-        // ajout du socket a la table user
-        // await this.chatService.setSocket(id du user connecte, client.id)
         // await this.chatService.setSocket(1, null)
     }
 
@@ -81,9 +104,25 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         }
         else
         {
-            console.log("from:", message.to, "-->", message.data);
-            this.server.emit("MP", message.data);   
+            console.log(client.name)
+            console.log("from_socket:", message.from_socket, "-->", message.data, ", to:", message.to);
+            // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
             this.server.to(message.recipient).emit("MP", message.data);
+
+            // faire un tableau de toutes les socket du channel sans celle du sender
+            // await this.chatService.findSocketUserById(message.from_user).then(socketuser => {
+
+            // })
+            // this.server.to(all_the_socket_in_channel).emit("MP", {data:message.data, channel:message.to})
         }
+    }
+
+    @SubscribeMessage('FIRST')
+    async handleMessageconnection(client: any, message: any) {
+        console.log("FIRST", message.userid, client.id)
+        await this.chatService.setSocket(Number(message.userid), client.id)
+        client.name = message.userid
+        this.addUser(message.userid, client.id);
+        this.printAllUser(this.userArray);
     }
 }

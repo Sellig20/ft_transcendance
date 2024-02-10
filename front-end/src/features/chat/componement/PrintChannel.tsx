@@ -1,12 +1,13 @@
-// import React, { Fragment } from 'react'
+import React from 'react'
+import { useState, useEffect, useRef} from 'react'
 
 import chatService from '../chat.service'
 
 
-const Message = ({ id, content, sender } : {
+const Message = ({ id, content, sender} : {
 	id: string,
 	content: string, 
-	sender: string
+	sender: string,
 }) => {
 	// console.log("message id:", id, " message:", content);
 	if (sender == "1")
@@ -18,12 +19,11 @@ const Message = ({ id, content, sender } : {
 					<div className="ms-5">
 						<div className="d-flex flex-row-reverse">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
+							id message: {id}
+								<br />
 								de : {sender}
 								<br />
 								'{content}'
-								<br />
-								'id : {id}'
-								(droite)
 							</div>
 						</div>
 					</div>
@@ -43,12 +43,11 @@ const Message = ({ id, content, sender } : {
 				{/* <div class="bg-danger"> */}
 						<div className="d-flex flex-row mb-3">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
+								id message: {id}
+								<br />
 								de : {sender}
 								<br />
 								'{content}'
-								<br />
-								'id : {id}'
-								(gauche)
 							</div>
 						</div>
 				{/* </div> */}
@@ -64,7 +63,13 @@ const Message = ({ id, content, sender } : {
 export const PrintChannel = ({ channelinfo } : {
 	channelinfo: any
 }) => {
-	if (channelinfo === null || channelinfo === undefined)
+	// const callApi = async (
+	// 	userid: any
+	// 	) => {
+	// 	await chatService.getUserById(userid).then(userinfo => setUsername(userinfo.username));
+	// }
+
+	if (channelinfo === undefined || channelinfo === null)
 	{
 		return(
 			<div>
@@ -72,9 +77,9 @@ export const PrintChannel = ({ channelinfo } : {
 			</div>
 		);
 	}
-	console.log("channel_messages OK = ", channelinfo);
-	const channel = channelinfo[0]
-	console.log(channel.messages);
+	console.log("[DEBUG] channel_messages loaded !", channelinfo);
+	const channel = channelinfo
+	// console.log(channel.messages);
 	if (channel.messages.length === 0)
 	{
 		return(
@@ -89,7 +94,6 @@ export const PrintChannel = ({ channelinfo } : {
 			:
 			{
 				channel.user_list.map((element: any) => {
-					// console.log("caca");
 					return (
 						<div key={element.id}>
 							{element.username}
@@ -99,7 +103,6 @@ export const PrintChannel = ({ channelinfo } : {
 			}
 			{
 				channel.messages.map((element: any) => {
-					// console.log("caca");
 					return (
 						<div key={element.id}>
 							<Message id={element.id} content={element.content} sender={element.userId}/>

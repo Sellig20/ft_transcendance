@@ -10,7 +10,7 @@ import { Rootstate } from '../../app/store';
 
 export function Chat() {
 	
-	const [socket, setSocket] = useState<Socket>()
+	const [socket, setSocket] = useState<Socket | null>(null)
 	const count = useRef(0)
 	const [messageSocket, setMessageSocket] = useState<string[]>([]);
 
@@ -24,43 +24,54 @@ export function Chat() {
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
 	const callApi = async (
-		userid: any
+		userid: any,
+		newSocket: Socket
 		) => {
-		await chatService.getUserById(userid).then(userinfo => setUserinfo(userinfo));
-		await chatService.findAllChannelJoinedByIdUser(userid).then(channelj => setChannelJoined(channelj));
+		await chatService.getUserById(userid).then(userinfo => {
+			setUserinfo(userinfo)
+			console.log("[FROM DB] userinfo:", userinfo)
+			setChannelJoined(userinfo.channel_list)
+			newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+		});
 		// choper les infos du user connecte
 		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
 	}
 	
+	const first = (
+		newSocket: Socket
+	) => {
+		callApi(userid, newSocket);
+		setSocket(newSocket)
+	}
+
 	// ici c'est de la magie noir avec le count juste parce que le strict mode reload le componemen 2 foist
 	// depuis react 18 sur la fonction use effect
 	// donc j'utilise le count pour pas que la requete "io(_)" soit faite sur le premier load de page.
 	useEffect(() => {
 		if (count.current === 0)
 		{
-			callApi(userid);
-			console.log("userinfo", userinfo)
-			console.log("channel joined", channelJoined)
 			const newSocket = io("http://localhost:8001")
-			setSocket(newSocket)
-			// fetch la socket du reducer
-			// sdfsdfsdfg
+			// setSocket(newSocket)
+			// if (socket !== null)
+			first(newSocket)
 		}
 		count.current++;
-	}, [setSocket])
+	}, [first])
 	
 	const send = (
 		value: string
 	) => {
-		socket?.emit("MP", {to: socket?.id, recipient: "socket du destinataire", data:value})
+		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value, to:channelSelect.id})
+		// socket?.emit("MP", {from: socket?.id, to: channelSelect[0].id, data:value})
 		console.log("value:", value);
 	}
 
 
 	const messageListener = (
-		messageprop: string
+		messageprop: any
 	) => {
-		setMessageSocket([...messageSocket, messageprop])
+		console.log(messageprop.channel_recipient, messageprop.from_user, messageprop.data)
+		setMessageSocket([...messageSocket, messageprop.content])
 	};
 
 	useEffect(() => {
@@ -102,6 +113,8 @@ export function Chat() {
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
 		event.preventDefault();
+		// if (channelSelect === null || channelSelect === undefined)
+		// 	first()
 		const id_chann = event.currentTarget.id
 		console.log("clicked on a channel, id_channel =", id_chann);
 		// setchannelSelectInfo() faire requete
@@ -140,13 +153,6 @@ export function Chat() {
 				</div>
 				<div id='chat' className='bg-danger w-75'>
 					<PrintChannel channelinfo={channelSelect}/>
-					{/* {message_db.map( message => {
-						return(
-								<div key={message.id}>
-									<Message id={message.id} content={message.content} sender={message.sender} recipient={message.recipient}/>
-								</div>
-						)
-					})} */}
 					<div className="d-flex justify-content-end">
 						<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
