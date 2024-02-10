@@ -1,6 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../user/user.store';
+import { Socket, io } from "socket.io-client";
+import { Rootstate } from '../../app/store';
+import { useSelector } from 'react-redux';
 
 const Navbar = () => {
 
@@ -8,6 +11,9 @@ const Navbar = () => {
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
+		// disconnect la socket ici mais j'ai la flemme la
+		// const so = useSelector((state: Rootstate) => state.user.socket);
+		// console.log(so)
 		dispatch(logout());
 		localStorage.removeItem("token");
 		navigate('/');

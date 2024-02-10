@@ -12,12 +12,12 @@ datasource db {
 
 model User {
   id           Int       @id @unique @default(autoincrement())
+  socket       String[]
   username     String    @unique
   email        String    @unique
   channel_list Channel[]
   Message      Message[]
   friends      Int[]     @unique
-  socket       String?
 
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt

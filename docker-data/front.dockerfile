@@ -21,4 +21,4 @@ COPY . .
 
 EXPOSE 80
 
-ENTRYPOINT ["/bin/sh", "-c", "npm run dev -- --port 80 --host"]
+ENTRYPOINT ["/bin/sh", "-c", "npm i && npm run dev -- --port 80 --host"]
