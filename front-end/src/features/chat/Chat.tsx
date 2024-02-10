@@ -61,8 +61,10 @@ export function Chat() {
 	const send = (
 		value: string
 	) => {
+		// to generate database
+		if (value === "a")
+			socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value,})
 		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value, to:channelSelect.id})
-		// socket?.emit("MP", {from: socket?.id, to: channelSelect[0].id, data:value})
 		console.log("value:", value);
 	}
 
