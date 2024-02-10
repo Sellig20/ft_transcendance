@@ -46,24 +46,25 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         {
             let indexx = -1;
             this.userArray.map((item, index) => {
-                console.log("[DEBUGGG]", item.idsocket)
+                // console.log("[DEBUGGG] LISTE DES SOCKET DANS USER_ARRAY", item.idsocket)
                 if(idsocket === item.idsocket)
                     indexx = index
             })
+            // console.log("[DEBUGGG] INDEX A VIRER", indexx)
             if(indexx !== -1)
             {
-                console.log(`[REMOVE USER LIST] SOCKET ID: ${idsocket}`);
-                await this.chatService.findSocketUserById(Number(this.userArray[indexx].iduser)).then(res => {
-                    let list_socket = res.socket
-                    list_socket.map((item, index) => {
-                        // console.log(item, index)
-                        if (item === idsocket)
-                        list_socket.splice(index, 1)
-                    })
-                    // console.log(list_socket)
-                    this.chatService.setSocketUserById(Number(this.userArray[indexx].iduser), list_socket)
-                    this.userArray.splice(indexx, 1);
-                })
+                // console.log(`[REMOVE USER LIST] SOCKET ID: ${idsocket} ${this.userArray[indexx].iduser}`);
+                // await this.chatService.findSocketUserById(Number(this.userArray[indexx].iduser)).then(res => {
+                //     let list_socket = res.socket
+                //     list_socket.map((item, index) => {
+                //         // console.log(item, index)
+                //         if (item === idsocket)
+                //         list_socket.splice(index, 1)
+                //     })
+                //     // console.log(list_socket)
+                //     this.chatService.setSocketUserById(Number(this.userArray[indexx].iduser), list_socket)
+                this.userArray.splice(indexx, 1);
+                // })
             }
         }
     }
