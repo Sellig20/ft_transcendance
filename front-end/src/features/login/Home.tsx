@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux';
-import useIsAuth from '../hook/useIsAuth'
 import { useNavigate } from 'react-router-dom'
 import { Rootstate } from '../../app/store';
 
@@ -11,7 +10,6 @@ const Home = () => {
 	console.log(user);
 	
 	const navigate = useNavigate();
-	useIsAuth()
 
 	const handleUser = () => {
 		navigate('/user');

@@ -28,7 +28,7 @@ const UserSetting = () => {
 	}
 
 	const hanldeUsername =  async () => {
-		let rep = await userService.changeUserName(username)
+		const rep = await userService.changeUserName(username)
 		console.log(rep);
 	}
 
