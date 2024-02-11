@@ -60,15 +60,11 @@ const Message = ({ id, content, sender} : {
 	}
 }
 
-export const PrintChannel = ({ channelinfo } : {
-	channelinfo: any
+export const PrintChannel = ({ channelinfo, newMessages} : {
+	channelinfo: any,
+	newMessages: any,
 }) => {
-	// const callApi = async (
-	// 	userid: any
-	// 	) => {
-	// 	await chatService.getUserById(userid).then(userinfo => setUsername(userinfo.username));
-	// }
-
+	console.log("print chann")
 	if (channelinfo === undefined || channelinfo === null)
 	{
 		return(
@@ -88,6 +84,10 @@ export const PrintChannel = ({ channelinfo } : {
 			</div>
 		);
 	}
+	if (newMessages.length !== 0)
+		channel.messages.push(newMessages)
+	console.log("channel", channel.messages)
+	console.log("tttttt", newMessages)
 	return (
 		<div>
 			{channel.name}
@@ -102,9 +102,9 @@ export const PrintChannel = ({ channelinfo } : {
 				})
 			}
 			{
-				channel.messages.map((element: any) => {
+				channel.messages.map((element: any, index:any) => {
 					return (
-						<div key={element.id}>
+						<div key={index}>
 							<Message id={element.id} content={element.content} sender={element.userId}/>
 						</div>
 					)
