@@ -77,11 +77,17 @@ export class ChatService {
 				name: true,
 				messages: true,
 				personal: true,
+				public: true,
+				admins: true,
+				banned: true,
+				owner: true,
 				user_list: {select: {
 					id: true,
 					username: true,
 					friends: true,
 					socket: true,
+					blocked_user: true,
+
 				}}
 			}
 
@@ -100,6 +106,9 @@ export class ChatService {
 					id: true,
 					name: true,
 					personal: true,
+					public: true,
+					banned: true,
+					password: true
 				}}
 			}
 
