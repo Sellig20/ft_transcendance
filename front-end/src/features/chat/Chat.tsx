@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffect, useRef} from 'react'
 import { ChannelCards } from './componement/ChannelCards';
 import { PrintChannel } from './componement/PrintChannel';
+import { CreateChannel } from './componement/CreateChannel';
 import { io, Socket } from "socket.io-client";
 import chatService from './chat.service'
 
@@ -151,10 +152,14 @@ export function Chat() {
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				<div id='panel' className='bg-info w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<div id="addfriend" className="h-100 d-inline-block">
+					<CreateChannel clickHandler={HandleAddFriendButton}/>
+					{/* <div id="create_channel" className="h-100 d-inline-block">
+						<input type="checkbox"/> private channel
+						<br />
+						<input type="checkbox"/> protected
 						<input type="text" className="form-control" name="inputAddfriend" id="inputAddfriend" ref={inputFriendRef}/>
-						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
-					</div>
+						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>create channel</button>
+					</div> */}
 				</div>
 				<div id='chat' className='bg-danger w-75'>
 					<div key={1}>
