@@ -12,7 +12,7 @@ export function Chat() {
 	
 	const [socket, setSocket] = useState<Socket | null>(null)
 	const count = useRef(0)
-	const [messageSocket, setMessageSocket] = useState<string[]>([]);
+	const [messageSocket, setMessageSocket] = useState<any>([]);
 
 	const inputMessageRef = useRef(null);
 	const inputFriendRef = useRef(null);
@@ -51,8 +51,6 @@ export function Chat() {
 		if (count.current === 0)
 		{
 			const newSocket = io("http://localhost:8001")
-			// setSocket(newSocket)
-			// if (socket !== null)
 			first(newSocket)
 		}
 		count.current++;
@@ -72,14 +70,20 @@ export function Chat() {
 	const messageListener = (
 		messageprop: any
 	) => {
-		console.log(messageprop.channel_recipient, messageprop.from_user, messageprop.data)
-		setMessageSocket([...messageSocket, messageprop.content])
+		if (channelSelect === undefined)
+			return ;
+		if (channelSelect.id === messageprop.from_channel)
+		{
+			// console.log("msg recu:", messageprop)
+			setMessageSocket(messageprop)
+			setMessageSocket({content: messageprop.data, userId: messageprop.from_user})
+		}
 	};
 
 	useEffect(() => {
 		socket?.on("MP", messageListener)
 		return () => {
-		socket?.off("MP", messageListener)
+			socket?.off("MP", messageListener)
 		}
 	}, [messageListener])
 
@@ -115,8 +119,7 @@ export function Chat() {
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
 		event.preventDefault();
-		// if (channelSelect === null || channelSelect === undefined)
-		// 	first()
+		setMessageSocket([])
 		const id_chann = event.currentTarget.id
 		console.log("clicked on a channel, id_channel =", id_chann);
 		// setchannelSelectInfo() faire requete
@@ -154,20 +157,22 @@ export function Chat() {
 					</div>
 				</div>
 				<div id='chat' className='bg-danger w-75'>
-					<PrintChannel channelinfo={channelSelect}/>
+					<div key={1}>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket}/>
+					</div>
 					<div className="d-flex justify-content-end">
 						<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
 						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
 						
 					</div>
 					<div>
-					{
+					{/* {
 						messageSocket.map((messageSocket, index) => (
 							<div key={index}>
 								{messageSocket}
 							</div>
 						))
-					}
+					} */}
 					</div>
 				</div>
 			</div>

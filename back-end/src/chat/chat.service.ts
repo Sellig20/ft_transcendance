@@ -109,7 +109,7 @@ export class ChatService {
 
 	async findAllSocketOnChannelByIdChannel(channelId: number)
 	{
-		const channels = await this.prisma.channel.findMany({
+		const channels = await this.prisma.channel.findFirst({
 			where: {
 				id: channelId
 			},
@@ -124,6 +124,26 @@ export class ChatService {
 		})
 		return channels;
 	}
+
+	async createMessage(content: string, idUser: number, idChannel: number)
+	{
+		await this.prisma.message.create({
+			data: {
+				content: content,
+				sender: {connect: {id:idUser}},
+				recipient: {connect: {id:idChannel}}
+			},
+
+		})
+	}
+
+	// const message1: User = await this.prisma.message.create({
+	// 	data: {
+	// 		content: 'content_message1',
+	// 		sender: {connect: {id:1}},
+	// 		recipient: {connect: {id:2}}
+	// 	},
+	// })
 
 // ---------------------- TEST FUNCTION -------------------------
 
