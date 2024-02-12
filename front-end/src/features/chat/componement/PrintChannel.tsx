@@ -60,11 +60,18 @@ const Message = ({ id, content, sender} : {
 	}
 }
 
-export const PrintChannel = ({ channelinfo, newMessages} : {
+export const PrintChannel = ({ channelinfo, newMessages, reload} : {
 	channelinfo: any,
 	newMessages: any,
+	reload: () => void,
+
 }) => {
 	console.log("print chann")
+	if (channelinfo === "")
+	{
+		reload()
+		return ;
+	}
 	if (channelinfo === undefined || channelinfo === null)
 	{
 		return(
@@ -75,7 +82,10 @@ export const PrintChannel = ({ channelinfo, newMessages} : {
 	}
 	console.log("[DEBUG] channel_messages loaded !", channelinfo);
 	const channel = channelinfo
-	// console.log(channel.messages);
+	if (newMessages.length !== 0)
+		channel.messages.push(newMessages)
+	console.log("channel", channel.messages)
+	console.log("tttttt", newMessages)
 	if (channel.messages.length === 0)
 	{
 		return(
@@ -84,10 +94,6 @@ export const PrintChannel = ({ channelinfo, newMessages} : {
 			</div>
 		);
 	}
-	if (newMessages.length !== 0)
-		channel.messages.push(newMessages)
-	console.log("channel", channel.messages)
-	console.log("tttttt", newMessages)
 	return (
 		<div>
 			{channel.name}

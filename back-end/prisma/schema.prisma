@@ -18,6 +18,7 @@ model User {
   channel_list Channel[]
   Message      Message[]
   friends      Int[]     @unique
+  blocked_user Int[]     @unique
 
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
@@ -32,8 +33,13 @@ model Channel {
   id        Int       @id @unique @default(autoincrement())
   name      String?
   personal  Boolean?  @default(true)
+  public    Boolean?  @default(false)
   user_list User[]
   messages  Message[]
+  admins    Int[]
+  banned    Int[]
+  owner     Int?
+  password  String?
 }
 
 model Message {

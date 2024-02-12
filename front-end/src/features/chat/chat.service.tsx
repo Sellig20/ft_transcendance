@@ -21,9 +21,27 @@ const findAllInfoInChannelById = async (idchannel: number) => {
 	return request.data
 }
 
+const createChannel = async (
+	name: string, 
+	isPersonal: boolean,
+	isPublic: boolean,
+	idUser: number,
+	password: string
+) => {
+	let response
+	try {
+		response = await api.post('/chat/createChannel', {name: name, isPersonal: isPersonal, isPublic: isPublic, idUser: idUser, password: password})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response.data
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
-	findAllInfoInChannelById: findAllInfoInChannelById
+	findAllInfoInChannelById: findAllInfoInChannelById,
+	createChannel: createChannel
 
 }

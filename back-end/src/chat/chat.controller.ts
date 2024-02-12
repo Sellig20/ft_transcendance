@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Res, Param } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 
@@ -65,5 +65,20 @@ export class ChatController {
 	async findAllSocketOnChannelByIdChannel(@Param() param) {
 		
 		return await this.ChatService.findAllSocketOnChannelByIdChannel(Number(param.id));
+	}
+
+	@Post('/createChannel')
+	async createChannel(@Body() body) {
+		// const user = req.user;
+		// (
+		// 	name: string, 
+		// 	isPersonal: boolean,
+		// 	isPublic: boolean,
+		// 	idUser: number,
+		// 	password: string
+		// )
+		const result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, body.password);
+		// console.log(result);
+		return result
 	}
 }

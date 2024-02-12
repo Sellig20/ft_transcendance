@@ -77,11 +77,17 @@ export class ChatService {
 				name: true,
 				messages: true,
 				personal: true,
+				public: true,
+				admins: true,
+				banned: true,
+				owner: true,
 				user_list: {select: {
 					id: true,
 					username: true,
 					friends: true,
 					socket: true,
+					blocked_user: true,
+
 				}}
 			}
 
@@ -100,6 +106,9 @@ export class ChatService {
 					id: true,
 					name: true,
 					personal: true,
+					public: true,
+					banned: true,
+					password: true
 				}}
 			}
 
@@ -135,6 +144,28 @@ export class ChatService {
 			},
 
 		})
+	}
+
+	async createChannel(
+		name: string, 
+		isPersonal: boolean,
+		isPublic: boolean,
+		idUser: number,
+		password: string
+	)
+	{
+		const res = await this.prisma.channel.create({
+			data: {
+				name: name,
+				password: password,
+				personal: isPersonal,
+				public: isPublic,
+				user_list: {connect: [{id:idUser}]},
+				owner: idUser,
+			},
+
+		})
+		return res;
 	}
 
 	// const message1: User = await this.prisma.message.create({
