@@ -146,6 +146,28 @@ export class ChatService {
 		})
 	}
 
+	async createChannel(
+		name: string, 
+		isPersonal: boolean,
+		isPublic: boolean,
+		idUser: number,
+		password: string
+	)
+	{
+		const res = await this.prisma.channel.create({
+			data: {
+				name: name,
+				password: password,
+				personal: isPersonal,
+				public: isPublic,
+				user_list: {connect: [{id:idUser}]},
+				owner: idUser,
+			},
+
+		})
+		return res;
+	}
+
 	// const message1: User = await this.prisma.message.create({
 	// 	data: {
 	// 		content: 'content_message1',
