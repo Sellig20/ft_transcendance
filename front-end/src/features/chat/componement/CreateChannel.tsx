@@ -1,8 +1,28 @@
 import { useState, useEffect, useRef} from 'react'
 import React from 'react'
+import chatService from '../chat.service'
 
-export const CreateChannel = ({ clickHandler } : {
-	clickHandler: (e:  React.MouseEvent<HTMLButtonElement>) => void;
+const Password = ({ passwordRef, isPassword} : {
+	passwordRef: React.MutableRefObject<null>
+	isPassword: boolean,
+}) => {
+	if (isPassword === true)
+	{
+		return (
+			<input type="password" className="form-control" name="password" id="password" placeholder="password" ref={passwordRef}/>
+		)
+	}
+	else
+	{
+		return ;
+	}
+}
+
+export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
+	iduser: any,
+	userinfo: any,
+	setuserinfo: any,
+	reload: () => void
 }) => {
 	const inputNameRef = useRef(null);
 	const inputPasswordRef = useRef(null);
@@ -43,9 +63,35 @@ export const CreateChannel = ({ clickHandler } : {
 		setMode("password")
 	};
 
-	const fff = (
+	const handlerSubmite = async (
 	) => {
-		console.log("clique: ", mode, inputNameRef.current.value, inputPasswordRef.current.value)
+		let channel_name = inputNameRef.current.value;
+		let channel_password = null
+		let	isPublic = false
+
+		if (channel_name === "")
+			return ;
+
+		if (mode === "password")
+		{
+			channel_password = inputPasswordRef.current.value;
+			isPublic = true
+			if (channel_password === "")
+				return ;
+		}
+		if (mode === "public")
+		{
+			isPublic = true
+		}
+		console.log("clique: ", mode, channel_name, channel_password)
+		
+		await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password).then(res => {
+			console.log("res", res)
+			console.log("userinfo", userinfo)
+			setuserinfo(userinfo.channel_list.push(res))
+			reload()
+			// setChannelJoined(userinfo.channel_list)
+		})
 		// creer le channel avec une requete + reload la page si possible d'un maniere ou d'un autre
 		// (peut etre en passant la ref des channels info id puis en l'incrementant avec le nouveau channel ?)
 	};
@@ -60,8 +106,8 @@ export const CreateChannel = ({ clickHandler } : {
 			<br />
 			{/* <input type="checkbox" checked={checkboxProtected}/> protected */}
 			<input type="text" className="form-control" name="inputchannel" id="inputchannel" placeholder="name" ref={inputNameRef}/>
-			<input type="text" className="form-control" name="password" id="password" placeholder="password" ref={inputPasswordRef}/>
-			<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={() => fff()}>create</button>
+			<Password passwordRef={inputPasswordRef} isPassword={checkboxPassword}/>
+			<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={() => handlerSubmite()}>create</button>
 		</div>
 	)
 
