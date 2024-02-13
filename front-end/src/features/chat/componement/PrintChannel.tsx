@@ -19,8 +19,6 @@ const Message = ({ id, content, sender} : {
 					<div className="ms-5">
 						<div className="d-flex flex-row-reverse">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-							id message: {id}
-								<br />
 								de : {sender}
 								<br />
 								'{content}'
@@ -43,8 +41,6 @@ const Message = ({ id, content, sender} : {
 				{/* <div class="bg-danger"> */}
 						<div className="d-flex flex-row mb-3">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-								id message: {id}
-								<br />
 								de : {sender}
 								<br />
 								'{content}'
