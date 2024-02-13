@@ -5,13 +5,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Rootstate } from '../../app/store'
 import { changeTfa } from './user.store'
 import loginService from '../login/login.service'
+import { toast } from 'react-toastify'
 
 const UserSetting = () => {
 	const dispatch = useDispatch();
 	const user = useSelector((state: Rootstate) => state.user)
 	const [isTFAEnabled, setIsTFAEnabled] = useState(false);
 	const [username, setUsername] = useState('');
-
+	const [file, setFile] = useState< File | null>(null)
+	const [image, setImage] = useState("")
 	const [img, setImg] = useState("")
 
 	const handleTfaGen = async () => {
@@ -32,17 +34,51 @@ const UserSetting = () => {
 		console.log(rep);
 	}
 
-	//   const handleImageUpload = (event) => {
-	//     setImage(URL.createObjectURL(event.target.files[0]));
-	//   };
+	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if(event.target.files && event.target.files[0])
+		{
+			setImage(URL.createObjectURL(event.target.files[0]));
+			// console.log(event.target.files[0]);
+			const toSave: File = event.target.files[0]
+			setFile(toSave);
+		}
+	}
+
+	const uploadFile = async () => {
+		let rep;
+		if (file) 
+		{
+			if (file.size > 50000){
+				toast.error("Incorrect img size");
+				setFile(null);
+				setImage("");
+				return null;
+			}
+			const formData = new FormData();
+			formData.append("file", file);
+			rep = await userService.uploadFile(file);
+			// console.log(formData);
+			console.log('reponse du back', rep);
+			
+		}
+		setFile(null);
+		setImage("");
+	}
+
 	return (
 		<div className="container">
 			<h1>User Settings</h1>
 
 			<div className="mb-3">
-				<label htmlFor="imageInput" className="form-label">Profile Image</label>
-				{/* <input type="file" className="form-control" id="imageInput" accept="image/*" onChange={handleImageUpload} /> */}
-				{/* {image && <img src={image} alt="Uploaded" className="mt-3 img-thumbnail" style={{ maxWidth: '200px' }} />} */}
+				<label htmlFor="imageInput" className="form-label">Profile Avatar</label>  
+				<input type="file" placeholder="" className="form-control" id="imageInput" accept=".jpg" onChange={handleImageUpload} aria-describedby="imgHelp"/>
+				<div id="imgHelp" className="form-text">Max size 50kb and must be jpg</div>
+				{image && 
+					<>
+						<img src={image} alt="Uploaded" className="mt-3 img-thumbnail" style={{ maxWidth: '200px' }} />
+						<button className="btn btn-outline-success" onClick={uploadFile} >Upload</button>
+					</>
+				}
 			</div>
 			{!user.tfa_status &&
 				<div className="mb-3 form-check">

@@ -21,9 +21,26 @@ const changeUserName = async (name: string) => {
 	return response.data
 }
 
+const uploadFile = async (file: File) => {
+	let response; 
+	try {
+		// const authToken = localStorage.getItem('token');
+		response = await api.post('/user/upload', {file: file}, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			}
+		}
+		)
+	} catch (error) {
+		return error;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
-	changeUserName: changeUserName
+	changeUserName: changeUserName,
+	uploadFile: uploadFile
 
 }

@@ -22,6 +22,10 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
+  img			  Bytes?
+  img_type		  String?
+  img_size		  Int?
+  
   firstName       String?
   lastName        String?
   TFA_secret_hash String?

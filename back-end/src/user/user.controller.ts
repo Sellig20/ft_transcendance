@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Headers, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Express } from 'express'
 import { FrontUserDto } from './UserDto';
 import hashService from '../auth/utils/hash'
 import { Public } from 'src/auth/utils/custo.deco';
 import { UsersService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -42,6 +44,21 @@ export class UserController {
 		console.log(result);
 		return result
 	}
+
+
+	@Post('/upload')
+	@UseInterceptors(FileInterceptor('file'))
+	async uploadFile(@Req() req, @UploadedFile(
+		new ParseFilePipe({
+			validators: [
+				new MaxFileSizeValidator({maxSize: 50000}),
+				new FileTypeValidator({ fileType: 'image/jpeg'})
+			]
+	})) file: Express.Multer.File) {
+		const response = await this.userservice.saveImg(req.user.id, file.buffer)
+		return ` <img src=${file} alt="Girl in a jacket" width="500" height="600"> `
+	}
+
 
 	@Public()
 	@Get('/cipher')
