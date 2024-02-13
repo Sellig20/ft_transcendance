@@ -39,7 +39,7 @@ model Channel {
   admins    Int[]
   banned    Int[]
   owner     Int?
-  password  String?
+  password  String?   @default("")
 }
 
 model Message {

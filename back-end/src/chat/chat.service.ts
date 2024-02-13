@@ -19,7 +19,10 @@ export class ChatService {
 				channel_list: {select: {
 					id: true,
 					name: true,
-					personal: true
+					personal: true,
+					password: true,
+					public: true
+
 				}},
 				friends: true,
 				createAt: true,
@@ -81,6 +84,7 @@ export class ChatService {
 				admins: true,
 				banned: true,
 				owner: true,
+				password: true,
 				user_list: {select: {
 					id: true,
 					username: true,
