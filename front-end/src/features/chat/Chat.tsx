@@ -155,7 +155,6 @@ export function Chat() {
 			inputFriendRef.current.value = "";
 		}
 	};
-
 	return (
 		<div>
 			<div>
@@ -163,11 +162,13 @@ export function Chat() {
 			</div>
 
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
-				<div id='panel' className='bg-info w-25'>
+				{/* <div id='panel' className='bg-info w-25'> */}
+				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
 					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo}/>
 				</div>
-				<div id='chat' className='bg-danger w-75'>
+				{/* <div id='chat' className='bg-danger w-75'> */}
+				<div id='chat' className='bg-secondary w-75'>
 					<div key={1}>
 						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload}/>
 						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>

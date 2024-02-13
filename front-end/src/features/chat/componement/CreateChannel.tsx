@@ -33,8 +33,6 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 
 	const hprivate = (
 	) => {
-		let newstate = !checkboxPrivate
-		console.log("checkboxxxx: ",newstate, checkboxPublic, checkboxPassword)
 		setCheckboxPrivate(true)
 		setcheckboxPublic(false)
 		setcheckboxPassword(false)
@@ -44,8 +42,6 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 
 	const hpublic = (
 	) => {
-		let newstate = !checkboxPublic
-		console.log("checkboxxxx: ", checkboxPrivate, newstate, checkboxPassword)
 		setCheckboxPrivate(false)
 		setcheckboxPublic(true)
 		setcheckboxPassword(false)
@@ -55,8 +51,6 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 
 	const hpassword = (
 	) => {
-		let newstate = !checkboxPassword
-		console.log("checkboxxxx: ", checkboxPrivate, checkboxPublic, newstate)
 		setCheckboxPrivate(false)
 		setcheckboxPublic(false)
 		setcheckboxPassword(true)
@@ -67,21 +61,27 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 	) => {
 		let channel_name = inputNameRef.current.value;
 		let channel_password = null
-		let	isPublic = false
+		let	isPublic = true
 
 		if (channel_name === "")
 			return ;
 
-		if (mode === "password")
+		if (mode == "password")
 		{
 			channel_password = inputPasswordRef.current.value;
 			isPublic = true
 			if (channel_password === "")
 				return ;
 		}
-		if (mode === "public")
+		else if (mode == "public")
 		{
+			console.log("mode public")
 			isPublic = true
+		}
+		else if (mode == "private")
+		{
+			console.log("mode private")
+			isPublic = false
 		}
 		console.log("clique: ", mode, channel_name, channel_password)
 		
