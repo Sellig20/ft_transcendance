@@ -6,10 +6,12 @@ import { UserModule } from './user/user.module';
 import { LoggingMiddleware } from './logger/loggerBasic';
 import { MyGateway } from './chat/chat.gateway';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './pongGame/game.module';
+import { gatewayPong } from './pongGame/game.gateway';
 
 @Module({
   controllers: [],
-  providers: [MyGateway],
+  providers: [MyGateway, gatewayPong],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -19,6 +21,7 @@ import { ChatModule } from './chat/chat.module';
     PrismaModule,
     UserModule,
     ChatModule,
+    GameModule,
   ],
 })
 
