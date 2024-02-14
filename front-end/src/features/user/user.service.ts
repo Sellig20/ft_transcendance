@@ -21,16 +21,15 @@ const changeUserName = async (name: string) => {
 	return response.data
 }
 
-const uploadFile = async (file: File) => {
+const uploadFile = async (file: FormData) => {
 	let response; 
 	try {
 		// const authToken = localStorage.getItem('token');
-		response = await api.post('/user/upload', {file: file}, {
+		response = await api.post('/user/upload', file, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			}
-		}
-		)
+		})
 	} catch (error) {
 		return error;
 	}

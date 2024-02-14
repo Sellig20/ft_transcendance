@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { LoggingMiddleware } from './logger/loggerBasic';
 import { MyGateway } from './chat/chat.gateway';
 import { ChatModule } from './chat/chat.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   controllers: [],
@@ -15,6 +16,7 @@ import { ChatModule } from './chat/chat.module';
       isGlobal: true,
       ignoreEnvFile: true,
     }),
+
     AuthModule,
     PrismaModule,
     UserModule,

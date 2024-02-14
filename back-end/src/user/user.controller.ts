@@ -46,19 +46,44 @@ export class UserController {
 	}
 
 
-	@Post('/upload')
-	@UseInterceptors(FileInterceptor('file'))
-	async uploadFile(@Req() req, @UploadedFile(
-		new ParseFilePipe({
-			validators: [
-				new MaxFileSizeValidator({maxSize: 50000}),
-				new FileTypeValidator({ fileType: 'image/jpeg'})
-			]
-	})) file: Express.Multer.File) {
-		const response = await this.userservice.saveImg(req.user.id, file.buffer)
-		return ` <img src=${file} alt="Girl in a jacket" width="500" height="600"> `
-	}
+	// @Post('/upload')
+	// @UseInterceptors(
+	// 	FileInterceptor('avatar')
+	// )
+	// async uploadFile(@UploadedFile(
+	// 	new ParseFilePipe({
+	// 	validators: [
+	// 		new MaxFileSizeValidator({maxSize: 1000 * 1000 *10}),
+	// 		new FileTypeValidator({ fileType: 'image/jpeg'})
+	// 	]
+	// 	})
+	// ) file) {
+	// // 	const response = {
+	// // 		originalname: file.originalname,
+	// // 		filename: file.filename,
+	// // 	};
+	// // 	return response;
+	// // }
 
+
+	@Post('/upload')
+	@UseInterceptors(
+		FileInterceptor('avatar'),
+	)
+	async uploadedFile(@UploadedFile(
+		new ParseFilePipe({
+		validators: [
+			new MaxFileSizeValidator({maxSize: 2097152}),
+			new FileTypeValidator({ fileType: 'image/jpeg'})
+		]
+		})
+	) file) {
+		const response = {
+			originalname: file.originalname,
+			filename: file.filename,
+		};
+		return response;
+	}
 
 	@Public()
 	@Get('/cipher')

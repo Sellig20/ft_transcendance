@@ -12,7 +12,7 @@ const UserSetting = () => {
 	const user = useSelector((state: Rootstate) => state.user)
 	const [isTFAEnabled, setIsTFAEnabled] = useState(false);
 	const [username, setUsername] = useState('');
-	const [file, setFile] = useState< File | null>(null)
+	const [file, setFile] = useState<File | null>(null);
 	const [image, setImage] = useState("")
 	const [img, setImg] = useState("")
 
@@ -38,9 +38,9 @@ const UserSetting = () => {
 		if(event.target.files && event.target.files[0])
 		{
 			setImage(URL.createObjectURL(event.target.files[0]));
-			// console.log(event.target.files[0]);
-			const toSave: File = event.target.files[0]
-			setFile(toSave);
+			console.log(event.target.files[0]);
+			
+			setFile(event.target.files[0]);
 		}
 	}
 
@@ -48,15 +48,17 @@ const UserSetting = () => {
 		let rep;
 		if (file) 
 		{
-			if (file.size > 50000){
+			if (file.size > 2097152){
 				toast.error("Incorrect img size");
 				setFile(null);
 				setImage("");
 				return null;
 			}
+			// console.log(file);
+			
 			const formData = new FormData();
-			formData.append("file", file);
-			rep = await userService.uploadFile(file);
+			formData.append('avatar', file);
+			rep = await userService.uploadFile(formData);
 			// console.log(formData);
 			console.log('reponse du back', rep);
 			
@@ -72,7 +74,7 @@ const UserSetting = () => {
 			<div className="mb-3">
 				<label htmlFor="imageInput" className="form-label">Profile Avatar</label>  
 				<input type="file" placeholder="" className="form-control" id="imageInput" accept=".jpg" onChange={handleImageUpload} aria-describedby="imgHelp"/>
-				<div id="imgHelp" className="form-text">Max size 50kb and must be jpg</div>
+				<div id="imgHelp" className="form-text">Max size 2Mb and must be jpg</div>
 				{image && 
 					<>
 						<img src={image} alt="Uploaded" className="mt-3 img-thumbnail" style={{ maxWidth: '200px' }} />
