@@ -22,7 +22,7 @@ export class AuthController {
 	@Get('42-redirect')
 	async auth42Redirect(@Req() req, @Res() res) {
 		console.log('hello went through the redirect :)');
-		const url = new URL('http://localhost:80/auth');
+		const url = new URL('http://localhost:8080/auth');
 		console.log('in this ft guard', req.user);
 		if (req.user.TFA_activated) {
 			url.searchParams.append('tfa', 'ON');
