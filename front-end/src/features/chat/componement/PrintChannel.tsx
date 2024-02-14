@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
+import { ChannelDescription } from './ChannelDescription';
 
 import chatService from '../chat.service'
 
@@ -19,8 +20,6 @@ const Message = ({ id, content, sender} : {
 					<div className="ms-5">
 						<div className="d-flex flex-row-reverse">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-							id message: {id}
-								<br />
 								de : {sender}
 								<br />
 								'{content}'
@@ -43,8 +42,6 @@ const Message = ({ id, content, sender} : {
 				{/* <div class="bg-danger"> */}
 						<div className="d-flex flex-row mb-3">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-								id message: {id}
-								<br />
 								de : {sender}
 								<br />
 								'{content}'
@@ -60,15 +57,18 @@ const Message = ({ id, content, sender} : {
 	}
 }
 
-export const PrintChannel = ({ channelinfo } : {
-	channelinfo: any
+export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo} : {
+	channelinfo: any,
+	newMessages: any,
+	reload: () => void,
+	userinfo: any
 }) => {
-	// const callApi = async (
-	// 	userid: any
-	// 	) => {
-	// 	await chatService.getUserById(userid).then(userinfo => setUsername(userinfo.username));
-	// }
-
+	console.log("print chann")
+	if (channelinfo === "")
+	{
+		reload()
+		return ;
+	}
 	if (channelinfo === undefined || channelinfo === null)
 	{
 		return(
@@ -79,7 +79,10 @@ export const PrintChannel = ({ channelinfo } : {
 	}
 	console.log("[DEBUG] channel_messages loaded !", channelinfo);
 	const channel = channelinfo
-	// console.log(channel.messages);
+	if (newMessages.length !== 0)
+		channel.messages.push(newMessages)
+	console.log("channel", channel.messages)
+	console.log("tttttt", newMessages)
 	if (channel.messages.length === 0)
 	{
 		return(
@@ -90,21 +93,13 @@ export const PrintChannel = ({ channelinfo } : {
 	}
 	return (
 		<div>
-			{channel.name}
-			:
+			<div>
+				<ChannelDescription channelinfo={channel} userinfo={userinfo}/>
+			</div>
 			{
-				channel.user_list.map((element: any) => {
+				channel.messages.map((element: any, index:any) => {
 					return (
-						<div key={element.id}>
-							{element.username}
-						</div>
-					)
-				})
-			}
-			{
-				channel.messages.map((element: any) => {
-					return (
-						<div key={element.id}>
+						<div key={index}>
 							<Message id={element.id} content={element.content} sender={element.userId}/>
 						</div>
 					)

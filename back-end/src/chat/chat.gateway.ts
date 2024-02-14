@@ -69,13 +69,20 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         }
     }
 
-    // async findSocketChannels(channel_id: number) {
-    //     // cherche tout les socket du channel
-    //     // await this.chatService.getAllSocketInChannel(channelId).then(res =>
-            
-
-    //     //     )
-    // }
+    // cherche tout les socket du channel
+    async findSocketChannels(channel_id: number) {
+        let liste_socket = []
+        await this.chatService.findAllSocketOnChannelByIdChannel(channel_id).then(res => {
+            const liste = res.user_list
+            liste.map((item, index) => {
+                // console.log(item.socket)
+                liste_socket.push(...item.socket)
+            })
+            // console.log(liste_socket)
+            // return (liste_socket)
+        })
+        return (liste_socket)
+    }
     
     async handleConnection(client: Socket, ...args: any[]) {
         console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
@@ -99,7 +106,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     async handleMessage(client: any, message: any) {
         if (message.data === "a")
         {
-            this.server.to(this.userArray[0]).emit("MP", "ca marche");
+            // this.server.to(this.userArray[0]).emit("MP", "ca marche");
             console.log("---create test database---")
             await this.chatService.createTest();
         }
@@ -108,13 +115,15 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
             console.log(client.name)
             console.log("from_socket:", message.from_socket, "-->", message.data, ", to:", message.to);
             // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
-            this.server.to(message.recipient).emit("MP", message.data);
-
-            // faire un tableau de toutes les socket du channel sans celle du sender
-            // await this.chatService.findSocketUserById(message.from_user).then(socketuser => {
-
-            // })
-            // this.server.to(all_the_socket_in_channel).emit("MP", {data:message.data, channel:message.to})
+            // this.server.to(message.recipient).emit("MP", message.data);
+            
+            await this.findSocketChannels(message.to).then(res => {
+                res.map((item, index) => {
+                    // console.log("envoie de '", message.data, "' to socketid :", item)
+                    this.server.to(item).emit("MP", {from_channel: message.to, from_user:message.from_user, data:message.data});
+                })
+                this.chatService.createMessage(message.data, message.from_user, message.to)
+            })
         }
     }
 
