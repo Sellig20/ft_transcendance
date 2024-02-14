@@ -170,22 +170,8 @@ export function Chat() {
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
 					<div key={1}>
-						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload}/>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo}/>
 						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>
-					</div>
-					{/* <div className="d-flex justify-content-end">
-						<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
-						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
-						
-					</div> */}
-					<div>
-					{/* {
-						messageSocket.map((messageSocket, index) => (
-							<div key={index}>
-								{messageSocket}
-							</div>
-						))
-					} */}
 					</div>
 				</div>
 			</div>

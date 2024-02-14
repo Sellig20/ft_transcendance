@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
+import { ChannelDescription } from './ChannelDescription';
 
 import chatService from '../chat.service'
 
@@ -56,11 +57,11 @@ const Message = ({ id, content, sender} : {
 	}
 }
 
-export const PrintChannel = ({ channelinfo, newMessages, reload} : {
+export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo} : {
 	channelinfo: any,
 	newMessages: any,
 	reload: () => void,
-
+	userinfo: any
 }) => {
 	console.log("print chann")
 	if (channelinfo === "")
@@ -92,17 +93,9 @@ export const PrintChannel = ({ channelinfo, newMessages, reload} : {
 	}
 	return (
 		<div>
-			{channel.name}
-			:
-			{
-				channel.user_list.map((element: any) => {
-					return (
-						<div key={element.id}>
-							{element.username}
-						</div>
-					)
-				})
-			}
+			<div>
+				<ChannelDescription channelinfo={channel} userinfo={userinfo}/>
+			</div>
 			{
 				channel.messages.map((element: any, index:any) => {
 					return (
