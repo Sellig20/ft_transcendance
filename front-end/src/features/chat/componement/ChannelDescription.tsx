@@ -130,6 +130,7 @@ export const ChannelDescription = ({ channelinfo, userinfo } : {
 		<div>
 			WELCOME TO : {channelinfo.name}
 			<br />
+			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id}/>
 			{
 				channelinfo.user_list.map((element: any, index:any) => {
 					return (
