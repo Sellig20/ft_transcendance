@@ -23,6 +23,10 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
+  img_url		  String @default("placeholder")
+
+  user_status	  String @default("offline")
+  
   firstName       String?
   lastName        String?
   TFA_secret_hash String?

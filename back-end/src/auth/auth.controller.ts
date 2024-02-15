@@ -22,7 +22,7 @@ export class AuthController {
 	@Get('42-redirect')
 	async auth42Redirect(@Req() req, @Res() res) {
 		console.log('hello went through the redirect :)');
-		const url = new URL('http://localhost:80/auth');
+		const url = new URL('http://localhost:8080/auth');
 		console.log('in this ft guard', req.user);
 		if (req.user.TFA_activated) {
 			url.searchParams.append('tfa', 'ON');
@@ -32,6 +32,7 @@ export class AuthController {
 		else {
 			url.searchParams.append('tfa', 'OFF');
 			const token = await this.authService.signin(req.user);
+			await this.userService.changeStatus(req.user.id, "online");
 			url.searchParams.append('code', token.access_token);
 		} 
 		return res.redirect(url.href);
@@ -81,6 +82,7 @@ export class AuthController {
 			throw new UnauthorizedException('Wrong authentification code');
 		}
 		const user = await this.userService.findUserId(body.idFront)
+		await this.userService.changeStatus(user.id, "online");
 		return await this.authService.signinTFA(user);
 	}
 

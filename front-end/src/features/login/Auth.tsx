@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useDispatch} from "react-redux";
 import { useNavigate } from "react-router-dom";
 import userService from './login.service'
-import { addUser } from "../user/user.store";
+import { addAvatar, addUser } from "../user/user.store";
 import loginService from "./login.service";
 import { toast } from "react-toastify";
 
@@ -13,6 +13,7 @@ const Auth = () => {
 	const [tfa, setTfa] = useState(false)
 	const [code, setCode] = useState("")
 
+	
 
 	// useIsNotAuth();
 	useEffect(() => {
@@ -29,6 +30,10 @@ const Auth = () => {
 			if (tfa === 'OFF') {
 				if (tmp)
 					localStorage.setItem("token", tmp);
+					userService.setAvatar().then((rawImg) => {
+					const url = URL.createObjectURL(new Blob([rawImg]));
+					dispatch(addAvatar(url))
+				})
 				userService.getUser().then(user => dispatch(addUser(user)));
 				toast.success("you are logged in", {autoClose: false});
 				navigate('/home');

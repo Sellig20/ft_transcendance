@@ -21,9 +21,61 @@ const changeUserName = async (name: string) => {
 	return response.data
 }
 
+const uploadFile = async (file: FormData) => {
+	let response; 
+	try {
+		// const authToken = localStorage.getItem('token');
+		response = await api.post('/user/upload', file, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			}
+		})
+	} catch (error) {
+		return error;
+	}
+	return response.data
+}
+
+const getAvatar = async (filename: string) => {
+	let response;
+	try {
+		response = await api.get(`user/avatar${filename}`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return error;
+	}
+	
+	return response.data
+}
+
+const changeUserStatus = async (status: string) => {
+	let response
+	try {
+		response = await api.patch('/user/changeStatus', {status: status})
+	} catch (error){
+		return error;
+	}
+	return response.data
+}
+
+const getUserStatus = async (id: string) => {
+	let response
+	try {
+		response = await api.patch(`/user/status${id}`)
+	} catch (error){
+		return error;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
-	changeUserName: changeUserName
+	changeUserName: changeUserName,
+	uploadFile: uploadFile,
+	getAvatar: getAvatar,
+	changeUserStatus: changeUserStatus,
+	getUserStatus: getUserStatus
 
 }
