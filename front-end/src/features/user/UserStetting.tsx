@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import QrCode from './QrCode'
 import userService from './user.service'
 import { useDispatch, useSelector } from 'react-redux'
 import { Rootstate } from '../../app/store'
-import { changeTfa } from './user.store'
+import { addAvatar, changeTfa } from './user.store'
 import loginService from '../login/login.service'
 import { toast } from 'react-toastify'
 
 const UserSetting = () => {
+
 	const dispatch = useDispatch();
 	const user = useSelector((state: Rootstate) => state.user)
 	const [isTFAEnabled, setIsTFAEnabled] = useState(false);
@@ -16,6 +17,15 @@ const UserSetting = () => {
 	const [image, setImage] = useState("")
 	const [avatar, setAvatar] = useState("")
 	const [img, setImg] = useState("")
+
+	useEffect(() => {
+		if (user.img)
+			setAvatar(user.img)
+		return () => {
+			if (avatar) {
+				URL.revokeObjectURL(avatar);
+			}
+		}}, [])
 
 	const handleTfaGen = async () => {
 		if (!user.tfa_status) {
@@ -61,10 +71,11 @@ const UserSetting = () => {
 			formData.append('avatar', file);
 			rep = await userService.uploadFile(formData);
 			// console.log(formData);
-			console.log(rep);
+			// console.log(rep);
 			
 			const rawImg = await userService.getAvatar(rep);
 			const url = URL.createObjectURL(new Blob([rawImg]));
+			dispatch(addAvatar(url))
 			setAvatar(url)
 			
 		}
@@ -74,13 +85,15 @@ const UserSetting = () => {
 
 	return (
 		<div className="container">
-
 			{avatar &&
-				<img src={avatar} className="rounded float-end" alt="..."></img>
+
+				<img src={avatar} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
 			}
+
 			<h1>User Settings</h1>
 
 			<div className="mb-3">
+
 				<label htmlFor="imageInput" className="form-label">Profile Avatar</label>  
 				<input type="file" placeholder="" className="form-control" id="imageInput" accept=".jpg" onChange={handleImageUpload} aria-describedby="imgHelp"/>
 				<div id="imgHelp" className="form-text">Max size 2Mb and must be jpg</div>
@@ -109,7 +122,7 @@ const UserSetting = () => {
 			<div className="mb-3 row">
 				<label htmlFor="usernameInput" className="col-sm-2 col-form-label">Username</label>
 				<div className="col-sm-10">
-					<input type="text" className="form-control col-2" style={{ maxWidth: '300px' }} id="usernameInput" value={username} onChange={(e) => setUsername(e.target.value)} />
+					<input type="text" className="form-control col-2" style={{ maxWidth: '300px', maxHeight: '300px' }} id="usernameInput" value={username} onChange={(e) => setUsername(e.target.value)} />
 				</div>
 			</div>
 

@@ -48,11 +48,25 @@ const getTfaOff = async () => {
 	return req.data
 }
 
+
+const setAvatar = async () => {
+	let response;
+	try {
+		response = await api.get('user/myavatar', {
+			responseType: 'blob',
+		});
+	} catch (error) {
+		return null
+	}
+	return response.data
+}
+
 export default {
 	get42: get42,
 	gettest: gettest,
 	getUser: getUser,
 	getLoginStatus: getLoginStatus,
 	postTFAauth: postTFAauth,
-	getTfaOff: getTfaOff
+	getTfaOff: getTfaOff,
+	setAvatar: setAvatar,
 }

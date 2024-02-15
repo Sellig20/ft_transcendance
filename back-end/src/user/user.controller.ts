@@ -58,11 +58,6 @@ export class UserController {
 		]
 		})
 	) file) {
-		const response = {
-			originalname: file.originalname,
-			filename: file.filename,
-		};
-		// const img_url = `http://localhost:8000/user/avatar/${file.filename}.jpg`;
 		this.userservice.saveImg(req.user.id, file.filename);
 		
 		return file.filename;
@@ -70,8 +65,19 @@ export class UserController {
 
 	@Get('/avatar:filename')
 	serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
-		console.log('looking for  ', filename);
+		// console.log('looking for  ', filename);
 		return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
+	}
+
+	@Get('/myavatar')
+	async serveMyAvatar(@Req() req,  @Res() res: Response){
+		const img_name = await this.userservice.myAvatar(req.user.id)
+		if (img_name === 'placeholder'){
+			return res.sendFile("avatarDefault", { root: join(__dirname, '../..', 'avatar') });
+		}
+		else {
+			return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
+		}
 	}
 
 	@Public()

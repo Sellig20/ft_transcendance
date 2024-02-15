@@ -36,10 +36,24 @@ const uploadFile = async (file: FormData) => {
 	return response.data
 }
 
+const getAvatar = async (filename: string) => {
+	let response;
+	try {
+		response = await api.get(`user/avatar${filename}`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return error;
+	}
+	
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
 	changeUserName: changeUserName,
-	uploadFile: uploadFile
+	uploadFile: uploadFile,
+	getAvatar: getAvatar
 
 }

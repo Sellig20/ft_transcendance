@@ -102,4 +102,21 @@ export class UsersService {
 			});
 		}
 	}
+
+	async myAvatar(id: number){
+				let result;
+		try {
+			result = await this.prisma.user.findFirst({
+				where: {
+					id: id,
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("no img", {
+				cause: new Error(),
+				description: "no img",
+			});
+		}
+		return result.img_url;
+	}
 }

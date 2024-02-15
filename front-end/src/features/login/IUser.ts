@@ -5,5 +5,6 @@ export type userOnConnection = {
 	email: string;
 	tfa_status: boolean;
 	connected: boolean;
+	img: string | null;
 }
 
