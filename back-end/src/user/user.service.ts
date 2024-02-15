@@ -119,4 +119,58 @@ export class UsersService {
 		}
 		return result.img_url;
 	}
+
+	async changeStatus(id: number, status: string) {
+		let result;
+		try {
+			result = await this.prisma.user.update({
+				where: {
+					id: id,
+				},
+				data: {
+					user_status: status
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("status change failure", {
+				cause: new Error(),
+				description: "status change failure",
+			});
+		}
+		return result;
+	}
+
+	async checkStatus(id: number) {
+		let result;
+		try {
+			result = await this.prisma.user.findFirst({
+				where: {
+					id: id,
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("status check failure", {
+				cause: new Error(),
+				description: "status check failure",
+			});
+		}
+		return result.user_status;
+	}
+
+	async allOnline() {
+		let result;
+		try {
+			result = await this.prisma.user.findMany({
+				where: {
+					user_status: "online",
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("status check failure", {
+				cause: new Error(),
+				description: "status check failure",
+			});
+		}
+		return result;
+	}
 }

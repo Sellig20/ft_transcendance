@@ -24,6 +24,8 @@ model User {
   updateAt DateTime @updatedAt
 
   img_url		  String @default("placeholder")
+
+  user_status	  String @default("offline")
   
   firstName       String?
   lastName        String?

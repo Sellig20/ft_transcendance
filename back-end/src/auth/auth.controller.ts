@@ -32,6 +32,7 @@ export class AuthController {
 		else {
 			url.searchParams.append('tfa', 'OFF');
 			const token = await this.authService.signin(req.user);
+			await this.userService.changeStatus(req.user.id, "online");
 			url.searchParams.append('code', token.access_token);
 		} 
 		return res.redirect(url.href);
@@ -81,6 +82,7 @@ export class AuthController {
 			throw new UnauthorizedException('Wrong authentification code');
 		}
 		const user = await this.userService.findUserId(body.idFront)
+		await this.userService.changeStatus(user.id, "online");
 		return await this.authService.signinTFA(user);
 	}
 

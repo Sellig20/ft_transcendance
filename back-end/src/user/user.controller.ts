@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, Headers, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FrontUserDto } from './UserDto';
 import hashService from '../auth/utils/hash'
@@ -72,12 +72,29 @@ export class UserController {
 	@Get('/myavatar')
 	async serveMyAvatar(@Req() req,  @Res() res: Response){
 		const img_name = await this.userservice.myAvatar(req.user.id)
+
 		if (img_name === 'placeholder'){
 			return res.sendFile("avatarDefault", { root: join(__dirname, '../..', 'avatar') });
 		}
 		else {
 			return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
 		}
+	}
+
+	@Get('/status:id')
+	async getstatus(@Req() req) {
+		// @Param('id', ParseIntPipe) id: number
+		// const result = await this.userservice.checkStatus(id)
+		const result = await this.userservice.checkStatus(req.user.id);
+		return result
+	}
+
+	@Patch('/changeStatus')
+	async changeStatus(@Req() req, @Body() body) {
+		console.log('change status activated : page closed detected');
+			
+		const result = await this.userservice.changeStatus(req.user.id, body.status)
+		return result
 	}
 
 	@Public()

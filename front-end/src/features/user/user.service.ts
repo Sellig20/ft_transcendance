@@ -49,11 +49,33 @@ const getAvatar = async (filename: string) => {
 	return response.data
 }
 
+const changeUserStatus = async (status: string) => {
+	let response
+	try {
+		response = await api.patch('/user/changeStatus', {status: status})
+	} catch (error){
+		return error;
+	}
+	return response.data
+}
+
+const getUserStatus = async (id: string) => {
+	let response
+	try {
+		response = await api.patch(`/user/status${id}`)
+	} catch (error){
+		return error;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
 	changeUserName: changeUserName,
 	uploadFile: uploadFile,
-	getAvatar: getAvatar
+	getAvatar: getAvatar,
+	changeUserStatus: changeUserStatus,
+	getUserStatus: getUserStatus
 
 }

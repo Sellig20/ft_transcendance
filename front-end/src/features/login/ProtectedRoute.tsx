@@ -1,12 +1,17 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import login from './login.service'
+import usePageCloseDetection from '../hook/usePageClose';
+import userService from '../user/user.service';
 
 const ProtectedRoute: React.FC = () => {
 
 	const count = useRef(0);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
+
+	usePageCloseDetection(() => {
+	});
 
 	useEffect(() => {
 		if (count.current === 0)
