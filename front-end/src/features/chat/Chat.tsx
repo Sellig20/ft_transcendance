@@ -2,6 +2,8 @@ import React from 'react'
 import { useState, useEffect, useRef} from 'react'
 import { ChannelCards } from './componement/ChannelCards';
 import { PrintChannel } from './componement/PrintChannel';
+import { CreateChannel } from './componement/CreateChannel';
+import { InputMessage } from './componement/InputMessage';
 import { io, Socket } from "socket.io-client";
 import chatService from './chat.service'
 
@@ -12,7 +14,7 @@ export function Chat() {
 	
 	const [socket, setSocket] = useState<Socket | null>(null)
 	const count = useRef(0)
-	const [messageSocket, setMessageSocket] = useState<string[]>([]);
+	const [messageSocket, setMessageSocket] = useState<any>([]);
 
 	const inputMessageRef = useRef(null);
 	const inputFriendRef = useRef(null);
@@ -23,15 +25,22 @@ export function Chat() {
 	const [userinfo, setUserinfo] = useState<any>(null); // info du user connected
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
+	const reload = (
+	) => {
+		callApi(userid, 0, false)
+	}
+
 	const callApi = async (
 		userid: any,
-		newSocket: Socket
+		newSocket: any,
+		firstcall: boolean
 		) => {
 		await chatService.getUserById(userid).then(userinfo => {
 			setUserinfo(userinfo)
 			console.log("[FROM DB] userinfo:", userinfo)
 			setChannelJoined(userinfo.channel_list)
-			newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+			if (firstcall === true)
+				newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
 		});
 		// choper les infos du user connecte
 		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
@@ -40,7 +49,7 @@ export function Chat() {
 	const first = (
 		newSocket: Socket
 	) => {
-		callApi(userid, newSocket);
+		callApi(userid, newSocket, true);
 		setSocket(newSocket)
 	}
 
@@ -51,8 +60,6 @@ export function Chat() {
 		if (count.current === 0)
 		{
 			const newSocket = io("http://localhost:8001")
-			// setSocket(newSocket)
-			// if (socket !== null)
 			first(newSocket)
 		}
 		count.current++;
@@ -72,14 +79,20 @@ export function Chat() {
 	const messageListener = (
 		messageprop: any
 	) => {
-		console.log(messageprop.channel_recipient, messageprop.from_user, messageprop.data)
-		setMessageSocket([...messageSocket, messageprop.content])
+		if (channelSelect === undefined)
+			return ;
+		if (channelSelect.id === messageprop.from_channel)
+		{
+			console.log("msg recu:", messageprop)
+			setMessageSocket(messageprop)
+			setMessageSocket({content: messageprop.data, userId: messageprop.from_user})
+		}
 	};
 
 	useEffect(() => {
 		socket?.on("MP", messageListener)
 		return () => {
-		socket?.off("MP", messageListener)
+			socket?.off("MP", messageListener)
 		}
 	}, [messageListener])
 
@@ -88,7 +101,6 @@ export function Chat() {
 	const buttonHandler = async (
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
-		// let buttonname = event.currentTarget.name;
 		event.preventDefault();
 		if (inputMessageRef.current.value === null)
 			return ;
@@ -98,7 +110,6 @@ export function Chat() {
 		if (input != "")
 		{
 			send(input);
-			// console.log(messageSocket);
 			inputMessageRef.current.value = "";
 		}
 
@@ -115,12 +126,18 @@ export function Chat() {
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
 		event.preventDefault();
-		// if (channelSelect === null || channelSelect === undefined)
-		// 	first()
+		setMessageSocket([])
 		const id_chann = event.currentTarget.id
 		console.log("clicked on a channel, id_channel =", id_chann);
 		// setchannelSelectInfo() faire requete
-		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => setchannelSelect(messageChann));
+		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => {
+			if (messageChann === "") //	le channel existe pas
+			{
+				reload();
+				return ;
+			}
+			setchannelSelect(messageChann)
+		});
 
 	};
 	
@@ -138,7 +155,6 @@ export function Chat() {
 			inputFriendRef.current.value = "";
 		}
 	};
-
 	return (
 		<div>
 			<div>
@@ -146,28 +162,16 @@ export function Chat() {
 			</div>
 
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
-				<div id='panel' className='bg-info w-25'>
+				{/* <div id='panel' className='bg-info w-25'> */}
+				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<div id="addfriend" className="h-100 d-inline-block">
-						<input type="text" className="form-control" name="inputAddfriend" id="inputAddfriend" ref={inputFriendRef}/>
-						<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={HandleAddFriendButton}>Add Friend</button>
-					</div>
+					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo}/>
 				</div>
-				<div id='chat' className='bg-danger w-75'>
-					<PrintChannel channelinfo={channelSelect}/>
-					<div className="d-flex justify-content-end">
-						<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
-						<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
-						
-					</div>
-					<div>
-					{
-						messageSocket.map((messageSocket, index) => (
-							<div key={index}>
-								{messageSocket}
-							</div>
-						))
-					}
+				{/* <div id='chat' className='bg-danger w-75'> */}
+				<div id='chat' className='bg-secondary w-75'>
+					<div key={1}>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo}/>
+						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>
 					</div>
 				</div>
 			</div>

@@ -19,7 +19,10 @@ export class ChatService {
 				channel_list: {select: {
 					id: true,
 					name: true,
-					personal: true
+					personal: true,
+					password: true,
+					public: true
+
 				}},
 				friends: true,
 				createAt: true,
@@ -77,11 +80,18 @@ export class ChatService {
 				name: true,
 				messages: true,
 				personal: true,
+				public: true,
+				admins: true,
+				banned: true,
+				owner: true,
+				password: true,
 				user_list: {select: {
 					id: true,
 					username: true,
 					friends: true,
 					socket: true,
+					blocked_user: true,
+
 				}}
 			}
 
@@ -100,6 +110,9 @@ export class ChatService {
 					id: true,
 					name: true,
 					personal: true,
+					public: true,
+					banned: true,
+					password: true
 				}}
 			}
 
@@ -109,7 +122,7 @@ export class ChatService {
 
 	async findAllSocketOnChannelByIdChannel(channelId: number)
 	{
-		const channels = await this.prisma.channel.findMany({
+		const channels = await this.prisma.channel.findFirst({
 			where: {
 				id: channelId
 			},
@@ -124,6 +137,48 @@ export class ChatService {
 		})
 		return channels;
 	}
+
+	async createMessage(content: string, idUser: number, idChannel: number)
+	{
+		await this.prisma.message.create({
+			data: {
+				content: content,
+				sender: {connect: {id:idUser}},
+				recipient: {connect: {id:idChannel}}
+			},
+
+		})
+	}
+
+	async createChannel(
+		name: string, 
+		isPersonal: boolean,
+		isPublic: boolean,
+		idUser: number,
+		password: string
+	)
+	{
+		const res = await this.prisma.channel.create({
+			data: {
+				name: name,
+				password: password,
+				personal: isPersonal,
+				public: isPublic,
+				user_list: {connect: [{id:idUser}]},
+				owner: idUser,
+			},
+
+		})
+		return res;
+	}
+
+	// const message1: User = await this.prisma.message.create({
+	// 	data: {
+	// 		content: 'content_message1',
+	// 		sender: {connect: {id:1}},
+	// 		recipient: {connect: {id:2}}
+	// 	},
+	// })
 
 // ---------------------- TEST FUNCTION -------------------------
 
