@@ -84,7 +84,7 @@ export class UsersService {
 		return result;
 	}
 
-	async saveImg(id: number, file: Buffer){
+	async saveImg(id: number, imgUrl: string){
 		let result;
 		try {
 			result = await this.prisma.user.update({
@@ -92,7 +92,7 @@ export class UsersService {
 					id: id,
 				},
 				data: {
-					img: file,
+					img_url: imgUrl,
 				},
 			});
 		} catch (error) {
@@ -101,6 +101,5 @@ export class UsersService {
 				description: "error while saving img",
 			});
 		}
-		return result
 	}
 }

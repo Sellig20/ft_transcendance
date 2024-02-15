@@ -23,9 +23,7 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  img			  Bytes?
-  img_type		  String?
-  img_size		  Int?
+  img_url		  String @default("placeholder")
   
   firstName       String?
   lastName        String?

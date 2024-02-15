@@ -7,6 +7,8 @@ import { LoggingMiddleware } from './logger/loggerBasic';
 import { MyGateway } from './chat/chat.gateway';
 import { ChatModule } from './chat/chat.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   controllers: [],
@@ -16,7 +18,6 @@ import { MulterModule } from '@nestjs/platform-express';
       isGlobal: true,
       ignoreEnvFile: true,
     }),
-
     AuthModule,
     PrismaModule,
     UserModule,

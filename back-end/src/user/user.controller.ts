@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res, Headers, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Headers, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Express } from 'express'
 import { FrontUserDto } from './UserDto';
 import hashService from '../auth/utils/hash'
 import { Public } from 'src/auth/utils/custo.deco';
 import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { join } from 'path';
 
 @Controller('user')
 export class UserController {
@@ -45,32 +46,11 @@ export class UserController {
 		return result
 	}
 
-
-	// @Post('/upload')
-	// @UseInterceptors(
-	// 	FileInterceptor('avatar')
-	// )
-	// async uploadFile(@UploadedFile(
-	// 	new ParseFilePipe({
-	// 	validators: [
-	// 		new MaxFileSizeValidator({maxSize: 1000 * 1000 *10}),
-	// 		new FileTypeValidator({ fileType: 'image/jpeg'})
-	// 	]
-	// 	})
-	// ) file) {
-	// // 	const response = {
-	// // 		originalname: file.originalname,
-	// // 		filename: file.filename,
-	// // 	};
-	// // 	return response;
-	// // }
-
-
 	@Post('/upload')
 	@UseInterceptors(
 		FileInterceptor('avatar'),
 	)
-	async uploadedFile(@UploadedFile(
+	async uploadedFile(@Req() req, @UploadedFile(
 		new ParseFilePipe({
 		validators: [
 			new MaxFileSizeValidator({maxSize: 2097152}),
@@ -82,7 +62,16 @@ export class UserController {
 			originalname: file.originalname,
 			filename: file.filename,
 		};
-		return response;
+		// const img_url = `http://localhost:8000/user/avatar/${file.filename}.jpg`;
+		this.userservice.saveImg(req.user.id, file.filename);
+		
+		return file.filename;
+	}
+
+	@Get('/avatar:filename')
+	serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
+		console.log('looking for  ', filename);
+		return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
 	}
 
 	@Public()

@@ -14,6 +14,7 @@ const UserSetting = () => {
 	const [username, setUsername] = useState('');
 	const [file, setFile] = useState<File | null>(null);
 	const [image, setImage] = useState("")
+	const [avatar, setAvatar] = useState("")
 	const [img, setImg] = useState("")
 
 	const handleTfaGen = async () => {
@@ -60,7 +61,11 @@ const UserSetting = () => {
 			formData.append('avatar', file);
 			rep = await userService.uploadFile(formData);
 			// console.log(formData);
-			console.log('reponse du back', rep);
+			console.log(rep);
+			
+			const rawImg = await userService.getAvatar(rep);
+			const url = URL.createObjectURL(new Blob([rawImg]));
+			setAvatar(url)
 			
 		}
 		setFile(null);
@@ -69,6 +74,10 @@ const UserSetting = () => {
 
 	return (
 		<div className="container">
+
+			{avatar &&
+				<img src={avatar} className="rounded float-end" alt="..."></img>
+			}
 			<h1>User Settings</h1>
 
 			<div className="mb-3">
