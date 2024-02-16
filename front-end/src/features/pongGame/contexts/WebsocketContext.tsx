@@ -9,4 +9,3 @@ export const socket = io('http://localhost:8002/game', {
 export const WebsocketContext = createContext<Socket>(socket);
 
 export const WebsocketProvider = WebsocketContext.Provider;
-

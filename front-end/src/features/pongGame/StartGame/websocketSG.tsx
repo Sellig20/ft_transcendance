@@ -8,6 +8,15 @@ export const WebsocketSG = () => {
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
 
+    const setWinner = (winnerIs: boolean, winnerIdentity: string) => {
+        if (winnerIs === true && winnerIdentity === "one") {
+            gameState.player1Winner = true;
+        }
+        else if (winnerIs === true && winnerIdentity === "two") {
+            gameState.player2Winner = true;
+        }
+    }
+
     const updateScorePlayer2 = (data: number) => {
         gameState.player2Score = data;
     }
@@ -26,6 +35,13 @@ export const WebsocketSG = () => {
     for (let i = 10; i < board.height; i += 25) {
             context.fillRect(board.width / 2 - 10, i, 5, 5);
         }
+    }
+
+    const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        context.fillStyle = 'white';
+        context.font = '40 px Arial';
+        context.textAlign = 'center';
+        context.fillText('END GAME', board.width / 2, board.height / 2);
     }
 
     const createBoardGame = () => {
@@ -106,7 +122,12 @@ export const WebsocketSG = () => {
         const board = createBoardGame();
         if (board) {
             const context = createContextCanvas(board);
-            if (context ) {
+            if (context) {
+                if (gameState.player1Winner === true || gameState.player2Winner === true) {
+                    console.log("FIN DU JEU");
+                    displayEndGame(context, board);
+                    return;
+                }
                 context.fillStyle = "skyblue";
                 drawPaddle1(context);
                 drawPaddle2(context);
@@ -118,9 +139,9 @@ export const WebsocketSG = () => {
         requestAnimationFrame(update);
     };
 
-    const sendCanvasToServer = (ball: GameStateFD, context: CanvasRenderingContext2D) => {
-        socket.emit('sendCanvasToServer', ball, context);
-    }
+    // const sendCanvasToServer = (ball: GameStateFD, context: CanvasRenderingContext2D) => {
+    //     socket.emit('sendCanvasToServer', ball, context);
+    // }
     
     useEffect(() => {
         update();
@@ -134,9 +155,9 @@ export const WebsocketSG = () => {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
 
-        socket.emit('handleInit1');
-        socket.emit('handleInit2');
-        socket.emit('handleInitBallAndGame');
+        // socket.emit('handleInit1');
+        // socket.emit('handleInit2');
+        // socket.emit('handleInitBallAndGame');
         
         const userId = 1;
         const makeMovePaddle1 = (newVelocityY: number) => {
@@ -182,7 +203,7 @@ export const WebsocketSG = () => {
         }; 
 
         window.addEventListener('keydown', handleKeyDown);
-        socket.on('sendCanvasToServer', sendCanvasToServer);
+        // socket.on('sendCanvasToServer', sendCanvasToServer);
 
         //quand je reviens du serveur. le serveur renvoie :
         socket.on('initplayer1', (newGameState: number) => {
@@ -213,13 +234,17 @@ export const WebsocketSG = () => {
             ballCollisionBorder(ball);
         })//detecting border
 
+        socket.on('winnerIs', (winnerIs: boolean, winnerIdentity: string) => {
+            setWinner(winnerIs, winnerIdentity);
+        })
+
         return () => {
             console.log("Unregistering events...");  
             socket.off('connect');
             window.removeEventListener('keydown', handleKeyDown);
             socket.off('updatePaddle1');
             socket.off('updatePaddle2');
-            socket.off('sendCanvasToServer', sendCanvasToServer);
+            // socket.off('sendCanvasToServer', sendCanvasToServer);
             socket.off('updateCanvasAfterSend');
             socket.off('updateBallDataToClientTHREE');
             socket.off('initplayer1');
