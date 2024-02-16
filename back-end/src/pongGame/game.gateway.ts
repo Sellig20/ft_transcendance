@@ -2,11 +2,9 @@ import { OnModuleInit } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
-@WebSocketGateway({
-    cors: {
-        origin: ['http://localhost:3000'],
-        credentials: true,
-    },
+@WebSocketGateway(8002, {
+    namespace: 'game',
+    cors: "*"
 })
 
 export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, OnGatewayDisconnect<Socket> {
