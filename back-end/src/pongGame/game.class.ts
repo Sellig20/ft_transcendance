@@ -3,7 +3,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
 
-
 export class Game {
     
     private userArray: string[] = [];
@@ -13,7 +12,7 @@ export class Game {
     }
 
     maxScore() {
-        console.log("mas SCORE");
+        console.log("max SCORE");
         if (this.gameState.player1Score >= 11) {
             this.gameState.player1Winner = true;
             // this.server.emit('winnerIs', this.gameState.player1Winner, this.gameState.idPlayer1);

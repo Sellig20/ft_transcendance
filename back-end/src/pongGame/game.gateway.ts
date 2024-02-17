@@ -3,10 +3,10 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
 import { Game } from "./game.class";
-// @WebSocketGateway(8001, {
-//     // namespace: 'game',
-//     cors: "*"
-// })
+@WebSocketGateway(8001, {
+    // namespace: 'game',
+    cors: "*"
+})
 
 export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, OnGatewayDisconnect<Socket> {
     
@@ -75,7 +75,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         // this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
     }
 
-
     // TODO Change for game Class
     @SubscribeMessage('handleCollision2')
     handleCollisionWithLeftBorder() {
@@ -92,8 +91,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         // console.log("player 1 score =>", this.gameState.player1Score)
         // this.server.emit('updatePlayer1', this.gameState.player1Score );
     }
-
-
 
     // TODO Move to gameClass
     @SubscribeMessage('handleInit1')
@@ -114,6 +111,4 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     handleInitialisationBall() {
         // this.games.startGameLoop();
     }
-
-    
 }

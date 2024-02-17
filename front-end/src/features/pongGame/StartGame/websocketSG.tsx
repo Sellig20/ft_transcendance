@@ -151,9 +151,9 @@ export const WebsocketSG = () => {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
 
-        // socket.emit('handleInit1');
-        // socket.emit('handleInit2');
-        // socket.emit('handleInitBallAndGame');
+        socket.emit('handleInit1');
+        socket.emit('handleInit2');
+        socket.emit('handleInitBallAndGame');
         
         const userId = 1;
         const makeMovePaddle1 = (newVelocityY: number) => {
