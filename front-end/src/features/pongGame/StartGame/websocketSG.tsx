@@ -138,10 +138,6 @@ export const WebsocketSG = () => {
         }
         requestAnimationFrame(update);
     };
-
-    // const sendCanvasToServer = (ball: GameStateFD, context: CanvasRenderingContext2D) => {
-    //     socket.emit('sendCanvasToServer', ball, context);
-    // }
     
     useEffect(() => {
         update();
@@ -161,10 +157,10 @@ export const WebsocketSG = () => {
         
         const userId = 1;
         const makeMovePaddle1 = (newVelocityY: number) => {
-            console.log("velocity en recepton = ", newVelocityY);
+            // console.log("velocity en recepton = ", newVelocityY);
         }
         const makeMovePaddle2 = (newVelocityY: number) => {
-            console.log("velocity en recepton = ", newVelocityY);
+            // console.log("velocity en recepton = ", newVelocityY);
         }
         
         const handleKeyDown = (event: KeyboardEvent) => {

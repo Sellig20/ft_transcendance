@@ -77,7 +77,6 @@ services:
     ports:
       - "8000:8000"
       - "8001:8001"
-      - "8002:8002"
     volumes:
       - "./back-end:/app"
     restart: always

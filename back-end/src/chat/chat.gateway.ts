@@ -6,7 +6,7 @@ import { ChatService } from 'src/chat/chat.service';
 // import { AuthService } from 'src/user/user.service';
 
 @WebSocketGateway(8001, { 
-    namespace: 'chat',
+    // namespace: 'chat',
     cors: '*'})
 export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     

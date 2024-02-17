@@ -3,8 +3,8 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
 import { Game } from "./game.class";
-@WebSocketGateway(8002, {
-    namespace: 'game',
+@WebSocketGateway(8001, {
+    // namespace: 'game',
     cors: "*"
 })
 
@@ -13,13 +13,11 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     @WebSocketServer()
     server: Server;
     
-    private userArray: string[] = [];
+    private userArray: string[] = [];// BUG CHANGE THIS
     private gameState: GameStateBD = new GameStateBD();
     games: Game[] = [];
 
-    constructor() {
-
-    }
+    constructor() {}
 
     onModuleInit() {
         this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
@@ -30,7 +28,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     handleConnection(client: Socket, ...args: any[]) {
         console.log("Le client connecte est -> ", client.id);
         // this.addUser(client.id);
-        // this.sendUAEvent();
     
         const userIndex = this.userArray.indexOf(client.id);
         // this.server.to(client.id).emit('yourUserId', userIndex + 1);
@@ -44,7 +41,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         this.server.emit('user-disconnected', { clientId: client.id, userArray: this.userArray});
         // this.sendUAEvent();
     }
-    
+
+    // TODO Change for only 1 socket
     @SubscribeMessage('keydownPD1')
     handleKeyPressedDownPD1(client: Socket, data: { key: string }) {
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
@@ -77,6 +75,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
     }
 
+
+    // TODO Change for game Class
     @SubscribeMessage('handleCollision2')
     handleCollisionWithLeftBorder() {
         this.gameState.player2Score += 1;
@@ -93,6 +93,9 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         this.server.emit('updatePlayer1', this.gameState.player1Score );
     }
 
+
+
+    // TODO Move to gameClass
     @SubscribeMessage('handleInit1')
     handleInitialisationPlayer1() {
         this.gameState.paddle1.y += this.gameState.paddle1.velocityY;

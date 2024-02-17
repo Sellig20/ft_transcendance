@@ -4,68 +4,39 @@ import { socket, WebsocketProvider } from './contexts/WebsocketContext';
 import { WebSocketPG } from './GameGate/webSocketPG';
 import { WebsocketSG } from './StartGame/websocketSG';
 import QueueGate from './QueueGate/index'
+import { Routes, Route } from 'react-router-dom';
+import Error from './Error/index'
 
 export function Game() {
 	
     return (
-        <div>
-        <WebsocketProvider value ={socket}>
-            <div>
-                <StartGame />
-                <WebsocketSG />
-            </div>
-        </WebsocketProvider>
-        <WebsocketProvider value={socket}>
-            <div>
-                <GameGate />
-                <WebSocketPG />
-            </div>
-        </WebsocketProvider>
-        <WebsocketProvider value={socket}>
-            <div>
-                <QueueGate />
-            </div>
-        </WebsocketProvider>
-        </div>
+        <Routes>
+                <Route path="/" element={
+                    <WebsocketProvider value ={socket}>
+                        <div>
+                            <GameGate />
+                            <WebSocketPG />
+                        </div>
+                    </WebsocketProvider>
+                }/>
+                <Route path="/queue" element={
+                    <WebsocketProvider value ={socket}>
+                        <div>
+                            <QueueGate />
+                        </div>
+                    </WebsocketProvider>
+                }/>
+                <Route path="/startGame" element={
+                    <WebsocketProvider value ={socket}>
+                        <div>
+                            <StartGame />
+                            <WebsocketSG />
+                        </div>
+                    </WebsocketProvider>
+                }/>
+                <Route path="*" element={<Error />} />
+        </Routes>
     )
-    // return (
-    //     <Router>
-    //       <Routes>
-    //         <Route path="/" element={<Home />} />
-    //         <Route path="/survey" element={<Survey />} />
-    //         <Route path="/GameGate" 
-    //           element={
-    //             <WebsocketProvider value={socket}>
-    //               <div>
-    //                 <GameGate />
-    //                 <WebSocketPG />
-    //               </div>
-    //             </WebsocketProvider>
-    //           }
-    //         />
-    //         <Route path="/StartGame" 
-    //           element={
-    //             <WebsocketProvider value ={socket}>
-    //               <div>
-    //                 <StartGame size={10} />
-    //                 <WebsocketSG />
-    //               </div>
-    //             </WebsocketProvider>
-    //           } />
-    //         <Route path="/QueueGate" 
-    //           element={
-    //             <WebsocketProvider value={socket}>
-    //               <div>
-    //                 <QueueGate />
-    //               </div>
-    //             </WebsocketProvider>
-    //           }
-    //         />
-    //         <Route path="*" element={<Error />} />
-    //         {/*toutes celles qui ne sont pas declarees juste au dessus sont en error  */}
-    //       </Routes>
-    //     </Router>
-    //   );
 }
 
 export default Game;

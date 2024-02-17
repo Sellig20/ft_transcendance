@@ -3,6 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
 
+
 export class Game {
     
     private userArray: string[] = [];
@@ -10,7 +11,6 @@ export class Game {
 
     constructor() {
     }
-
 
     maxScore() {
         console.log("mas SCORE");
@@ -82,7 +82,7 @@ export class Game {
     
     startGameLoop(): void {
         setInterval(() => {
-        // this.handleInitialisationPlayer1();
+        //  handleInitialisationPlayer1();
         // this.handleInitialisationPlayer2();
         this.initialisationBallMove();
         this.detectingBorder();
@@ -108,9 +108,6 @@ export class Game {
         })
         console.log("-------------------------------");
     }
-    
-
-
     
     private addUser(item: string): void {
         this.userArray.push(item);
