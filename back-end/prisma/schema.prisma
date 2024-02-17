@@ -29,7 +29,10 @@ model User {
 
   win			  Int @default(0)
   lose			  Int @default(0)
-  
+  elo			  Int @default(400)
+  success_one	  Boolean @default(false)
+  success_two	  Boolean @default(false)
+  success_three   Boolean @default(false)
   
   firstName       String?
   lastName        String?

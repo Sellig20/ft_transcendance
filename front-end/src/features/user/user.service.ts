@@ -69,6 +69,16 @@ const getUserStatus = async (id: string) => {
 	return response.data
 }
 
+const getSats = async () => {
+	let response
+	try {
+		response = await api.get(`/user/stats`)
+	} catch (error){
+		return error;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
@@ -76,6 +86,7 @@ export default {
 	uploadFile: uploadFile,
 	getAvatar: getAvatar,
 	changeUserStatus: changeUserStatus,
-	getUserStatus: getUserStatus
+	getUserStatus: getUserStatus,
+	getSats: getSats
 
 }
