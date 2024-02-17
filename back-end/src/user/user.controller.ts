@@ -116,7 +116,6 @@ export class UserController {
 		let stats = new StatsDto();
 		let db_stats = await this.userservice.dbStats(req.user.id);
 		stats = {...db_stats};
-		console.log('hello stats', stats);
 		
 		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
 		if (stats.level > 5)
