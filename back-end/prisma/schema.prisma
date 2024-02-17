@@ -26,6 +26,10 @@ model User {
   img_url		  String @default("placeholder")
 
   user_status	  String @default("offline")
+
+  win			  Int @default(0)
+  lose			  Int @default(0)
+  
   
   firstName       String?
   lastName        String?
