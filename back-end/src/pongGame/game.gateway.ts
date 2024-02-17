@@ -3,15 +3,15 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { GameStateBD} from "./gameStateBD";
 import { Game } from "./game.class";
-@WebSocketGateway(8001, {
-    // namespace: 'game',
-    cors: "*"
-})
+// @WebSocketGateway(8001, {
+//     // namespace: 'game',
+//     cors: "*"
+// })
 
 export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, OnGatewayDisconnect<Socket> {
     
-    @WebSocketServer()
-    server: Server;
+    // @WebSocketServer()
+    // server: Server;
     
     private userArray: string[] = [];// BUG CHANGE THIS
     private gameState: GameStateBD = new GameStateBD();
@@ -20,9 +20,9 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     constructor() {}
 
     onModuleInit() {
-        this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
-            console.log('Connection -> ', socket.id);
-        })
+        // this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
+        //     console.log('Connection -> ', socket.id);
+        // })
     }
 
     handleConnection(client: Socket, ...args: any[]) {
@@ -38,7 +38,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     
     handleDisconnect(client: Socket, ...args: any[]) {
         // this.removeUser(client.id);
-        this.server.emit('user-disconnected', { clientId: client.id, userArray: this.userArray});
+        // this.server.emit('user-disconnected', { clientId: client.id, userArray: this.userArray});
         // this.sendUAEvent();
     }
 
@@ -48,7 +48,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
         this.gameState.paddle1.velocityY = 3;
         this.handleInitialisationPlayer1();
-        this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
+        // this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
     }
 
     @SubscribeMessage('keydownPD2')
@@ -56,7 +56,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
         this.gameState.paddle2.velocityY = 3;
         this.handleInitialisationPlayer2();
-        this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
+        // this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
     }
 
     @SubscribeMessage('keyupPD1')
@@ -64,7 +64,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);
         this.gameState.paddle1.velocityY = -3;
         this.handleInitialisationPlayer1();
-        this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
+        // this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
     }
 
     @SubscribeMessage('keyupPD2')
@@ -72,7 +72,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);
         this.gameState.paddle2.velocityY = -3;
         this.handleInitialisationPlayer2();
-        this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
+        // this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
     }
 
 
@@ -82,7 +82,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         this.gameState.player2Score += 1;
         // this.games.maxScore();
         // console.log("player 2 score =>", this.gameState.player2Score)
-        this.server.emit('updatePlayer2', this.gameState.player2Score );
+        // this.server.emit('updatePlayer2', this.gameState.player2Score );
     }
 
     @SubscribeMessage('handleCollision1')
@@ -90,7 +90,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
         this.gameState.player1Score += 1;
         // this.games.maxScore();
         // console.log("player 1 score =>", this.gameState.player1Score)
-        this.server.emit('updatePlayer1', this.gameState.player1Score );
+        // this.server.emit('updatePlayer1', this.gameState.player1Score );
     }
 
 
@@ -100,14 +100,14 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection<Socket>, O
     handleInitialisationPlayer1() {
         this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
         this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
-        this.server.emit('initplayer1', this.gameState.paddle1.y)
+        // this.server.emit('initplayer1', this.gameState.paddle1.y)
     }
 
     @SubscribeMessage('handleInit2')
     handleInitialisationPlayer2() {
         this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
         this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
-        this.server.emit('initplayer2', this.gameState.paddle2.y)
+        // this.server.emit('initplayer2', this.gameState.paddle2.y)
     }
     
     @SubscribeMessage('handleInitBallAndGame')

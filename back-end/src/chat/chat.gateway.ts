@@ -5,9 +5,9 @@ import { UsersService } from 'src/user/user.service';
 import { ChatService } from 'src/chat/chat.service';
 // import { AuthService } from 'src/user/user.service';
 
-@WebSocketGateway(8001, { 
-    // namespace: 'chat',
-    cors: '*'})
+// @WebSocketGateway(8001, { 
+//     // namespace: 'chat',
+//     cors: '*'})
 export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     
     constructor(
@@ -15,16 +15,16 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
 		private userService: UsersService,
         private chatService: ChatService) { }
     
-    @WebSocketServer()
-    server: Server;
+    // @WebSocketServer()
+    // server: Server;
 
     private userArray: any[] = [];
 
     onModuleInit() {
-        this.server.on('-- ON MODULE INIT -- connection', (socket) => {
-            console.log("socket du server:", socket.id);
-            console.log('-- ON MODULE INIT -- Connected in gateway.ts');
-        })
+        // this.server.on('-- ON MODULE INIT -- connection', (socket) => {
+        //     console.log("socket du server:", socket.id);
+        //     console.log('-- ON MODULE INIT -- Connected in gateway.ts');
+        // })
     }
 
     private printAllUser(liste: any[]): void {
@@ -122,7 +122,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
             await this.findSocketChannels(message.to).then(res => {
                 res.map((item, index) => {
                     // console.log("envoie de '", message.data, "' to socketid :", item)
-                    this.server.to(item).emit("MP", {from_channel: message.to, from_user:message.from_user, data:message.data});
+                    // this.server.to(item).emit("MP", {from_channel: message.to, from_user:message.from_user, data:message.data});
                 })
                 this.chatService.createMessage(message.data, message.from_user, message.to)
             })
