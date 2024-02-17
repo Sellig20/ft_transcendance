@@ -1,4 +1,10 @@
-
+export enum playerStatus {
+  isSettling = 'IS SETTLING',
+  isAvailable = 'IS AVAILABLE',
+  isWaitingSmo = 'IS WAITING SOMEONE',
+  isPlaying = 'IS PLAYING',
+  finishedPlaying = 'FINISHED PLAYING',
+}
 export class GameStateBD {
     boardWidth: number = 500;
     boardHeight: number = 500;
@@ -20,7 +26,7 @@ export class GameStateBD {
 
     idPlayer1: string = "one";
     idPlayer2: string = "two";
-
+    
     paddle1: PaddleType = {
       x: 10,
       y: this.boardHeight / 2,
@@ -62,5 +68,9 @@ export class GameStateBD {
     velocityX: number,
     velocityY: number,
     color: string,
+  }
+  export interface Player {
+    socketId: string;
+    status: playerStatus;
   }
   

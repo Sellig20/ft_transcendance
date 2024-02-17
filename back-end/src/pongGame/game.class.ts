@@ -1,15 +1,39 @@
 import { OnModuleInit } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
-import { GameStateBD} from "./gameStateBD";
-
+import { GameStateBD, Player} from "./gameStateBD";
 
 export class Game {
     
-    private userArray: string[] = [];
+    // private userArray: string[] = [];
     private gameState: GameStateBD = new GameStateBD();
+    private gameId: string;
+    private server: Server;
+    private player1: Player;
+    private player2: Player;
 
-    constructor() {
+    constructor(Id: string, server: Server, player1: Player, player2: Player) {
+        this.gameId = Id;
+        this.server = server;
+        this.player1 = player1;
+        console.log("***** 1 ******** ", this.player1.socketId);
+        this.player2 = player2;
+        console.log("****** 2 ******* ", this.player2.socketId);
+    }
+
+    actualDataInClassGame() {
+        console.log("game id => ", this.gameId);
+        console.log("player1 => ", this.player1.socketId);
+        console.log("player2 => ", this.player2.socketId);
+    }
+
+    start() {
+        // this.server.emit('prepareForMatch');
+        this.sendToPlayer("prepareForMatch", {});
+    }
+
+    sendToPlayer(event: string, data: any) {
+        this.server.emit(event, data);
     }
 
     maxScore() {
@@ -79,7 +103,7 @@ export class Game {
             this.gameState.ball.velocityY = -this.gameState.ball.velocityY;
         }
     }
-    
+
     startGameLoop(): void {
         setInterval(() => {
         //  handleInitialisationPlayer1();
@@ -97,29 +121,10 @@ export class Game {
         }, 16); // 16 ms (environ 60 FPS)
     }
     
-    getConnectedUsers(): string[] {
-        return Array.from(this.userArray);
-    }
+    // getConnectedUsers(): string[] {
+    //     return Array.from(this.userArray);
+    // }
     
-    private displayUserArray(): void {
-        console.log("-------------------------------");
-        this.userArray.forEach((item, index) => {
-            console.log(`item [${item}] | index ${index}`);
-        })
-        console.log("-------------------------------");
-    }
     
-    private addUser(item: string): void {
-        this.userArray.push(item);
-        const index = this.userArray.indexOf(item);
-        console.log(`Le client ajoute est => ${item} pour index : ${index}`);
-    }
-    
-    private removeUser(userId: string): void {
-        const indexToRemove = this.userArray.indexOf(userId);
-        if (indexToRemove !== -1) {
-            this.userArray.splice(indexToRemove, 1);
-        }
-    }
 }
     

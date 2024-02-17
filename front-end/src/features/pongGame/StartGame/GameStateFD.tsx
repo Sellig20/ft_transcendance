@@ -1,4 +1,10 @@
+import { Socket } from "socket.io-client";
 
+enum playerStatus {
+  isAvailable = 'ISAVAILABLE',
+  isPlaying = 'ISPLAYING',
+  finishedPlaying = 'FINISHEDPLAYING',
+}
 export class GameStateFD {
     boardWidth: number = 500;
     boardHeight: number = 500;
@@ -64,6 +70,10 @@ export class GameStateFD {
     velocityX: number,
     velocityY: number,
     color: string,
+  }
+  export interface Player {
+    socketId: Socket;
+    statuts: playerStatus;
   }
   
   

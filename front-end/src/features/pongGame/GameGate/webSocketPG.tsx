@@ -1,24 +1,30 @@
 import { useContext, useEffect, useState } from "react"
 import { WebsocketContext } from "../contexts/WebsocketContext"
-
+import { useNavigate } from 'react-router-dom';
 
 export const WebSocketPG = () => {
 
-    const [value, setValue] = useState('');
+    const navigate = useNavigate();
     const socket = useContext(WebsocketContext);
 
+    const handleRedirectToQueueGate = () => {
+        socket.emit('goQueueList', socket.id);
+        navigate('../queue');
+    }
+    
     useEffect(() => {
+
         if (socket.connected)
         {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
-
+        
         const handleConnect = () => {
-                console.log('Connected in GAME GATE!');
+            console.log('Connected in GAME GATE!');
         }
 
         socket.on('connect', handleConnect);
-        
+
         return () => {
             console.log("Unregistering events...");  
             socket.off('connect');
@@ -30,7 +36,7 @@ export const WebSocketPG = () => {
         <div>
             <div>
                 <h1>Websocket Component</h1>
-                
+                <button onClick={handleRedirectToQueueGate}>QueueGateuh</button>
             </div>
         </div>
     )
