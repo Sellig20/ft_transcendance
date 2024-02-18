@@ -150,56 +150,21 @@ export const WebsocketSG = () => {
         if (socket.connected) {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
-
-        // socket.emit('handleInit1');
-        // socket.emit('handleInit2');
-        // socket.emit('handleInitBallAndGame');
-        
-        const userId = 1;
-        const makeMovePaddle1 = (newVelocityY: number) => {
-            // console.log("velocity en recepton = ", newVelocityY);
-        }
-        const makeMovePaddle2 = (newVelocityY: number) => {
-            // console.log("velocity en recepton = ", newVelocityY);
-        }
         
         const handleKeyDown = (event: KeyboardEvent) => {
             
             if (event.key === 'ArrowUp') {
-                if (userId === 1) {
-                    socket.emit('keyupPD1', { key: event.code })
-                        socket.on('paddle1Moved', (newVelocityY: number) => {
-                        makeMovePaddle1(newVelocityY);
-                    })
-                    console.log(`Arrow UP by ${userId}`);
-                    
-                } else if (userId === 2) {
-                    socket.emit('keyupPD2', { key: event.code })
-                    socket.on('paddle2Moved', (newVelocityY: number) => {
-                        makeMovePaddle2(newVelocityY);
-                    })
-                    console.log(`Arrow UP by ${userId}`);
-                }
+                console.log("JE PASSSSSSSSSSE ICI UUUUUUUP")
+                socket.emit('keyupPD1', {key: event.code})
+
             }
             else if (event.key === 'ArrowDown') {
-                if (userId === 1) {
-                    socket.emit('keydownPD1', { key: event.code })
-                    socket.on('paddle1Moved', (newVelocityY: number) => {
-                        makeMovePaddle1(newVelocityY);
-                    })
-                    console.log(`Arrow DOWN by ${userId}`);
-                } else if (userId === 2) {
-                    socket.emit('keydownPD2', { key: event.code })
-                    socket.on('paddle2Moved', (newVelocityY: number) => {
-                        makeMovePaddle2(newVelocityY);
-                    })
-                    console.log(`Arrow DOWN by ${userId}`);
-                }
+                console.log("JE PASSSSSSSSSSE ICI DOOOOWN")
+                socket.emit('keydownPD1', {key: event.code})
             }
         }; 
 
         window.addEventListener('keydown', handleKeyDown);
-        // socket.on('sendCanvasToServer', sendCanvasToServer);
 
         //quand je reviens du serveur. le serveur renvoie :
         socket.on('initplayer1', (newGameState: number) => {
@@ -240,7 +205,6 @@ export const WebsocketSG = () => {
             window.removeEventListener('keydown', handleKeyDown);
             socket.off('updatePaddle1');
             socket.off('updatePaddle2');
-            // socket.off('sendCanvasToServer', sendCanvasToServer);
             socket.off('updateCanvasAfterSend');
             socket.off('updateBallDataToClientTHREE');
             socket.off('initplayer1');

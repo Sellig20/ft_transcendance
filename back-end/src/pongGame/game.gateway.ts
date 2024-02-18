@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
     cors: "*"
 })
 
-export class gatewayPong implements OnGatewayConnection<Socket>, OnGatewayDisconnect<Socket> {
+export class gatewayPong implements OnGatewayDisconnect<Socket> {
     
     @WebSocketServer()
     server: Server;
@@ -32,52 +32,55 @@ export class gatewayPong implements OnGatewayConnection<Socket>, OnGatewayDiscon
     handleConnection(client: Socket, ...args: any[]) {
         let i = 0;
         this.addUser(client.id);
-        // console.log("--------------------- on connection 1 ------------------");
-        // this.displayUserArray();
-        // console.log("--------------------- on connection 2 ------------------");
-
     }
-    // this.server.to(client.id).emit('yourUserId', userIndex + 1);
-
-    // this.server.emit('user-connected', { clientId: client.id, userArray: this.userArray});
     
     handleDisconnect(client: Socket, ...args: any[]) {
-        this.removeUser(client.id);
+        // this.removeUser(client.id);
         this.server.emit('user-disconnected', { clientId: client.id, userArray: this.userArray});
     }
 
+    getStrGame(id: string)
+    {
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const gameId = currentGame.getGameId();
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (id === d1 || id === d2) {
+                console.log(`Game found for player ${id}: ${gameId}`);
+                // Faites ce que vous devez faire avec la game trouvée
+            } else {
+                console.log(`No game found for player ${id} in game ${gameId}`);
+            }
+        }
+    }
+    
     // TODO Change for only 1 socket
     @SubscribeMessage('keydownPD1')
-    handleKeyPressedDownPD1(client: Socket, data: { key: string }) {
+    handleKeyPressedDownPD1(client: Socket, data: {key: string}) {
         console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
+        const strGame = this.getStrGame(client.id);
         this.gameState.paddle1.velocityY = 3;
         this.handleInitialisationPlayer1();
         this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
     }
 
-    @SubscribeMessage('keydownPD2')
-    handleKeyPressedDownPD2(client: Socket, data: { key: string }) {
-        console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
-        this.gameState.paddle2.velocityY = 3;
-        this.handleInitialisationPlayer2();
-        this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
-    }
-
     @SubscribeMessage('keyupPD1')
-    handleKeyPressedUpPD1(client: Socket, data: { key: string }) {
-        console.log('PADDLE MOVED: [', data.key, '] by', client.id);
+    handleKeyPressedUpPD1(client: Socket, data: {key: string}) {
+        console.log('PADDLE MOVED: [', data.key, '] by', client.id);        
+        const strGame = this.getStrGame(client.id);
         this.gameState.paddle1.velocityY = -3;
         this.handleInitialisationPlayer1();
         this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
     }
 
-    @SubscribeMessage('keyupPD2')
-    handleKeyPressedUpPD2(client: Socket, data: { key: string }) {
-        console.log('PADDLE MOVED: [', data.key, '] by', client.id);
-        this.gameState.paddle2.velocityY = -3;
-        this.handleInitialisationPlayer2();
-        this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
-    }
+    // @SubscribeMessage('keyupPD2')
+    // handleKeyPressedUpPD2(client: Socket, data: { key: string }) {
+    //     console.log('PADDLE MOVED: [', data.key, '] by', client.id);
+    //     this.gameState.paddle2.velocityY = -3;
+    //     this.handleInitialisationPlayer2();
+    //     this.server.emit('paddle2Moved', this.gameState.paddle1.velocityY);
+    // }
 
     // TODO Change for game Class
     @SubscribeMessage('handleCollision2')
@@ -116,35 +119,15 @@ export class gatewayPong implements OnGatewayConnection<Socket>, OnGatewayDiscon
         // this.games.startGameLoop();
     }
 
-    // @SubscribeMessage('goQueueList')
-    // handleGoQueueList(client: Socket, payload: any): void {
-    //   const playersToPlay = this.players.filter(player => player.status === PlayerStatus.Available).slice(0, 2);
-  
-    //   if (playersToPlay.length === 2) {
-    //     playersToPlay.forEach(player => {
-    //       player.status = PlayerStatus.Playing;
-    //     });
-  
-    //     playersToPlay.forEach(player => {
-    //       this.server.to(player.id).emit('gameStart', { message: 'Le jeu commence!' });
-    //     });
-    //   } else {
-
-    //   }
-    // }
-  
-    // private emitUpdatedPlayers() {
-    //   this.server.emit('updatedPlayers', this.players);
-    // }
 
     @SubscribeMessage('goQueueList') 
     handleGoQueueList(client: Socket, socketId: string): void {
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];
-            if (socketId === player.socketId) {
-                player.status = playerStatus.isAvailable;
+            if (socketId === player.socketId && player.status) {//si tu as clique
+                player.status = playerStatus.isAvailable;//je te mets en available pour jouer
                 player.socketId = socketId;
-                this.userArray.splice(i, 1, player);
+                this.userArray.splice(i, 1, player);//je remets le joueur actualise
             }
         }
         const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
@@ -158,12 +141,31 @@ export class gatewayPong implements OnGatewayConnection<Socket>, OnGatewayDiscon
             const player1 = playersAvailable[0];
             const player2 = playersAvailable[1];
             const gameId = uuidv4();
+            console.log("");
+            console.log("");
+            console.log("LES JOUEURS QUI VEULENT JOUER SONT : 1  ", player1);
+            console.log("LES JOUEURS QUI VEULENT JOUER SONT : 2  ", player2);
+            console.log("");
+            console.log("");
             const currentGame = new Game(gameId, this.server, player1, player2);
             this.games.push(currentGame);
             currentGame.actualDataInClassGame();
             currentGame.start();
+            playersAvailable.length = 0;
             this.removeUser(player1.socketId);
             this.removeUser(player2.socketId);
+    
+            // Retirer les joueurs de playersAvailable
+            const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
+            const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
+    
+            if (indexPlayer1 !== -1) {
+                playersAvailable.splice(indexPlayer1, 1);
+            }
+    
+            if (indexPlayer2 !== -1) {
+                playersAvailable.splice(indexPlayer2, 1);
+            }
         }
     }
 
@@ -192,37 +194,3 @@ export class gatewayPong implements OnGatewayConnection<Socket>, OnGatewayDiscon
         }
     }
 }
-
-
-
-// let count = 0;
-        // this.displayUserArray();
-        // for (let i = 0; i < this.userArray.length; i++) {
-        //     const player = this.userArray[i];
-        //     const sI = player.socketId;
-        //     if (player.status === 'IS AVAILABLE') {
-        //         if (count === 1) {
-        //             player.status = playerStatus.isPlaying;
-        //             player.socketId = sI;
-        //             this.userArray.splice(i, 1, player);
-        //             break;
-        //         }
-        //         else {
-        //             count = 1;
-        //             player.status = playerStatus.isWaitingSmo;
-        //             player.socketId = sI;
-        //             this.userArray.splice(i, 1, player);
-        //         }
-        //     }
-        // }
-        // if (count === 1) {
-        //     for (let i = 0; i < this.userArray.length; i++) {
-        //         const player = this.userArray[i];
-        //         const sI = player.socketId;
-        //         if (player.status === 'IS WAITING SOMEONE') {
-        //                 player.status = playerStatus.isPlaying;
-        //                 player.socketId = sI;
-        //                 this.userArray.splice(i, 1, player);
-        //         }
-        //     }
-        // }

@@ -11,22 +11,54 @@ export class Game {
     private server: Server;
     private player1: Player;
     private player2: Player;
+    private boolAct: boolean = false;
 
     constructor(Id: string, server: Server, player1: Player, player2: Player) {
-        this.gameId = Id;
         this.server = server;
-        this.player1 = player1;
-        console.log("***** 1 ******** ", this.player1.socketId);
-        this.player2 = player2;
-        console.log("****** 2 ******* ", this.player2.socketId);
+        if (!this.player1 && !this.player2) 
+        {
+            console.log("undefined 1 et 2");
+            this.player1 =player1;
+            this.player2 = player2;
+            this.server = server;
+            this.gameId = Id;
+            console.log("***** 1 ******** ", this.player1.socketId);
+            console.log("****** 2 ******* ", this.player2.socketId);
+            console.log("***** 3 ******** ", this.gameId);
+        }
+        else if (this.player1 && player1.socketId && this.player1.socketId === player1.socketId) {
+            console.log("player 1 non undefned mais pareil ");
+            return ;
+        }
+        else if (this.player1 && player1.socketId && this.player1.socketId !== player1.socketId){
+            
+            console.log("player 2 non undefned mais diff ");
+            this.player1 = player1;
+            
+            // this.player1 = player1;
+        }
+        else if (this.player2 && player2.socketId && this.player2.socketId === player2.socketId) {
+            console.log("player 2 non undefned mais pareil ");
+            return ;
+        }
+        else if (this.player2 && player2.socketId && this.player2.socketId !== player2.socketId){
+            this.player2 = player2;
+            this.server = server;
+            this.gameId = Id;
+            console.log("***** 1 ******** ", this.player1.socketId);
+            console.log("****** 2 ******* ", this.player2.socketId);
+            console.log("***** 3 ******** ", this.gameId);
+            console.log("player 2 non undefned mais diff ");
+            // this.player1 = player1;
+        }
+        else
+            return;
     }
 
     actualDataInClassGame() {
         console.log("game id => ", this.gameId);
-        console.log("player1 => ", this.player1.socketId);
-        console.log("player2 => ", this.player2.socketId);
     }
-
+    
     start() {
         // this.server.emit('prepareForMatch');
         this.sendToPlayer("prepareForMatch", {});
@@ -34,6 +66,32 @@ export class Game {
 
     sendToPlayer(event: string, data: any) {
         this.server.emit(event, data);
+    }
+
+    getGameId(): string {
+        return this.gameId;
+    }
+
+    getPlayer1Id() : string {
+        return this.player1.socketId;
+    }
+
+    getPlayer2Id() : string {
+        return this.player2.socketId;
+    }
+    
+    getGameForPlayer(id: string) {
+        // console.log("------------------- loading ", id);
+        // console.log("player1 => ", this.player1.socketId);
+        // console.log("player2 => ", this.player2.socketId);
+        if (id == this.player1.socketId || id == this.player2.socketId) {
+            console.log("gameId is : ", this.gameId);
+            return this.gameId;
+        }
+        else {
+                console.log("gameId is : not founded");
+                return "nor found";
+        }
     }
 
     maxScore() {

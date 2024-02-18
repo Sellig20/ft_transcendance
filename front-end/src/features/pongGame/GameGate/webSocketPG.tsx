@@ -9,6 +9,7 @@ export const WebSocketPG = () => {
 
     const handleRedirectToQueueGate = () => {
         socket.emit('goQueueList', socket.id);
+        console.log("Nous avons clique !");
         navigate('../queue');
     }
     
@@ -19,18 +20,19 @@ export const WebSocketPG = () => {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
         
-        const handleConnect = () => {
-            console.log('Connected in GAME GATE!');
-        }
+        // const handleConnect = () => {
+            // console.log('Connected in GAME GATE!');
+        // }
 
-        socket.on('connect', handleConnect);
+        // socket.on('connect', handleConnect);
 
         return () => {
             console.log("Unregistering events...");  
             socket.off('connect');
+            socket.off('goQueueList', handleRedirectToQueueGate);
         }
 
-    }, [socket]);
+    }, []);
 
     return (
         <div>
