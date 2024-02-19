@@ -12,13 +12,10 @@ const genQrcode = async () => {
 }
 
 const changeUserName = async (name: string) => {
-	let response
 	try {
-		response = await api.post('/user/name', {name: name})
+		await api.post('/user/name', {username: name})
 	} catch (error){
-		return error;
 	}
-	return response.data
 }
 
 const uploadFile = async (file: FormData) => {

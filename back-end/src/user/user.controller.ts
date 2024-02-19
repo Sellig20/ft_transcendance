@@ -7,7 +7,7 @@ import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { join } from 'path';
-import { stat } from 'fs';
+import { NameDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -40,11 +40,12 @@ export class UserController {
 	}
 
 	@Post('/name')
-	async changeUserName(@Req() req, @Body() body) {
+	async changeUserName(@Req() req, @Body() nameDto: NameDto) {
 		const user = req.user;
-		const result = await this.userservice.changeName(user.id, body.name);
-		console.log(result);
-		return result
+		await this.userservice.changeName(user.id, nameDto.username);
+		console.log(nameDto);
+		
+		return nameDto.username
 	}
 
 	@Post('/upload')

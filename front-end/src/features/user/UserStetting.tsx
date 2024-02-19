@@ -41,8 +41,7 @@ const UserSetting = () => {
 	}
 
 	const hanldeUsername =  async () => {
-		const rep = await userService.changeUserName(username)
-		console.log(rep);
+		await userService.changeUserName(username)
 	}
 
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
