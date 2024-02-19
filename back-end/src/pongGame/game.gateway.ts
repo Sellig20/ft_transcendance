@@ -47,30 +47,92 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
             const d1 = currentGame.getPlayer1Id();
             const d2 = currentGame.getPlayer2Id();
             if (id === d1 || id === d2) {
-                console.log(`Game found for player ${id}: ${gameId}`);
-                // Faites ce que vous devez faire avec la game trouvée
+                // console.log(`Game found for player ((${id})): [${gameId}]`);
+                return gameId;
+
             } else {
-                console.log(`No game found for player ${id} in game ${gameId}`);
+                console.log(`No game found for player ((${id})) in game [${gameId}]`);
             }
         }
     }
+
+    getP(id: string)
+    {
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const gameId = currentGame.getGameId();
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (id === d1) {
+                return 1;
+            } else  if (id === d2) {
+                return 2;
+            }
+            else
+                console.log("Error");
+        }
+    }
+
+  
     
     // TODO Change for only 1 socket
     @SubscribeMessage('keydownPD1')
     handleKeyPressedDownPD1(client: Socket, data: {key: string}) {
-        console.log('PADDLE MOVED: [', data.key, '] by', client.id);        // this.handleUpdatePositionPaddle(client, data);
         const strGame = this.getStrGame(client.id);
+        const player1dup = this.getP(client.id);
+        let whatI: string = null;
+        if (player1dup === 1)
+            whatI = "player 1";
+        else if (player1dup === 2)
+            whatI = "player 2";
+        // console.log('xxx paadle down : [', data.key, ']\n by', client.id, ' who is ', whatI,' in [', strGame,']');;// this.handleUpdatePositionPaddle(client, data);
         this.gameState.paddle1.velocityY = 3;
-        this.handleInitialisationPlayer1();
-        this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
+        if (player1dup === 1)
+        {
+            this.gameState.paddle1.socket = client.id;
+            console.log("Je suis 1 et je suis : ", this.gameState.paddle1.socket);
+            this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
+            this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
+            this.server.emit('initplayer1', this.gameState.paddle1.y);
+        }
+        else if (player1dup === 2)
+        {
+            this.gameState.paddle2.socket = client.id;
+            console.log("Je suis 2 et je suis : ", this.gameState.paddle2.socket);
+            this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
+            this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
+            this.server.emit('initplayer2', this.gameState.paddle2.y);
+        }
+        else
+            return ;
     }
+
+    // @SubscribeMessage('handleInit1')
+    // handleInitialisationPlayer1() {
+    //     this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
+    //     this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
+    //     this.server.emit('initplayer1', this.gameState.paddle1.y)
+    // }
+
+    // @SubscribeMessage('handleInit2')
+    // handleInitialisationPlayer2() {
+    //     this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
+    //     this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
+    //     this.server.emit('initplayer2', this.gameState.paddle2.y)
+    // }
 
     @SubscribeMessage('keyupPD1')
     handleKeyPressedUpPD1(client: Socket, data: {key: string}) {
-        console.log('PADDLE MOVED: [', data.key, '] by', client.id);        
         const strGame = this.getStrGame(client.id);
+        const player1dup = this.getP(client.id);
+        let whatI: string = null;
+        if (player1dup === 1)
+            whatI = "player 1";
+        else if (player1dup === 2)
+            whatI = "player 2";
+        console.log('xxx paadle up : [', data.key, ']\n by', client.id, ' who is ', whatI,' in [', strGame,']');;// this.handleUpdatePositionPaddle(client, data);
         this.gameState.paddle1.velocityY = -3;
-        this.handleInitialisationPlayer1();
+        // this.handleInitialisationPlayer1();
         this.server.emit('paddle1Moved', this.gameState.paddle1.velocityY);
     }
 
@@ -100,25 +162,12 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     }
 
     // TODO Move to gameClass
-    @SubscribeMessage('handleInit1')
-    handleInitialisationPlayer1() {
-        this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
-        this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
-        this.server.emit('initplayer1', this.gameState.paddle1.y)
-    }
-
-    @SubscribeMessage('handleInit2')
-    handleInitialisationPlayer2() {
-        this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
-        this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
-        this.server.emit('initplayer2', this.gameState.paddle2.y)
-    }
+   
     
     @SubscribeMessage('handleInitBallAndGame')
     handleInitialisationBall() {
         // this.games.startGameLoop();
     }
-
 
     @SubscribeMessage('goQueueList') 
     handleGoQueueList(client: Socket, socketId: string): void {

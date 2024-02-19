@@ -18,7 +18,7 @@ export class Game {
         if (!this.player1 && !this.player2) 
         {
             console.log("undefined 1 et 2");
-            this.player1 =player1;
+            this.player1 = player1;
             this.player2 = player2;
             this.server = server;
             this.gameId = Id;
@@ -34,7 +34,6 @@ export class Game {
             
             console.log("player 2 non undefned mais diff ");
             this.player1 = player1;
-            
             // this.player1 = player1;
         }
         else if (this.player2 && player2.socketId && this.player2.socketId === player2.socketId) {
@@ -78,20 +77,6 @@ export class Game {
 
     getPlayer2Id() : string {
         return this.player2.socketId;
-    }
-    
-    getGameForPlayer(id: string) {
-        // console.log("------------------- loading ", id);
-        // console.log("player1 => ", this.player1.socketId);
-        // console.log("player2 => ", this.player2.socketId);
-        if (id == this.player1.socketId || id == this.player2.socketId) {
-            console.log("gameId is : ", this.gameId);
-            return this.gameId;
-        }
-        else {
-                console.log("gameId is : not founded");
-                return "nor found";
-        }
     }
 
     maxScore() {

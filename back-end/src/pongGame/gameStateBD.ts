@@ -28,6 +28,7 @@ export class GameStateBD {
     idPlayer2: string = "two";
     
     paddle1: PaddleType = {
+      socket: null,
       x: 10,
       y: this.boardHeight / 2,
       width: this.playerWidth,
@@ -36,6 +37,7 @@ export class GameStateBD {
     };
   
     paddle2: PaddleType = {
+      socket: null,
       x: this.boardWidth - this.playerWidth - 10,
       y: this.boardHeight / 2,
       width: this.playerWidth,
@@ -54,6 +56,7 @@ export class GameStateBD {
     };
   }
   export interface PaddleType {
+    socket: string;
     x: number;
     y: number;
     width: number;
