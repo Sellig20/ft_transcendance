@@ -58,11 +58,12 @@ const Message = ({ id, content, sender, sender_name} : {
 	}
 }
 
-export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo} : {
+export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo, locked} : {
 	channelinfo: any,
 	newMessages: any,
 	reload: () => void,
-	userinfo: any
+	userinfo: any,
+	locked: boolean
 }) => {
 	console.log("print chann")
 	if (channelinfo === "")
@@ -78,20 +79,28 @@ export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo} : {
 			</div>
 		);
 	}
+	if (channelinfo.password !== "" && channelinfo.password !== null && locked === true)
+	{
+		return(
+			<div>
+				please enter password...
+			</div>
+		);
+	}
 	console.log("[DEBUG] channel_messages loaded !", channelinfo);
 	const channel = channelinfo
 	if (newMessages.length !== 0)
 		channel.messages.push(newMessages)
 	console.log("channel", channel.messages)
 	console.log("tttttt", newMessages)
-	if (channel.messages.length === 0)
-	{
-		return(
-			<div>
-				send message to start conversation !
-			</div>
-		);
-	}
+	// if (channel.messages.length === 0)
+	// {
+	// 	return(
+	// 		<div>
+	// 			send message to start conversation !
+	// 		</div>
+	// 	);
+	// }
 	return (
 		<div>
 			<div>

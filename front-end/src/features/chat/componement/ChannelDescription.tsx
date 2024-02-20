@@ -102,7 +102,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 				<div>
 					{element.username} ({status})
 					<input type="button" value={"Mute (1min)"} id={element.id}/>
-					<input type="button" value={"kick"} id={element.id}/>
+					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id}/>
 					<input type="button" value={"Profil"} id={element.id}/>
 					<input type="button" value={"PlayWith"} id={element.id}/>
@@ -142,7 +142,6 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 	if(isOwner === false && channelinfo.admins.length !== 0 && channelinfo.admins.indexOf(userinfo.id) !== -1)
 		isAdmin = true
 	console.log("channelinfoooo", channelinfo)
-	// console.log(channelinfo.admins.indexOf(1))
 	return (
 		<div>
 			WELCOME TO : {channelinfo.name}

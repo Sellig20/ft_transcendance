@@ -19,10 +19,11 @@ export function Chat() {
 	const inputMessageRef = useRef(null);
 	const inputFriendRef = useRef(null);
 
-
+	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
 	const [channelSelect, setchannelSelect] = useState<any>(); // channel en cours d'affichage
 	const [userinfo, setUserinfo] = useState<any>(null); // info du user connected
+	
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
 	const reload = (
@@ -152,30 +153,27 @@ export function Chat() {
 			send(input);
 			inputMessageRef.current.value = "";
 		}
-
-
-		// setUpdated(inputMessageRef.current.value);
-		// // const button: HTMLButtonElement = event.currentTarget;
-		// // setClickedButton(button.name);
-		// // console.log(buttonname);
-		// // console.log(message);
-
 	};
 
 	const handleChannel = async (
-		event: React.MouseEvent<HTMLButtonElement>
+		// event: React.MouseEvent<HTMLButtonElement>
+		channelinfo: any,
 	) => {
-		event.preventDefault();
+		// event.preventDefault();
 		setMessageSocket([])
-		const id_chann = event.currentTarget.id
-		console.log("clicked on a channel, id_channel =", id_chann);
+		// const id_chann = event.currentTarget.id
+		console.log("clicked on a channel, id_channel =", channelinfo.id);
 		// setchannelSelectInfo() faire requete
-		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => {
+		await chatService.findAllInfoInChannelById(Number(channelinfo.id)).then(messageChann => {
 			if (messageChann === "") //	le channel existe pas
 			{
 				reload();
 				return ;
 			}
+			if (messageChann.password === null || messageChann.password === "")
+				setChannelLocked(false)
+			else
+				setChannelLocked(true)
 			setchannelSelect(messageChann)
 		});
 
@@ -202,13 +200,13 @@ export function Chat() {
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo}/>
+					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
 					<div key={1}>
-						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo}/>
-						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo} locked={channelLocked}/>
+						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef} locked={channelLocked} setLocked={setChannelLocked}/>
 					</div>
 				</div>
 			</div>
