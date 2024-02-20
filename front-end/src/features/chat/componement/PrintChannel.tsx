@@ -5,10 +5,11 @@ import { ChannelDescription } from './ChannelDescription';
 import chatService from '../chat.service'
 
 
-const Message = ({ id, content, sender} : {
+const Message = ({ id, content, sender, sender_name} : {
 	id: string,
 	content: string, 
 	sender: string,
+	sender_name: string
 }) => {
 	// console.log("message id:", id, " message:", content);
 	if (sender == "1")
@@ -20,7 +21,7 @@ const Message = ({ id, content, sender} : {
 					<div className="ms-5">
 						<div className="d-flex flex-row-reverse">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-								de : {sender}
+								de : {sender_name}
 								<br />
 								'{content}'
 							</div>
@@ -42,7 +43,7 @@ const Message = ({ id, content, sender} : {
 				{/* <div class="bg-danger"> */}
 						<div className="d-flex flex-row mb-3">
 							<div className="p-3 mb-2 bg-primary text-white  rounded-5">
-								de : {sender}
+								de : {sender_name}
 								<br />
 								'{content}'
 							</div>
@@ -94,13 +95,13 @@ export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo} : {
 	return (
 		<div>
 			<div>
-				<ChannelDescription channelinfo={channel} userinfo={userinfo}/>
+				<ChannelDescription channelinfo={channel} userinfo={userinfo} reload={reload}/>
 			</div>
 			{
 				channel.messages.map((element: any, index:any) => {
 					return (
 						<div key={index}>
-							<Message id={element.id} content={element.content} sender={element.userId}/>
+							<Message id={element.id} content={element.content} sender={element.userId} sender_name={element.sender_name}/>
 						</div>
 					)
 				})
