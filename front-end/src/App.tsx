@@ -1,7 +1,7 @@
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 import Login from './features/login/Login';
 import Auth from './features/login/Auth'
-import Home from './features/login/Home';
+import Home from './features/Homepage/Home';
 import ProtectedRoute from './features/login/ProtectedRoute';
 import Navbar from './features/navbar/Navbar';
 import UserSetting from './features/user/UserStetting';
