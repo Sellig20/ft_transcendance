@@ -38,10 +38,25 @@ const createChannel = async (
 	return response.data
 }
 
+const leaveChannelById = async (
+	userid: number, 
+	channelid: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
 	findAllInfoInChannelById: findAllInfoInChannelById,
-	createChannel: createChannel
+	createChannel: createChannel,
+	leaveChannelById: leaveChannelById
 
 }

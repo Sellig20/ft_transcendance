@@ -39,11 +39,19 @@ export function Chat() {
 			setUserinfo(userinfo)
 			console.log("[FROM DB] userinfo:", userinfo)
 			setChannelJoined(userinfo.channel_list)
+			if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
+			{
+				let finded = false
+				userinfo.channel_list.map((element: any) => {
+					if (element.id === channelSelect.id)
+						finded = true
+				})
+				if (finded === false)
+					setchannelSelect(null)
+			}
 			if (firstcall === true)
 				newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
 		});
-		// choper les infos du user connecte
-		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
 	}
 	
 	const first = (
@@ -71,7 +79,7 @@ export function Chat() {
 		// to generate database
 		if (value === "a")
 			socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value,})
-		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value, to:channelSelect.id})
+		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, from_user_name: userinfo.username, data:value, to:channelSelect.id})
 		console.log("value:", value);
 	}
 
@@ -85,7 +93,7 @@ export function Chat() {
 		{
 			console.log("msg recu:", messageprop)
 			setMessageSocket(messageprop)
-			setMessageSocket({content: messageprop.data, userId: messageprop.from_user})
+			setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
 
@@ -155,6 +163,7 @@ export function Chat() {
 			inputFriendRef.current.value = "";
 		}
 	};
+
 	return (
 		<div>
 			<div>

@@ -1,8 +1,20 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
-
 import chatService from '../chat.service'
 import { userInfo } from 'os'
+
+const handleLeave = async (
+	userid: number,
+	channelid: number,
+	reload: any
+) => {
+	await chatService.leaveChannelById(Number(userid), Number(channelid)).then(res => {
+		// setchannelSelect(null)
+		reload();
+		console.log(res)
+	});
+
+};
 
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
 	channelinfo: any,
@@ -103,22 +115,13 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
 
 }
 
-export const ChannelDescription = ({ channelinfo, userinfo } : {
+export const ChannelDescription = ({ channelinfo, userinfo, reload } : {
 	channelinfo: any,
-	userinfo:	any
+	userinfo:	any,
+	reload: any
 }) => {
-	// let found = -1
 	let isOwner = false
 	let isAdmin = false
-	// channelinfo.user_list.map((element: any, index:any) => {
-	// 	if (element.id === userinfo.id)
-	// 	{
-	// 		found = index
-			
-	// 	}
-	// })
-	// if (found === -1)
-	// 	return ;
 	
 	if(channelinfo.owner === userinfo.id)
 		isOwner = true
@@ -130,7 +133,7 @@ export const ChannelDescription = ({ channelinfo, userinfo } : {
 		<div>
 			WELCOME TO : {channelinfo.name}
 			<br />
-			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id}/>
+			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
 			{
 				channelinfo.user_list.map((element: any, index:any) => {
 					return (

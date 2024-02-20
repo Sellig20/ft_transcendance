@@ -9,7 +9,7 @@ export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, button
 	buttonHandler: (event: React.MouseEvent<HTMLButtonElement>) => Promise<void>,
 }) => {
 	// console.log("channel selected:", channelinfo, newMessages)
-	if(channelinfo === undefined)
+	if(channelinfo === undefined || channelinfo === null)
 		return ;
 	return (
 			<div className="d-flex justify-content-end">

@@ -68,10 +68,10 @@ export class ChatService {
 			}
 		})
 	}
-
+	
 	async findAllInfoInChannelById(channelId: number)
 	{
-		const messages = await this.prisma.channel.findFirst({
+		const channel = await this.prisma.channel.findFirst({
 			where: {
 				id: channelId
 			},
@@ -96,7 +96,7 @@ export class ChatService {
 			}
 
 		})
-		return messages;
+		return channel;
 	}
 
 	async findAllChannelJoinedByIdUser(userId: number)
@@ -138,13 +138,14 @@ export class ChatService {
 		return channels;
 	}
 
-	async createMessage(content: string, idUser: number, idChannel: number)
+	async createMessage(content: string, idUser: number, idChannel: number, sender_name: string)
 	{
 		await this.prisma.message.create({
 			data: {
 				content: content,
 				sender: {connect: {id:idUser}},
-				recipient: {connect: {id:idChannel}}
+				recipient: {connect: {id:idChannel}},
+				sender_name : sender_name
 			},
 
 		})
@@ -172,13 +173,16 @@ export class ChatService {
 		return res;
 	}
 
-	// const message1: User = await this.prisma.message.create({
-	// 	data: {
-	// 		content: 'content_message1',
-	// 		sender: {connect: {id:1}},
-	// 		recipient: {connect: {id:2}}
-	// 	},
-	// })
+	async leaveChannelById(userID: number, channelID: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				channel_list: {disconnect: [{id:channelID}]}
+			}
+		})
+	}
 
 // ---------------------- TEST FUNCTION -------------------------
 

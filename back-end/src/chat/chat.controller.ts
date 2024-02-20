@@ -81,4 +81,12 @@ export class ChatController {
 		// console.log(result);
 		return result
 	}
+
+	@Post('/leaveChannelById')
+	async leaveChannelById(@Body() body) {
+		// verifier si le userid est le owner 
+		const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+		// console.log(result);
+		return result
+	}
 }
