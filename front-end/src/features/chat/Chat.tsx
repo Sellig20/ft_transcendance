@@ -26,8 +26,15 @@ export function Chat() {
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
 	const reload = (
+		send_to_channel?: number
 	) => {
-		callApi(userid, 0, false)
+		if (send_to_channel === undefined)
+			callApi(userid, 0, false)
+		else
+		{
+			socket?.emit("RELOAD", {userinfo:userinfo, channelid:send_to_channel})
+			// callApi(userid, 0, false)
+		}
 	}
 
 	const callApi = async (
@@ -83,6 +90,24 @@ export function Chat() {
 		console.log("value:", value);
 	}
 
+	const reloadListener = async (
+		messageprop: any
+	) => {
+		console.log("channelselected===", channelSelect, messageprop.channelid)
+		if (messageprop.channelid === channelSelect.id)
+		{
+			await chatService.findAllInfoInChannelById(Number(messageprop.channelid)).then(messageChann => {
+				if (messageChann === "") //	le channel existe pas
+				{
+					reload();
+					return ;
+				}
+				setchannelSelect(messageChann)
+			});
+			// setchannelSelect(messageprop.channelid)
+			// reload()
+		}
+	};
 
 	const messageListener = (
 		messageprop: any
@@ -103,6 +128,13 @@ export function Chat() {
 			socket?.off("MP", messageListener)
 		}
 	}, [messageListener])
+
+	useEffect(() => {
+		socket?.on("RELOAD", reloadListener)
+		return () => {
+			socket?.off("RELOAD", reloadListener)
+		}
+	}, [reloadListener])
 
 
 
@@ -166,10 +198,6 @@ export function Chat() {
 
 	return (
 		<div>
-			<div>
-				<h1>App: CHAT</h1>
-			</div>
-
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>

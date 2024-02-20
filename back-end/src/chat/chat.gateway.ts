@@ -98,7 +98,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
         this.removeUser(client.id);
         this.printAllUser(this.userArray);
-        // await this.chatService.setSocket(1, null)
+        // emit la question de qui tu es ??????
     }
 
 
@@ -112,8 +112,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         }
         else
         {
-            console.log(client.name)
-            console.log(message)
+            // console.log(client.name)
+            // console.log(message)
             console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
             // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
             // this.server.to(message.recipient).emit("MP", message.data);
@@ -141,4 +141,18 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         this.addUser(message.userid, client.id);
         this.printAllUser(this.userArray);
     }
+
+    @SubscribeMessage('RELOAD')
+    async handleReload(client: any, message: any) {
+        console.log("reload all the user in channel", message.channelid)
+        await this.findSocketChannels(message.channelid).then(res => {
+            res.map((item, index) => {
+                // console.log("envoie de '", message.data, "' to socketid :", item)
+                this.server.to(item).emit("RELOAD", {
+                    channelid: message.channelid
+                });
+            })
+        })
+    }
+
 }

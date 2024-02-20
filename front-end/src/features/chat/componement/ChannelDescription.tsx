@@ -16,12 +16,26 @@ const handleLeave = async (
 
 };
 
-const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
+const handleKick = async (
+	userToKick: number,
+	channelinfo: any,
+	reload: any
+) => {
+	await chatService.leaveChannelById(Number(userToKick), Number(channelinfo.id)).then(res => {
+		// setchannelSelect(null)
+		console.log(res, "kick user", userToKick, "from channel", channelinfo.name)
+		reload(channelinfo.id);
+	});
+
+};
+
+const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
 	isOwner: boolean,
 	isAdmin: boolean,
-	userinfo: any
+	userinfo: any,
+	reload: any
 }) => {
 	let status = "membre"
 	let idCard = element.id
@@ -54,7 +68,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
 						{element.username} ({status}) (you)
 						<input type="button" value={"setAdmin"} id={element.id}/>
 						<input type="button" value={"Mute (1min)"} id={element.id}/>
-						<input type="button" value={"kick"} id={element.id}/>
+						<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 						<input type="button" value={"Ban"} id={element.id}/>
 					</div>
 				)
@@ -64,7 +78,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
 					{element.username} ({status})
 					<input type="button" value={"setAdmin"} id={element.id}/>
 					<input type="button" value={"Mute (1min)"} id={element.id}/>
-					<input type="button" value={"kick"} id={element.id}/>
+					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id}/>
 					<input type="button" value={"Profil"} id={element.id}/>
 					<input type="button" value={"PlayWith"} id={element.id}/>
@@ -115,7 +129,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo } : {
 
 }
 
-export const ChannelDescription = ({ channelinfo, userinfo, reload } : {
+export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 	channelinfo: any,
 	userinfo:	any,
 	reload: any
@@ -138,7 +152,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload } : {
 				channelinfo.user_list.map((element: any, index:any) => {
 					return (
 						<div key={index}>
-							<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo}/>
+							<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo} reload={reload}/>
 						</div>
 					)
 				})
