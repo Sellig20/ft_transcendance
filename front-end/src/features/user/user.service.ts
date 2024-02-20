@@ -1,3 +1,4 @@
+import { PlayerStats } from '../../PropsType/Props';
 import api from '../api/api';
 
 
@@ -66,14 +67,23 @@ const getUserStatus = async (id: string) => {
 	return response.data
 }
 
-const getSats = async () => {
+const getSats = async (): Promise<PlayerStats> => {
 	let response
 	try {
 		response = await api.get(`/user/stats`)
 	} catch (error){
-		return error;
 	}
-	return response.data
+	return response?.data 
+}
+
+const getFriends = async (): Promise<any> => {
+	let response
+	try {
+		response = await api.get(`/user/friends`)
+	} catch (error){}
+	console.log(response?.data);
+	
+	return response?.data
 }
 
 export default {
@@ -84,6 +94,7 @@ export default {
 	getAvatar: getAvatar,
 	changeUserStatus: changeUserStatus,
 	getUserStatus: getUserStatus,
-	getSats: getSats
+	getSats: getSats,
+	getFriends: getFriends
 
 }

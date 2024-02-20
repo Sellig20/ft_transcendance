@@ -247,4 +247,41 @@ export class UsersService {
 		}
 		return result;
 	}
+
+	async getAllFriends(id: number) {
+		let friends;
+		let result;
+
+		try {
+			friends = await this.prisma.user.findFirst({
+				where: {
+					id: id,
+				},
+				select: {
+					friends: true
+				}
+			});
+			
+			result = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: friends.friends
+					},
+				},
+				select: {
+					user_status: true,
+					username: true,
+					id: true,
+					elo: true,
+					img_url: true
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("failed to get friends", {
+				cause: new Error(),
+				description: "failed to get friends",
+			});
+		}
+		return result;
+	}
 }

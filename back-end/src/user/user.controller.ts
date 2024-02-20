@@ -137,4 +137,10 @@ export class UserController {
 
 		return(stats)
 	}
+
+	@Get('/friends')
+	async userfriends(@Req() req){
+		let friends = await this.userservice.getAllFriends(req.user.id);
+		return(friends)
+	}
 }
