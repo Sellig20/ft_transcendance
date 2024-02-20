@@ -50,6 +50,7 @@ model Message {
   id        Int       @id @unique @default(autoincrement())
   content   String?
   sender    User      @relation(fields: [userId], references: [id])
+  sender_name String?
   recipient Channel   @relation(fields: [channelId], references: [id])
   date      DateTime? @default(now())
   userId    Int
