@@ -113,16 +113,22 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         else
         {
             console.log(client.name)
-            console.log("from_socket:", message.from_socket, "-->", message.data, ", to:", message.to);
+            console.log(message)
+            console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
             // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
             // this.server.to(message.recipient).emit("MP", message.data);
             
             await this.findSocketChannels(message.to).then(res => {
                 res.map((item, index) => {
                     // console.log("envoie de '", message.data, "' to socketid :", item)
-                    this.server.to(item).emit("MP", {from_channel: message.to, from_user:message.from_user, data:message.data});
+                    this.server.to(item).emit("MP", {
+                        from_channel: message.to,
+                        from_user:message.from_user,
+                        from_user_name:message.from_user_name,
+                        data:message.data
+                    });
                 })
-                this.chatService.createMessage(message.data, message.from_user, message.to)
+                this.chatService.createMessage(message.data, message.from_user, message.to, message.from_user_name)
             })
         }
     }
