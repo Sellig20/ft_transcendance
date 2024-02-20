@@ -8,23 +8,23 @@ export const WebsocketSG = () => {
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
 
-    const setWinner = (winnerIs: boolean, winnerIdentity: string) => {
-        if (winnerIs === true && winnerIdentity === "one") {
+    const setWinner = (winnerIdentity: string) => {
+        if (winnerIdentity === "one") {
             gameState.player1Winner = true;
         }
-        else if (winnerIs === true && winnerIdentity === "two") {
+        else if (winnerIdentity === "two") {
             gameState.player2Winner = true;
         }
     }
 
-    const updateScorePlayer2 = (data: number) => {
-        gameState.player2Score = data;
+    const updateScorePlayer1 = (scoreP1: number) => {
+        gameState.player1Score = scoreP1;
     }
 
-    const updateScorePlayer1 = (data: number) => {
-        gameState.player1Score = data;
+    const updateScorePlayer2 = (scoreP2: number) => {
+        gameState.player2Score = scoreP2;
     }
-    
+
     const displayScore = (context: CanvasRenderingContext2D) => {
         context.font = "45px sans-serif";
         context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
@@ -63,40 +63,23 @@ export const WebsocketSG = () => {
         }
         return null;
     }
-
-    const getCanvasTheContext = () => {
-        return canvasContextRef.current;
-    }
-
-    const renvoiBallData = (updateBallData: GameStateFD) => {
-        const context = getCanvasTheContext();
-        if (context) {
-            context.clearRect(0, 0, gameState.boardWidth, gameState.boardHeight);
-            updateBallData.ball.x += updateBallData.ball.velocityX;
-            updateBallData.ball.y += updateBallData.ball.velocityY;
-        }
-    }
     
     const drawBall = (context: CanvasRenderingContext2D) => {
         context.fillStyle = "pink";
         context.beginPath();
-        // context.arc(gameState.ball.x, gameState.ball.y, gameState.ball.width / 2, 0, 2 * Math.PI);
         context.fillRect(gameState.ball.x, gameState.ball.y, gameState.ball.width, gameState.ball.height);
         context.fill();
     }
 
-    const ballReceptionServer = (ball: number) => {
-        gameState.ball.velocityX = ball;
+    const ballAgainstPaddle = (velocityX: number) => {
+        gameState.ball.velocityX = velocityX;
     }//collisionBall detecting aingsnt machin evenement
 
-    const ballCollisionBorder = (ball: number) => {
-        gameState.ball.velocityY = ball;
+    const ballAgainstBorder = (velocityY: number) => {
+        gameState.ball.velocityY = velocityY;
     }//borderCollision detecting borderevenemt
 
-    const initiateBall = (ballX: number, ballY: number) => {
-        gameState.ball.x = ballX;
-        gameState.ball.y = ballY;
-    }
+   
 
     const drawPaddle1 = (context: CanvasRenderingContext2D) => {
         context.beginPath();
@@ -110,12 +93,14 @@ export const WebsocketSG = () => {
         context.fill();
     }
 
-    const initiatePaddle1 = (data: number) => {
-        gameState.paddle1.y = data;
+    const initiatePaddle1 = (vel: number, socketId: string) => {
+        gameState.paddle1.y = vel;
+        gameState.paddle1.socket = socketId;
     }
 
-    const initiatePaddle2 = (data: number) => {
-        gameState.paddle2.y = data;
+    const initiatePaddle2 = (vel: number, socketId: string) => {
+        gameState.paddle2.y = vel;
+        gameState.paddle2.socket = socketId;
     }
 
     const update = () => {
@@ -140,63 +125,60 @@ export const WebsocketSG = () => {
     };
     
     useEffect(() => {
+        ////////////// LOOP FOR FRONTEND /////////////////////////
         update();
 
+        ////////////// AU LANCEMENT DE START GAME //////////////
         const handleConnect = () => {
             console.log('Connected in START GAME!');
-            
         }
-        socket.on('connect', handleConnect);
+        
         if (socket.connected) {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
         
         const handleKeyDown = (event: KeyboardEvent) => {
-            
-            if (event.key === 'ArrowUp') {
-                console.log("JE PASSSSSSSSSSE ICI UUUUUUUP")
-                socket.emit('keyupPD1', {key: event.code})
-
-            }
-            else if (event.key === 'ArrowDown') {
-                console.log("JE PASSSSSSSSSSE ICI DOOOOWN")
-                socket.emit('keydownPD1', {key: event.code})
-            }
+            socket.emit('keydown', {key: event.code})
         }; 
-
+        
+        socket.on('connect', handleConnect);
         window.addEventListener('keydown', handleKeyDown);
 
-        //quand je reviens du serveur. le serveur renvoie :
-        socket.on('initplayer1', (newGameState: number) => {
-            initiatePaddle1(newGameState);
+        ///////////////////// SERVEUR RENVOIE ////////////////////////////
+        socket.on('initplayer1', (newGameVel: number, socketId: string) => {
+            initiatePaddle1(newGameVel, socketId);
         })
 
-        socket.on('initplayer2', (newGameState: number) => {
-            initiatePaddle2(newGameState);
+        socket.on('initplayer2', (newGameVel: number, socketId: string) => {
+            initiatePaddle2(newGameVel, socketId);
         })
 
-        socket.on('updatePlayer2', (newGameState: number) => {
-            updateScorePlayer2(newGameState);
+        socket.on('ballIsMoving', (data: {x: number, y: number}) => {
+            if (data)
+            {
+                gameState.ball.x = data.x;
+                gameState.ball.y = data.y;
+            }
         })
 
-        socket.on('updatePlayer1', (newGameState: number) => {
-            updateScorePlayer1(newGameState);
+        socket.on('updateScoreP1', (data: {scoreP1: number}) => {
+            updateScorePlayer1(data.scoreP1);
         })
 
-        socket.on('initBall', (ball: number, bally: number) => {
-            initiateBall(ball, bally);
+        socket.on('updateScoreP2', (data: {scoreP2: number}) => {
+            updateScorePlayer2(data.scoreP2);
         })
 
-        socket.on('collisionBall', (ball: number) => {
-            ballReceptionServer(ball);
-        })//detecting B agaist
+        socket.on('detectCollisionW/Paddle', (velocityX: number) => {
+            ballAgainstPaddle(velocityX);
+        })//detecting Ball agaist paddles
 
-        socket.on('borderCollision', (ball: number) => {
-            ballCollisionBorder(ball);
-        })//detecting border
+        socket.on('detectBorder', (velocityY: number) => {
+            ballAgainstBorder(velocityY);
+        })//detecting Ball against border wall
 
-        socket.on('winnerIs', (winnerIs: boolean, winnerIdentity: string) => {
-            setWinner(winnerIs, winnerIdentity);
+        socket.on('winnerIs', (winner: string) => {
+            setWinner(winner);
         })
 
         return () => {

@@ -10,6 +10,7 @@ const WebsocketQG = () => {
     useEffect(() => {
     
         const handlePrepareMatch = () => {
+            console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
 
