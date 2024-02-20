@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
+import hash from 'src/auth/utils/hash';
 
 
 @Controller('chat')
@@ -69,15 +70,15 @@ export class ChatController {
 
 	@Post('/createChannel')
 	async createChannel(@Body() body) {
-		// const user = req.user;
-		// (
-		// 	name: string, 
-		// 	isPersonal: boolean,
-		// 	isPublic: boolean,
-		// 	idUser: number,
-		// 	password: string
-		// )
-		const result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, body.password);
+		let final_password: string | null;
+		if (body.password !== null && body.password !== "")
+		{
+			final_password = hash.hash(String(body.password))
+		}
+		else
+			final_password = null
+		console.log(final_password)
+		const result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, final_password);
 		// console.log(result);
 		return result
 	}
