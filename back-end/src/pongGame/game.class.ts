@@ -54,10 +54,6 @@ export class Game {
     getPlayer2Id() : string {
         return this.player2.socketId;
     }
-
-    movePaddle1(vel: number) {
-
-    }
     
     maxScore() {
         if (this.gameState.player1Score >= 11) {
@@ -130,9 +126,30 @@ export class Game {
     initialisationBall() {
         this.gameState.ball.x += (this.gameState.ball.velocityX * this.gameState.currentLevel);
         this.gameState.ball.y += (this.gameState.ball.velocityY * this.gameState.currentLevel);
-        this.sendToPlayer('ballIsMoving', { x: this.gameState.ball.x, y: this.gameState.ball.y });
     }
 
+    initialisationPaddle1() {
+        // this.gameState.paddle1.socket = client.id;//met la socket du joueur dans son paddle
+        this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
+        this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
+        // const player2.socketId = this.getOpponentSocket(client.id);
+        this.server.to(this.player2.socketId).emit('initplayer1', this.gameState.paddle1.y, 
+            this.gameState.paddle1.socket);
+        this.server.to(this.player1.socketId).emit('initplayer1', this.gameState.paddle1.y, 
+        this.gameState.paddle1.socket);
+    }
+
+    initialisationPaddle2() {
+        // this.gameState.paddle2.socket = this.player1.socket;//met la socket du joueur dans son paddle
+        this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
+        this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
+        // const player2.socketId = this.getOpponentSocket(this.player1.socket);
+        this.server.to(this.player1.socketId).emit('initplayer2', this.gameState.paddle2.y, 
+            this.gameState.paddle2.socket);
+        this.server.to(this.player1.socketId).emit('initplayer2', this.gameState.paddle2.y, 
+            this.gameState.paddle2.socket);
+    }
+    
     startGameLoop(): void {
         setInterval(() => {
             this.initialisationBall();
@@ -140,6 +157,7 @@ export class Game {
             let ballHitPaddle = false;
             this.detectingCollisionWithPaddle(ballHitPaddle);
             this.ScoreAndResetBall(1, ballHitPaddle);
+            this.sendToPlayer('ballIsMoving', { x: this.gameState.ball.x, y: this.gameState.ball.y });
         }, 16); // 16 ms (environ 60 FPS)
     }
 

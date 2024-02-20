@@ -96,7 +96,6 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
         }
     }
     
-    // TODO Change for only 1 socket
     @SubscribeMessage('keydown')
     handleKeyPressedUpDown(client: Socket, data: {key: string}) {
         const strGame = this.getStrGame(client.id);
@@ -112,51 +111,28 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
             gameState.paddle2.velocityY = 3;
         if (playerSample === 1)//JOUEUR DU PADDLE 1 ARROW UP ET DOWN
         {
-            gameState.paddle1.socket = client.id;//met la socket du joueur dans son paddle
-            gameState.paddle1.y += gameState.paddle1.velocityY;
-            gameState.paddle1.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle1.height, gameState.paddle1.y));
-            const oppoSock = this.getOpponentSocket(client.id);
-            this.server.to(oppoSock).emit('initplayer1', gameState.paddle1.y, 
-                gameState.paddle1.socket);
-            this.server.to(client.id).emit('initplayer1', gameState.paddle1.y, 
-                gameState.paddle1.socket);
+            // gameState.paddle1.socket = client.id;//met la socket du joueur dans son paddle
+            // gameState.paddle1.y += gameState.paddle1.velocityY;
+            // gameState.paddle1.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle1.height, gameState.paddle1.y));
+            // const oppoSock = this.getOpponentSocket(client.id);
+            // this.server.to(oppoSock).emit('initplayer1', gameState.paddle1.y, 
+            //     gameState.paddle1.socket);
+            // this.server.to(client.id).emit('initplayer1', gameState.paddle1.y, 
+            //     gameState.paddle1.socket);
         }
         else if (playerSample === 2)//JOUEUR DU PADDLE 2 ARROW UP ET DOWN
         {
-            gameState.paddle2.socket = client.id;//met la socket du joueur dans son paddle
-            gameState.paddle2.y += gameState.paddle2.velocityY;
-            gameState.paddle2.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle2.height, gameState.paddle2.y));
-            const oppoSock = this.getOpponentSocket(client.id);
-            this.server.to(oppoSock).emit('initplayer2', gameState.paddle2.y, 
-                gameState.paddle2.socket);
-            this.server.to(client.id).emit('initplayer2', gameState.paddle2.y, 
-                gameState.paddle2.socket);
+            // gameState.paddle2.socket = client.id;//met la socket du joueur dans son paddle
+            // gameState.paddle2.y += gameState.paddle2.velocityY;
+            // gameState.paddle2.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle2.height, gameState.paddle2.y));
+            // const oppoSock = this.getOpponentSocket(client.id);
+            // this.server.to(oppoSock).emit('initplayer2', gameState.paddle2.y, 
+            //     gameState.paddle2.socket);
+            // this.server.to(client.id).emit('initplayer2', gameState.paddle2.y, 
+            //     gameState.paddle2.socket);
         }
         else
             return ;
-    }
-
-
-
-    // TODO Change for game Class
-    @SubscribeMessage('handleCollision2')
-    handleCollisionWithLeftBorder() {
-        // this.games.maxScore();
-        // this.server.emit('updatePlayer2', gameState.player2Score );
-    }
-
-    @SubscribeMessage('handleCollision1')
-    handleCollisionWithRightBorder() {
-        // this.games.maxScore();
-        // this.server.emit('updatePlayer1', gameState.player1Score );
-    }
-
-    // TODO Move to gameClass
-   
-    
-    @SubscribeMessage('handleInitBallAndGame')
-    handleInitialisationBall() {
-        // this.games.startGameLoop();
     }
 
     @SubscribeMessage('goQueueList') 
@@ -195,7 +171,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
             this.removeUser(player1.socketId);
             this.removeUser(player2.socketId);
     
-            // Retirer les joueurs de playersAvailable
+            // Retire les joueurs de playersAvailable
             const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
             const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
     

@@ -19,12 +19,6 @@ export const WebSocketPG = () => {
         {
             console.log(`je suis ${socket.id} dans game gate .tsx`);
         }
-        
-        // const handleConnect = () => {
-            // console.log('Connected in GAME GATE!');
-        // }
-
-        // socket.on('connect', handleConnect);
 
         return () => {
             console.log("Unregistering events...");  
