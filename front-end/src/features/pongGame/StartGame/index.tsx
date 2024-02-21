@@ -4,7 +4,7 @@ const StartGame: React.FC = () => {
 
   return (
       <nav>
-          <h1>StartGame JEUUUUUUUU</h1>
+          <h1>START GAME</h1>
       </nav>
   )
 }

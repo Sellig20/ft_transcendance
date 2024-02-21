@@ -98,41 +98,41 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     
     @SubscribeMessage('keydown')
     handleKeyPressedUpDown(client: Socket, data: {key: string}) {
-        const strGame = this.getStrGame(client.id);
         const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
-        const gameState = this.getGaObj(client.id);
+        let tmp: number = 0;
         if (data.key === "ArrowUp" && playerSample === 1)
-            gameState.paddle1.velocityY = -3;
+        {
+            tmp = -3;
+        }
         else if (data.key === "ArrowDown" && playerSample === 1)
-            gameState.paddle1.velocityY = 3;
+            tmp = 3;
         else if (data.key === "ArrowUp" && playerSample === 2)
-            gameState.paddle2.velocityY = -3;
+            tmp = -3;
         else if (data.key === "ArrowDown" && playerSample === 2)
-            gameState.paddle2.velocityY = 3;
-        if (playerSample === 1)//JOUEUR DU PADDLE 1 ARROW UP ET DOWN
-        {
-            // gameState.paddle1.socket = client.id;//met la socket du joueur dans son paddle
-            // gameState.paddle1.y += gameState.paddle1.velocityY;
-            // gameState.paddle1.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle1.height, gameState.paddle1.y));
-            // const oppoSock = this.getOpponentSocket(client.id);
-            // this.server.to(oppoSock).emit('initplayer1', gameState.paddle1.y, 
-            //     gameState.paddle1.socket);
-            // this.server.to(client.id).emit('initplayer1', gameState.paddle1.y, 
-            //     gameState.paddle1.socket);
+            tmp = 3;
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const gameId = currentGame.getGameId();
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+                if (playerSample === 1)//JOUEUR DU PADDLE 1 ARROW UP ET DOWN
+                {
+                    this.games[i].updateVelPaddle1(tmp);
+                }
+                else if (playerSample === 2)//JOUEUR DU PADDLE 2 ARROW UP ET DOWN
+                {
+                    this.games[i].updateVelPaddle2(tmp);
+                }
+                else
+                    return ;
+            }
         }
-        else if (playerSample === 2)//JOUEUR DU PADDLE 2 ARROW UP ET DOWN
-        {
-            // gameState.paddle2.socket = client.id;//met la socket du joueur dans son paddle
-            // gameState.paddle2.y += gameState.paddle2.velocityY;
-            // gameState.paddle2.y = Math.max(0, Math.min(gameState.boardHeight - gameState.paddle2.height, gameState.paddle2.y));
-            // const oppoSock = this.getOpponentSocket(client.id);
-            // this.server.to(oppoSock).emit('initplayer2', gameState.paddle2.y, 
-            //     gameState.paddle2.socket);
-            // this.server.to(client.id).emit('initplayer2', gameState.paddle2.y, 
-            //     gameState.paddle2.socket);
-        }
-        else
-            return ;
+    }
+
+    @SubscribeMessage('Abandon')
+    handleAbandon(client: Socket, socketId: string): void {
+
     }
 
     @SubscribeMessage('goQueueList') 

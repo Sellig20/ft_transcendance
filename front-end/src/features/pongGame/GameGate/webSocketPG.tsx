@@ -31,8 +31,7 @@ export const WebSocketPG = () => {
     return (
         <div>
             <div>
-                <h1>Websocket Component</h1>
-                <button onClick={handleRedirectToQueueGate}>QueueGateuh</button>
+                <button onClick={handleRedirectToQueueGate}>Find someone to play with</button>
             </div>
         </div>
     )

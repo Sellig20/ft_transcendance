@@ -24,6 +24,7 @@ const WebsocketQG = () => {
     return (
         <div>
             <h2>Page queue list</h2>
+            <h3>Loading... finding someone to play with you</h3>
         </div>
     )
 
