@@ -7,7 +7,8 @@ import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { join } from 'path';
-import { NameDto } from './dto/user.dto';
+import { IdDto, NameDto } from './dto/user.dto';
+import { identity } from 'rxjs';
 
 @Controller('user')
 export class UserController {
@@ -74,13 +75,7 @@ export class UserController {
 	@Get('/myavatar')
 	async serveMyAvatar(@Req() req,  @Res() res: Response){
 		const img_name = await this.userservice.myAvatar(req.user.id)
-
-		if (img_name === 'placeholder'){
-			return res.sendFile("avatarDefault", { root: join(__dirname, '../..', 'avatar') });
-		}
-		else {
-			return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
-		}
+		return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
 	}
 
 	@Get('/status:id')
@@ -93,7 +88,6 @@ export class UserController {
 
 	@Patch('/changeStatus')
 	async changeStatus(@Req() req, @Body() body) {
-		console.log('change status activated : page closed detected');
 			
 		const result = await this.userservice.changeStatus(req.user.id, body.status)
 		return result
@@ -142,5 +136,23 @@ export class UserController {
 	async userfriends(@Req() req){
 		let friends = await this.userservice.getAllFriends(req.user.id);
 		return(friends)
+	}
+
+	@Get('/everyone')
+	async users(@Req() req){
+		let users = await this.userservice.getAllUsers();
+		return(users)
+	}
+
+	@Patch('/addfriend')
+	async addfriend(@Req() req, @Body() IdFriend: IdDto){
+		await this.userservice.addFriend(req.user.id, IdFriend.id)
+		return {msg: "friend added"}
+	}
+
+	@Get('/everyone/filter')
+	async usersFilter(@Req() req){
+		let users = await this.userservice.getAllUsersFilter(req.user.id);
+		return(users)
 	}
 }

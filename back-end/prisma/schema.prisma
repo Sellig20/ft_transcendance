@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -17,7 +18,8 @@ model User {
   email        String    @unique
   channel_list Channel[]
   Message      Message[]
-  friends      Int[]     @unique
+  friends	   Int[] 	 @default([])
+
   blocked_user Int[]     @unique
 
   createAt DateTime @default(now())

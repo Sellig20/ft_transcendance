@@ -18,7 +18,9 @@ export class AuthService {
 
 	//a commenter pour tej les fakes data
 	async onModuleInit() {
-		await this.generateAndSaveFakeData();
+		const fakeusers = await this.prisma.user.findMany({})
+		if (fakeusers.length < 12)
+			await this.generateAndSaveFakeData();
 	}
 
 	async generateAndSaveFakeData() {
