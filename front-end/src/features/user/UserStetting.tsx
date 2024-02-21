@@ -72,11 +72,12 @@ const UserSetting = () => {
 			// console.log(formData);
 			// console.log(rep);
 			
-			const rawImg = await userService.getAvatar(rep);
-			const url = URL.createObjectURL(new Blob([rawImg]));
-			dispatch(addAvatar(url))
-			setAvatar(url)
-			
+			if (rep) {
+				const rawImg = await userService.getAvatar(rep);
+				const url = URL.createObjectURL(new Blob([rawImg]));
+				dispatch(addAvatar(url))
+				setAvatar(url)
+			}
 		}
 		setFile(null);
 		setImage("");

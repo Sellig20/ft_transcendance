@@ -33,6 +33,9 @@ const Navbar = () => {
 	const handleHome = () => {
 		navigate('/home');
 	}
+	const handleRepertory = () => {
+		navigate('/repertory');
+	}
 
 	return (
 		<nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
@@ -57,6 +60,9 @@ const Navbar = () => {
 					</li>
 					<li className="nav-item">
 						<a className="nav-link" onClick={handleUser}>Settings</a>
+					</li>
+					<li className="nav-item">
+						<a className="nav-link" onClick={handleRepertory}>Repertory</a>
 					</li>
 				</ul>
 			</div>

@@ -29,7 +29,7 @@ const uploadFile = async (file: FormData) => {
 			}
 		})
 	} catch (error) {
-		return error;
+		return null;
 	}
 	return response.data
 }
@@ -86,6 +86,25 @@ const getFriends = async (): Promise<any> => {
 	return response?.data
 }
 
+const getUsers = async (): Promise<any> => {
+	let response
+	try {
+		response = await api.get(`/user/everyone/filter`)
+	} catch (error){}
+	console.log(response?.data);
+	return response?.data
+}
+
+const addFriend = async (id: number) => {
+	let response
+	try {
+		response = await api.patch(`/user/addfriend`, { id: id})
+	} catch (error){
+		return null;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
@@ -95,6 +114,8 @@ export default {
 	changeUserStatus: changeUserStatus,
 	getUserStatus: getUserStatus,
 	getSats: getSats,
-	getFriends: getFriends
+	getFriends: getFriends,
+	getUsers: getUsers,
+	addFriend: addFriend,
 
 }

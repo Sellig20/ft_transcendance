@@ -7,7 +7,7 @@ const initialState: userOnConnection = {
 	username: "",
 	tfa_status: false,
 	connected: false,
-	img: null,
+	img: "/avatarDefault.png",
 }
 
 export const UserSlice = createSlice({

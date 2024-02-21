@@ -31,7 +31,11 @@ const Auth = () => {
 				if (tmp)
 					localStorage.setItem("token", tmp);
 					userService.setAvatar().then((rawImg) => {
-					const url = URL.createObjectURL(new Blob([rawImg]));
+					let url;
+					if (!rawImg)
+						url = "/avatarDefault.png"
+					else
+						url = URL.createObjectURL(new Blob([rawImg]));
 					dispatch(addAvatar(url))
 				})
 				userService.getUser().then(user => dispatch(addUser(user)));
