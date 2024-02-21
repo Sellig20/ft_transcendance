@@ -48,8 +48,8 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
             const d2 = currentGame.getPlayer2Id();
             if (id === d1 || id === d2) {//la socket recue correspond a un joueur
                 return gameId;//alors ce joueur est relie a une gameId, la retourner
-
             } else {
+
             }
         }
     }
@@ -79,6 +79,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
             if (id === d1 || id === d2) {//la socket recue correspond a un joueur
                 return this.games[i].getGameObject();
             } else {
+
             }
         }
     }
@@ -101,9 +102,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
         const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
         let tmp: number = 0;
         if (data.key === "ArrowUp" && playerSample === 1)
-        {
             tmp = -3;
-        }
         else if (data.key === "ArrowDown" && playerSample === 1)
             tmp = 3;
         else if (data.key === "ArrowUp" && playerSample === 2)
@@ -132,7 +131,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
-
+        console.log("-> ", client.id, " A ABANDONNEYYYY");
     }
 
     @SubscribeMessage('goQueueList') 
@@ -153,7 +152,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     {
         if (playersAvailable.length == 2)
         {
-            
+
             const player1 = playersAvailable[0];
             const player2 = playersAvailable[1];
             const gameId = uuidv4();

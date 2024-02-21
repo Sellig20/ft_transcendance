@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { GameStateBD, Player} from "./gameStateBD";
 
 export class Game {
-    
+
     private gameState: GameStateBD;
     private gameId: string;
     private server: Server;
@@ -24,29 +24,34 @@ export class Game {
         this.gameId = Id;
         this.gameState = this.initializeGameState();
     }
-    
+
     actualDataInClassGame() {
         console.log("game id => ", this.gameId);
     }
-    
+
     start() {
         this.sendToPlayer("prepareForMatch", {});
         this.startGameLoop();
     }
-    
+
     sendToPlayer(event: string, data: any) {
         this.server.to(this.player1.socketId).emit(event, data);
         this.server.to(this.player2.socketId).emit(event, data);
     }
-    
+
+    sendToPlayerBall(event: string, data: any, data1: any) {
+        this.server.to(this.player1.socketId).emit(event, data, data1);
+        this.server.to(this.player2.socketId).emit(event, data, data1);
+    }
+
     getGameId(): string {
         return this.gameId;
     }
-    
+
     getGameObject() : GameStateBD {
         return this.gameState;
     }
-    
+
     getPlayer1Id() : string {
         return this.player1.socketId;
     }
@@ -54,17 +59,19 @@ export class Game {
     getPlayer2Id() : string {
         return this.player2.socketId;
     }
-    
+
     maxScore() {
-        if (this.gameState.player1Score >= 11) {
-            console.log("GAGNANT IS ONE");
+        if (this.gameState.player1Score === 2) {
             this.gameState.player1Winner = true;
-            this.sendToPlayer('winnerIs', { winner: this.gameState.idPlayer1 });
+            this.sendToPlayer('winnerIs', this.gameState.idPlayer1);
+            this.sendToPlayer('congrats', this.gameState.idPlayer1);
+            // this.sendToPlayer('fail', this.gameState.idPlayer2);
         }
-        else if (this.gameState.player2Score >= 11) {
-            console.log("GAGNANT IS ONE");
+        else if (this.gameState.player2Score === 2) {
             this.gameState.player2Winner = true;
-            this.sendToPlayer('winnerIs', { winner: this.gameState.idPlayer2 });
+            this.sendToPlayer('winnerIs',  this.gameState.idPlayer2);
+            this.sendToPlayer('congrats', this.gameState.idPlayer2);
+            // this.sendToPlayer('fail', this.gameState.idPlayer1);
         }
     }
 
@@ -80,17 +87,15 @@ export class Game {
 
     ScoreAndResetBall(direction: number, ballHitPaddle: boolean) {
         if (this.gameState.ball.x < 0 && !ballHitPaddle) {
-            console.log(" + 1 pour joueur 2 !");
             this.gameState.player2Score += 1;
             this.maxScore();
-            this.sendToPlayer('updateScoreP2', { scoreP2: this.gameState.player2Score });
+            this.sendToPlayer('updateScoreP2',  this.gameState.player2Score );
             this.resetBall(1);
         }
         else if (this.gameState.ball.x + this.gameState.ballWidth > this.gameState.boardWidth && !ballHitPaddle) {
-            console.log(" + 1 pour joueur 1 !");
             this.gameState.player1Score += 1;
             this.maxScore();
-            this.sendToPlayer('updateScoreP1', { scoreP1: this.gameState.player1Score });
+            this.sendToPlayer('updateScoreP1', this.gameState.player1Score );
             this.resetBall(-1);
         }
     }
@@ -101,7 +106,7 @@ export class Game {
             a.y < b.y + b.height &&
             a.y + a.height > b.y;
     }
-    
+
     detectingCollisionWithPaddle(ballHitPaddle: boolean) {
         if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
             if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
@@ -115,16 +120,16 @@ export class Game {
                 ballHitPaddle = true;
             }
         }
-        this.sendToPlayer('detectCollisionW/Paddle', { x: this.gameState.ball.velocityX });
+        this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
     }
-    
+
     detectingBorder() {//borderCollision evenement
         if (this.gameState.ball.y <= 0 || this.gameState.ball.y + this.gameState.ball.height >= this.gameState.boardHeight) {
             this.gameState.ball.velocityY = -this.gameState.ball.velocityY;
-            this.sendToPlayer('detectBorder', { x: this.gameState.ball.velocityY});
+            this.sendToPlayer('detectBorder', this.gameState.ball.velocityY);
         }
     }
-    
+
     initialisationBall() {
         this.gameState.ball.x += (this.gameState.ball.velocityX * this.gameState.currentLevel);
         this.gameState.ball.y += (this.gameState.ball.velocityY * this.gameState.currentLevel);
@@ -132,7 +137,7 @@ export class Game {
         //     this.gameState.ball.y);
         // this.server.to(this.player1.socketId).emit('ballIsMoving', this.gameState.ball.x, 
         //     this.gameState.ball.y);
-        this.sendToPlayer('ballIsMoving', { x: this.gameState.ball.x, y: this.gameState.ball.y });
+        this.sendToPlayerBall('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y );
     }
 
     initialisationPaddle1() {
@@ -142,9 +147,9 @@ export class Game {
         //         this.gameState.paddle1.socket);
         // this.server.to(this.player1.socketId).emit('initplayer1', this.gameState.paddle1.y, 
         //     this.gameState.paddle1.socket);
-        this.sendToPlayer('initplayer1', { y: this.gameState.paddle1.y})
+        this.sendToPlayer('initplayer1', this.gameState.paddle1.y)
     }
-    
+
     initialisationPaddle2() {
         this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
         this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
@@ -152,7 +157,7 @@ export class Game {
         //     this.gameState.paddle2.socket);
         // this.server.to(this.player2.socketId).emit('initplayer2', this.gameState.paddle2.y, 
         //     this.gameState.paddle2.socket);
-        this.sendToPlayer('initplayer2', { y: this.gameState.paddle2.y})
+        this.sendToPlayer('initplayer2', this.gameState.paddle2.y)
     }
 
     updatePaddle1() {
@@ -163,9 +168,9 @@ export class Game {
         //         this.gameState.paddle1.socket);
         // this.server.to(this.player1.socketId).emit('initplayer1', this.gameState.paddle1.y, 
         //     this.gameState.paddle1.socket);
-        this.sendToPlayer('initplayer1', { y: this.gameState.paddle1.y})
+        this.sendToPlayer('initplayer1', this.gameState.paddle1.y)
     }
-    
+
     updatePaddle2() {
         this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
         this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
@@ -173,8 +178,7 @@ export class Game {
         //     this.gameState.paddle2.socket);
         // this.server.to(this.player2.socketId).emit('initplayer2', this.gameState.paddle2.y, 
         //     this.gameState.paddle2.socket);
-        this.sendToPlayer('initplayer2', { y: this.gameState.paddle2.y})
-
+        this.sendToPlayer('initplayer2', this.gameState.paddle2.y)
     }
 
     updateVelPaddle1(tmp: number) {
@@ -188,7 +192,7 @@ export class Game {
     updateBall() {
         this.gameState.currentLevel = 1;
     }
-    
+
     startGameLoop(): void {
         setInterval(() => {
             this.initialisationBall();
@@ -200,8 +204,7 @@ export class Game {
             this.ScoreAndResetBall(1, ballHitPaddle);
             this.updatePaddle1();
             this.updatePaddle2();
-            // this.updateBall();
-
+            this.updateBall();
         }, 16); // 16 ms (environ 60 FPS)
     }
 }

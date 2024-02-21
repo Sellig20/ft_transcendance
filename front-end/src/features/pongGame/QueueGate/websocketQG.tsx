@@ -7,6 +7,11 @@ const WebsocketQG = () => {
     const socket = useContext(WebsocketContext);
     const navigate = useNavigate();
 
+    const handleQuitQueue = () => {
+        socket.emit('goQuitQueue');
+        navigate('../');
+    }
+
     useEffect(() => {
     
         const handlePrepareMatch = () => {
@@ -25,6 +30,7 @@ const WebsocketQG = () => {
         <div>
             <h2>Page queue list</h2>
             <h3>Loading... finding someone to play with you</h3>
+            <button onClick={handleQuitQueue}>Quit Queue List</button>
         </div>
     )
 
