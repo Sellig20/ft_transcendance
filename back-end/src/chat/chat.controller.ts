@@ -90,4 +90,43 @@ export class ChatController {
 		// console.log(result);
 		return result
 	}
+
+	@Post('/banChannelById')
+	async banChannelById(@Body() body) {
+		// verifier si le userid est le owner
+		let result
+		try {
+			const result = await this.ChatService.leaveChannelById(body.userid, body.channelid)
+		} catch (error) {
+			return (error)
+		}
+		try {
+			let channelinfo = await this.ChatService.findAllInfoInChannelById(body.channelid)
+			if (channelinfo.banned.indexOf(body.userid) === -1)
+				await this.ChatService.addBannedUser(body.userid, body.channelid)
+		} catch (error) {
+			return (error)
+		}	
+		// console.log(result);
+		return result
+	}
+
+	@Post('/blockUserById')
+	async blockUserById(@Body() body) {
+		// verifier si le userid est le owner
+		let result
+		
+		const promise1 = this.ChatService.getblockedUserById(body.userid)
+		Promise.all([promise1]).then(([res1]) => {
+			if (res1.blocked_user.indexOf(body.userToBlock) !== -1)
+					return null;
+
+			try {
+				this.ChatService.blockUserById(body.userid, body.userToBlock)
+			} catch (error) {
+				return (error)
+			}
+		})
+		return result
+	}
 }
