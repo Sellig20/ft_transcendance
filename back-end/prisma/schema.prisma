@@ -17,23 +17,23 @@ model User {
   email        String    @unique
   channel_list Channel[]
   Message      Message[]
-  friends      Int[]     @unique
-  blocked_user Int[]     @unique
+  friends      Int[]
+  blocked_user Int[]
 
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  img_url		  String @default("placeholder")
+  img_url String @default("placeholder")
 
-  user_status	  String @default("offline")
+  user_status String @default("offline")
 
-  win			  Int @default(0)
-  lose			  Int @default(0)
-  elo			  Int @default(400)
-  success_one	  Boolean @default(false)
-  success_two	  Boolean @default(false)
-  success_three   Boolean @default(false)
-  
+  win           Int     @default(0)
+  lose          Int     @default(0)
+  elo           Int     @default(400)
+  success_one   Boolean @default(false)
+  success_two   Boolean @default(false)
+  success_three Boolean @default(false)
+
   firstName       String?
   lastName        String?
   TFA_secret_hash String?
@@ -54,12 +54,12 @@ model Channel {
 }
 
 model Message {
-  id        Int       @id @unique @default(autoincrement())
-  content   String?
-  sender    User      @relation(fields: [userId], references: [id])
+  id          Int       @id @unique @default(autoincrement())
+  content     String?
+  sender      User      @relation(fields: [userId], references: [id])
   sender_name String?
-  recipient Channel   @relation(fields: [channelId], references: [id])
-  date      DateTime? @default(now())
-  userId    Int
-  channelId Int
+  recipient   Channel   @relation(fields: [channelId], references: [id])
+  date        DateTime? @default(now())
+  userId      Int
+  channelId   Int
 }
