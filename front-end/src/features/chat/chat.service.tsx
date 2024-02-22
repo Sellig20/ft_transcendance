@@ -52,11 +52,41 @@ const leaveChannelById = async (
 	return response
 }
 
+const banChannelById = async (
+	userid: number, 
+	channelid: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/banChannelById', {userid: userid, channelid: channelid})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
+const blockUserById = async (
+	userid: number, 
+	userToBan: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/blockUserById', {userid: userid, userToBlock: userToBan})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
 	findAllInfoInChannelById: findAllInfoInChannelById,
 	createChannel: createChannel,
-	leaveChannelById: leaveChannelById
+	leaveChannelById: leaveChannelById,
+	banChannelById: banChannelById,
+	blockUserById: blockUserById
 
 }
