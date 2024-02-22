@@ -29,6 +29,33 @@ const handleKick = async (
 
 };
 
+const handleBan = async (
+	userToBan: number,
+	channelinfo: any,
+	reload: any
+) => {
+	await chatService.banChannelById(Number(userToBan), Number(channelinfo.id)).then(res => {
+		console.log(res, "Ban user", userToBan, "from channel", channelinfo.name)
+		reload(channelinfo.id);
+	});
+
+};
+
+const handleBlock = async (
+	iduserinfo: number,
+	userToBan: number,
+	reload: any,
+	channelinfo: any
+) => {
+	await chatService.blockUserById(Number(iduserinfo), Number(userToBan)).then(res => {
+		console.log(res, "block user")
+		// if (res === null || res === "")
+		// 	return ;
+		reload();
+	});
+
+};
+
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
@@ -51,7 +78,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 	if (isOwner === true)
 	{
 
-		if(status === "owner")
+		if(yourself === true)
 		{
 			return (
 				<div>
@@ -61,25 +88,14 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 		}
 		else
 		{
-			if (yourself === true)
-			{
-				return (
-					<div>
-						{element.username} ({status}) (you)
-						<input type="button" value={"setAdmin"} id={element.id}/>
-						<input type="button" value={"Mute (1min)"} id={element.id}/>
-						<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
-						<input type="button" value={"Ban"} id={element.id}/>
-					</div>
-				)
-			}
 			return (
 				<div>
 					{element.username} ({status})
 					<input type="button" value={"setAdmin"} id={element.id}/>
 					<input type="button" value={"Mute (1min)"} id={element.id}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Ban"} id={element.id}/>
+					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
 					<input type="button" value={"PlayWith"} id={element.id}/>
 				</div>
@@ -103,7 +119,8 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					{element.username} ({status})
 					<input type="button" value={"Mute (1min)"} id={element.id}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Ban"} id={element.id}/>
+					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
 					<input type="button" value={"PlayWith"} id={element.id}/>
 				</div>
@@ -120,6 +137,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
 					<input type="button" value={"PlayWith"} id={element.id}/>
 				</div>
