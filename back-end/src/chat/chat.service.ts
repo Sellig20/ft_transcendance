@@ -28,6 +28,7 @@ export class ChatService {
 				createAt: true,
 				username: true,
 				id: true,
+				blocked_user: true
 			}
 		})
 		return user;
@@ -182,6 +183,44 @@ export class ChatService {
 				channel_list: {disconnect: [{id:channelID}]}
 			}
 		})
+	}
+
+	async addBannedUser(userId: number, channelID: number) {
+		await this.prisma.channel.update({
+			where: {
+				id: channelID
+			},
+			data: {
+				banned: {
+					push: [userId]
+				}
+			}
+		})
+	}
+
+	async blockUserById(userId: number, userToBlock: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				blocked_user: {
+					push: [userToBlock]
+				}
+			}
+		})
+	}
+
+	async getblockedUserById(userId: number) {
+		const user = await this.prisma.user.findFirst({
+			where: {
+				id: userId
+			},
+			select: {
+				blocked_user: true,
+			},
+		})
+		return user;
 	}
 
 // ---------------------- TEST FUNCTION -------------------------
