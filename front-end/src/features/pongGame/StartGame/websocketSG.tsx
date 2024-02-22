@@ -2,7 +2,6 @@ import { useContext, useEffect, useState, useRef } from "react"
 import { WebsocketContext } from "../contexts/WebsocketContext"
 import { GameStateFD, GameStatus } from "./GameStateFD";
 import { useNavigate } from "react-router-dom";
-import { exit } from "process";
 
 export const WebsocketSG = () => {
 
@@ -127,7 +126,7 @@ export const WebsocketSG = () => {
 
     const handleAbandon = () => {
         socket.emit('Abandon', socket.id);
-        navigate('../');
+        navigate('../Abandon');
     }
 
     useEffect(() => {
@@ -139,7 +138,6 @@ export const WebsocketSG = () => {
         }
 
         const handleDisconnect = () => {
-            console.log("QUITTE LE JEU EN JEU");
             socket.emit('quitInGame');
         }
 
@@ -225,7 +223,8 @@ export const WebsocketSG = () => {
     return (
         <div className="game-container">
             <canvas id="board"></canvas>
-            <button onClick={handleAbandon}>Abandon Game</button>
+            <button className="buttonGame" onClick={handleAbandon}>
+                <span>Abandon Game</span></button>
         </div>
   );
 }

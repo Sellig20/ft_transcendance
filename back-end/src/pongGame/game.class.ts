@@ -15,6 +15,7 @@ export class Game {
       const gameState = new GameStateBD();
       gameState.paddle1.socket = this.player1.socketId;
       gameState.paddle2.socket = this.player2.socketId;
+      gameState.status = GameStatus.playingGame;
       return gameState;
     }
 
@@ -34,6 +35,20 @@ export class Game {
         this.sendToPlayer("prepareForMatch", {});
         this.gameState.status = GameStatus.playingGame;
         this.startGameLoop();
+    }
+
+    statusAbandon(newStat: GameStatus, socketClient: string) {
+        this.gameState.status = newStat;
+        if (socketClient === this.player1.socketId)
+        {
+            this.server.to(this.player1.socketId).emit('Aba');
+            this.server.to(this.player2.socketId).emit('Aba');
+        }
+        else if (socketClient === this.player2.socketId)
+        {
+            this.server.to(this.player1.socketId).emit('Aba');
+            this.server.to(this.player2.socketId).emit('Aba');
+        }
     }
 
     sendToPlayer(event: string, data: any) {

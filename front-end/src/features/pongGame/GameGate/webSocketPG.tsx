@@ -35,8 +35,10 @@ export const WebSocketPG = () => {
     return (
         <div>
             <div>
-                <button onClick={handleRedirectToQueueGate}>Find someone to play with</button>
-                <button onClick={handleQuitQueueGate}>Quit queue gate</button>
+                <button className="buttonGame" onClick={handleRedirectToQueueGate}>
+                    <span>Play</span></button>
+                <button className="buttonGame" onClick={handleQuitQueueGate}>
+                    <span>Quit </span></button>
             </div>
         </div>
     )

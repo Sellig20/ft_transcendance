@@ -131,10 +131,11 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
-        // const currentGame = this.getStrGame(client.id);
-        // const gameObj = this.getGaObj(currentGame);
-        // gameObj.status = GameStatus.abortedGame;
-        this.getGaObj(this.getStrGame(client.id)).status = GameStatus.abortedGame;
+        for (let i = 0; i < this.userArray.length; i++) {
+            const currentGame = this.games[i];
+            currentGame.statusAbandon(GameStatus.abortedGame, client.id);
+        }
+        // this.getGaObj(this.getStrGame(client.id)).status = GameStatus.abortedGame;
         console.log("-> ", client.id, " A ABANDONNEYYYY");
     }
 

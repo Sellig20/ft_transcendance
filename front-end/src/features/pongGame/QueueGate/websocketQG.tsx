@@ -30,7 +30,8 @@ const WebsocketQG = () => {
         <div>
             <h2>Page queue list</h2>
             <h3>Loading... finding someone to play with you</h3>
-            <button onClick={handleQuitQueue}>Quit Queue List</button>
+            <button className="buttonGame" onClick={handleQuitQueue}>
+                <span>Quit Queue List</span></button>
         </div>
     )
 

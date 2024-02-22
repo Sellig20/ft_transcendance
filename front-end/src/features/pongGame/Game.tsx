@@ -6,6 +6,8 @@ import { WebsocketSG } from './StartGame/websocketSG';
 import QueueGate from './QueueGate/index'
 import { Routes, Route } from 'react-router-dom';
 import Error from './Error/index'
+import { Abandon } from './Abandon'
+import './style.css'
 
 export function Game() {
 	
@@ -31,6 +33,13 @@ export function Game() {
                         <div>
                             <StartGame />
                             <WebsocketSG />
+                        </div>
+                    </WebsocketProvider>
+                }/>
+                <Route path="/abandon" element={
+                    <WebsocketProvider value ={socket}>
+                        <div>
+                            <Abandon />
                         </div>
                     </WebsocketProvider>
                 }/>
