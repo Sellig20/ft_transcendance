@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { GameStateBD } from "./gameStateBD";
 import { Player } from "./gameStateBD";
 import { Game } from "./game.class";
-import { playerStatus } from "./gameStateBD";
+import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 
 @WebSocketGateway(8001, {
@@ -131,6 +131,10 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
+        // const currentGame = this.getStrGame(client.id);
+        // const gameObj = this.getGaObj(currentGame);
+        // gameObj.status = GameStatus.abortedGame;
+        this.getGaObj(this.getStrGame(client.id)).status = GameStatus.abortedGame;
         console.log("-> ", client.id, " A ABANDONNEYYYY");
     }
 
@@ -152,16 +156,9 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     {
         if (playersAvailable.length == 2)
         {
-
             const player1 = playersAvailable[0];
             const player2 = playersAvailable[1];
             const gameId = uuidv4();
-            console.log("");
-            console.log("");
-            // console.log("LES JOUEURS QUI VEULENT JOUER SONT : 1  ", player1);
-            // console.log("LES JOUEURS QUI VEULENT JOUER SONT : 2  ", player2);
-            console.log("");
-            console.log("");
             const currentGame = new Game(gameId, this.server, player1, player2);
             this.games.push(currentGame);
             currentGame.actualDataInClassGame();

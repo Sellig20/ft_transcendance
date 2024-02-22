@@ -1,11 +1,22 @@
 import { Socket } from "socket.io-client";
 
-enum playerStatus {
-  isAvailable = 'ISAVAILABLE',
-  isPlaying = 'ISPLAYING',
-  finishedPlaying = 'FINISHEDPLAYING',
+export enum playerStatus {
+  isSettling = 'IS SETTLING',
+  isAvailable = 'IS AVAILABLE',
+  isWaitingSmo = 'IS WAITING SOMEONE',
+  isPlaying = 'IS PLAYING',
+  finishedPlaying = 'FINISHED PLAYING',
+}
+
+export enum GameStatus {
+  abortedGame = 'ABORTED',
+  finishedGame = 'FINISHED',
+  playingGame = 'PLAYING',
 }
 export class GameStateFD {
+
+    status: GameStatus;
+    
     boardWidth: number = 500;
     boardHeight: number = 500;
   
@@ -23,6 +34,9 @@ export class GameStateFD {
 
     player1Winner: boolean = false;
     player2Winner: boolean = false;
+
+    player1Looser: boolean = false;
+    player2Looser: boolean = false;
 
     idPlayer1: string = "one";
     idPlayer2: string = "two";
@@ -55,7 +69,6 @@ export class GameStateFD {
       color: "purple",
     };
   }
-  
   export interface PaddleType {
     socket: string;
     x: number;
@@ -76,7 +89,7 @@ export class GameStateFD {
   }
   export interface Player {
     socketId: Socket;
-    statuts: playerStatus;
+    status: playerStatus;
   }
   
   

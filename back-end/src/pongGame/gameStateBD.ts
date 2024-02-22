@@ -5,28 +5,17 @@ export enum playerStatus {
   isPlaying = 'IS PLAYING',
   finishedPlaying = 'FINISHED PLAYING',
 }
-export interface PaddleType {
-  socket: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  velocityY: number;
+
+export enum GameStatus {
+  abortedGame = 'ABORTED',
+  finishedGame = 'FINISHED',
+  playingGame = 'PLAYING',
 }
-export interface BallType {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  velocityX: number,
-  velocityY: number,
-  color: string,
-}
-export interface Player {
-  socketId: string;
-  status: playerStatus;
-}
+
 export class GameStateBD {
+  
+    status: GameStatus;
+    
     boardWidth: number = 500;
     boardHeight: number = 500;
   
@@ -76,5 +65,26 @@ export class GameStateBD {
       color: "purple",
     };
   }
- 
+  export interface PaddleType {
+    socket: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    velocityY: number;
+  }
+  export interface BallType {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    velocityX: number,
+    velocityY: number,
+    color: string,
+  }
+  export interface Player {
+    socketId: string;
+    status: playerStatus;
+  }
+  
   

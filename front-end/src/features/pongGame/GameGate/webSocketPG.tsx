@@ -9,10 +9,14 @@ export const WebSocketPG = () => {
 
     const handleRedirectToQueueGate = () => {
         socket.emit('goQueueList', socket.id);
-        console.log("Nous avons clique !");
         navigate('../queue');
     }
-    
+
+    const handleQuitQueueGate = () => {
+        socket.emit('goQuitQueueGate', socket.id);
+        navigate('../../home');
+    }
+
     useEffect(() => {
 
         if (socket.connected)
@@ -32,6 +36,7 @@ export const WebSocketPG = () => {
         <div>
             <div>
                 <button onClick={handleRedirectToQueueGate}>Find someone to play with</button>
+                <button onClick={handleQuitQueueGate}>Quit queue gate</button>
             </div>
         </div>
     )
