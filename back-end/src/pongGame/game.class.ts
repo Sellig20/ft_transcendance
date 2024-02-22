@@ -67,10 +67,14 @@ export class Game {
             console.log("Le gagnent est le joueur 1");
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
+            console.log("WINNER => 1");
+            console.log("LOOSER => 2");
             this.gameState.status = GameStatus.finishedGame;
         }
         else if (this.gameState.player2Score === 2) {
             console.log("le gagnant est le joueur 2");
+            console.log("WINNER => 2");
+            console.log("LOOSER => 1");
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
@@ -109,23 +113,35 @@ export class Game {
             a.y + a.height > b.y;
     }
 
+    // if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
+    //     if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
+    //         this.gameState.ball.velocityX = Math.abs(this.gameState.ball.velocityX);
+    //         // *= -1;
+    //         // Math.abs(this.gameState.ball.velocityX)
+    //         ballHitPaddle = true;
+    //         this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
+    //     }
+    // }
+    // else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
+    //     if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
+    //         this.gameState.ball.velocityX = -Math.abs(this.gameState.ball.velocityX); 
+    //         // *= -1;
+    //         ballHitPaddle = true;
+    //         this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
+    //     }
+    // }
+
     detectingCollisionWithPaddle(ballHitPaddle: boolean) {
         
         if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
-            console.log("collision 2 paddle 1");
             if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
-                console.log("collision 2 paddle 1");
-
                 this.gameState.ball.velocityX *= -1;
-                // Math.abs(this.gameState.ball.velocityX)
                 ballHitPaddle = true;
                 this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
             }
         }
         else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
-            console.log("collision 1 paddle 2");
             if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-                console.log("collision 2 paddle 2");
                 this.gameState.ball.velocityX *= -1;
                 ballHitPaddle = true;
                 this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
@@ -211,6 +227,6 @@ export class Game {
                 // this.server.to(this.player2.socketId).emit('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y);
             }
 
-        }, 16); // 16 ms (environ 60 FPS)
+        }, 10); // 16 ms (environ 60 FPS)
     }
 }

@@ -176,7 +176,6 @@ export const WebsocketSG = () => {
         })
 
         socket.on('detectCollisionW/Paddle', (velX: number) => {
-            console.log("COLLISION BABY");
             ballAgainstPaddle(velX);
         })//detecting Ball agaist paddles
 
@@ -190,8 +189,8 @@ export const WebsocketSG = () => {
                 gameState.player1Winner = true;
                 gameState.player2Winner = false;
             }
-            else if (name === "two") 
-            {                
+            else if (name === "two")
+            {
                 gameState.player2Winner = true;
                 gameState.player1Winner = false;
             }
@@ -199,13 +198,13 @@ export const WebsocketSG = () => {
 
         socket.on('looser', (name: string) => {
             if (name === "one")
-                gameState.player1Looser = false;
-            else if (name === "two") 
+                gameState.player1Looser = true;
+            else if (name === "two")
                 gameState.player2Looser = true;
         })
 
         return () => {
-            console.log("Unregistering events...");  
+            console.log("Unregistering events...");
             socket.off('connect');
             socket.off('disconnect');
             window.removeEventListener('keydown', handleKeyDown);
