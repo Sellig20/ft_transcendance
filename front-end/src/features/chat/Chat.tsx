@@ -94,7 +94,9 @@ export function Chat() {
 	const reloadListener = async (
 		messageprop: any
 	) => {
-		console.log("channelselected===", channelSelect, messageprop.channelid)
+		// console.log("channelselected===", channelSelect, messageprop.channelid)
+		if (channelSelect === undefined)
+			return ;
 		if (messageprop.channelid === channelSelect.id)
 		{
 			await chatService.findAllInfoInChannelById(Number(messageprop.channelid)).then(messageChann => {
@@ -118,8 +120,9 @@ export function Chat() {
 		if (channelSelect.id === messageprop.from_channel)
 		{
 			console.log("msg recu:", messageprop)
-			setMessageSocket(messageprop)
-			setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
+			reload(messageprop.from_channel)
+			// setMessageSocket(messageprop)
+			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
 
