@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface friend {
   id: number;
@@ -17,14 +18,19 @@ interface UserCardProps {
 
 const UserCardTwo: React.FC<UserCardProps> = ({ user, handle }) => {
 
+	const navigate = useNavigate();
 	const handleAddFriendClick = () => {
 		handle(user.id);
 	};
 
+	const seeUserPage = () => {
+		navigate(`/user/${user.id}`)
+	}
+
 	return (
 		<div className="col">
-			<div className="card h-100">
-				<div className="card-body">
+			<div className="card h-100" onClick={seeUserPage}>
+				<div className="card-body" onClick={seeUserPage}>
 				{/* <img src="/avatarDefault.png" className="img-thumbnail" style={{ maxWidth: '100px' }}  alt="..." /> */}
 					<h5 className="card-title">{user.username}</h5>
 					<p className="card-text">{user.user_status}</p>

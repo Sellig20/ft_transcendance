@@ -106,27 +106,64 @@ export class UserController {
 		return { msg: 'yep yep' };
 	}
 
-	@Get('/stats')
-	async userstats(@Req() req){
+	@Get('/stats:id')
+	async userstats(@Req() req, @Param('id', ParseIntPipe) id){
 		let stats = new StatsDto();
-		let db_stats = await this.userservice.dbStats(req.user.id);
+		let usedId;
+		if (id)
+			usedId = id;
+		else
+			usedId = req.user.id
+
+		let db_stats = await this.userservice.dbStats(usedId);
+		const friends: number[] = db_stats.friends;
+		
 		stats = {...db_stats};
 		
 		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
 		if (stats.level > 5)
 		{
-			await this.userservice.updateAchivement(1, req.user.id);
+			await this.userservice.updateAchivement(1, usedId);
 			stats.success_one = true;
 		}
-		// if (stats.level > 5)
-		// {
-		// 	this.userservice.updateAchivement(1);
-		// 	stats.success_one = true;
-		// }
+		if (friends.length > 0)
+		{
+			this.userservice.updateAchivement(2, usedId);
+			stats.success_two = true;
+		}
 		if (stats.win + stats.lose >= 10)
 		{
-			await this.userservice.updateAchivement(3, req.user.id);
+			await this.userservice.updateAchivement(3, usedId);
+			stats.success_three = true;
+		}
+
+		return(stats)
+	}
+
+	@Get('/stats')
+	async userstatsPerso(@Req() req){
+		let stats = new StatsDto();
+		let usedId = req.user.id
+		let db_stats = await this.userservice.dbStats(usedId);
+		const friends: number[] = db_stats.friends;
+		
+		stats = {...db_stats};
+		
+		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
+		if (stats.level > 5)
+		{
+			await this.userservice.updateAchivement(1, usedId);
 			stats.success_one = true;
+		}
+		if (friends.length > 0)
+		{
+			this.userservice.updateAchivement(2, usedId);
+			stats.success_two = true;
+		}
+		if (stats.win + stats.lose >= 10)
+		{
+			await this.userservice.updateAchivement(3, usedId);
+			stats.success_three = true;
 		}
 
 		return(stats)
@@ -153,6 +190,12 @@ export class UserController {
 	@Get('/everyone/filter')
 	async usersFilter(@Req() req){
 		let users = await this.userservice.getAllUsersFilter(req.user.id);
+		return(users)
+	}
+
+	@Get('/matchs:id')
+	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
+		let users = await this.userservice.getMatchs(id);
 		return(users)
 	}
 }

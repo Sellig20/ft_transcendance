@@ -181,6 +181,7 @@ export class UsersService {
 					id: id,
 				},
 				select: {
+					friends: true,
 					elo: true,
 					win: true,
 					lose: true,
@@ -225,10 +226,20 @@ export class UsersService {
 					data: {
 						success_one: true
 					}
-				
+
 				});
 			}
-			else
+			else if (achNum === 2)
+				result = await this.prisma.user.update({
+					where: {
+						id: id,
+					},
+					data: {
+						success_two: true
+					}
+
+				});
+			else if (achNum === 3)
 				result = await this.prisma.user.update({
 					where: {
 						id: id,
@@ -340,7 +351,7 @@ export class UsersService {
 
 		try {
 			// console.log(IdMe, IdFriend);
-			
+
 			await this.prisma.user.update({
 				where: {
 					id: IdMe,
@@ -368,6 +379,25 @@ export class UsersService {
 			throw new BadRequestException("Couldnt add friend", {
 				cause: new Error(),
 				description: "Couldnt add friend",
+			});
+		}
+	}
+
+	async getMatchs(userId: number) {
+	try {
+		const matchHistory = await this.prisma.match.findMany({
+			where: {
+				OR: [
+					{ winnerId: userId },
+					{ loserId: userId },
+				],
+			},
+		});
+		return matchHistory;
+		} catch (error) {
+			throw new BadRequestException("Error retrieving match history", {
+				cause: new Error(),
+				description: "Error retrieving match history",
 			});
 		}
 	}

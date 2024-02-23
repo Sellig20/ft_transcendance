@@ -76,6 +76,15 @@ const getSats = async (): Promise<PlayerStats> => {
 	return response?.data 
 }
 
+const getSatsPlayer = async (id: number): Promise<PlayerStats> => {
+	let response
+	try {
+		response = await api.get(`/user/stats${id}`)
+	} catch (error){
+	}
+	return response?.data 
+}
+
 const getFriends = async (): Promise<any> => {
 	let response
 	try {
@@ -105,6 +114,16 @@ const addFriend = async (id: number) => {
 	return response.data
 }
 
+const getMatch = async (id: number) => {
+	let response
+	try {
+		response = await api.get(`/user/matchs${id}`)
+	} catch (error){
+		return null;
+	}
+	return response.data
+}
+
 export default {
 	setTfaOn: setTfaOn,
 	genQrcode: genQrcode,
@@ -117,5 +136,7 @@ export default {
 	getFriends: getFriends,
 	getUsers: getUsers,
 	addFriend: addFriend,
+	getSatsPlayer: getSatsPlayer,
+	getMatch: getMatch,
 
 }
