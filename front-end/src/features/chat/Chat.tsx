@@ -59,7 +59,7 @@ export function Chat() {
 	useEffect(() => {
 		if (count.current === 0)
 		{
-			const newSocket = io("http://localhost:8001")
+			const newSocket = io(`http://${process.env.HOST_IP}:8001`)
 			first(newSocket)
 		}
 		count.current++;

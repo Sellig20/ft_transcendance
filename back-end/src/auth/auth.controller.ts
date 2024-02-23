@@ -5,6 +5,7 @@ import { Public } from './utils/custo.deco';
 import { UsersService } from 'src/user/user.service';
 import { JWTAUthGuard } from './guard/JWTGuard'
 import { log } from 'console';
+import { jwtConstants } from './utils/constant';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
 	@Get('42-redirect')
 	async auth42Redirect(@Req() req, @Res() res) {
 		// console.log('hello went through the redirect :)');
-		const url = new URL('http://localhost:8080/auth');
+		const url = new URL(`http://${jwtConstants.host_id}:8080/auth`);
 		// console.log('in this ft guard', req.user);
 		if (req.user.TFA_activated) {
 			url.searchParams.append('tfa', 'ON');
