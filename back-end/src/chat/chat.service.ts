@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ForbiddenException, BadRequestException } from '@nestjs/common';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
@@ -218,6 +219,38 @@ export class ChatService {
 			},
 			select: {
 				blocked_user: true,
+			},
+		})
+		return user;
+	}
+
+	async setAdminById(channelId: number, userToSet: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelId
+				},
+				data: {
+					admins: {
+						push: [userToSet]
+					}
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while set admin", {
+				cause: new Error(),
+				description: "error while set admin",
+			});
+		}
+	}
+
+	async getAdminInChannelById(channelId: number) {
+		const user = await this.prisma.channel.findFirst({
+			where: {
+				id: channelId
+			},
+			select: {
+				admins: true,
 			},
 		})
 		return user;

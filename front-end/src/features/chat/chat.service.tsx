@@ -80,6 +80,20 @@ const blockUserById = async (
 	return response
 }
 
+const setAdminById = async (
+	channelId: number, 
+	userToSet: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/setAdminById', {channelId: channelId, userToSet: userToSet})
+	} catch (error){
+		console.log(error);
+		return null;
+	}
+	return response
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
@@ -87,6 +101,7 @@ export default {
 	createChannel: createChannel,
 	leaveChannelById: leaveChannelById,
 	banChannelById: banChannelById,
-	blockUserById: blockUserById
+	blockUserById: blockUserById,
+	setAdminById:setAdminById
 
 }

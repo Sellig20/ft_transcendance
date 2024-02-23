@@ -2,6 +2,7 @@ import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import hash from 'src/auth/utils/hash';
+import { ForbiddenException, BadRequestException } from '@nestjs/common';
 
 
 @Controller('chat')
@@ -93,7 +94,6 @@ export class ChatController {
 
 	@Post('/banChannelById')
 	async banChannelById(@Body() body) {
-		// verifier si le userid est le owner
 		let result
 		try {
 			const result = await this.ChatService.leaveChannelById(body.userid, body.channelid)
@@ -113,7 +113,6 @@ export class ChatController {
 
 	@Post('/blockUserById')
 	async blockUserById(@Body() body) {
-		// verifier si le userid est le owner
 		let result
 		
 		const promise1 = this.ChatService.getblockedUserById(body.userid)
@@ -128,5 +127,24 @@ export class ChatController {
 			}
 		})
 		return result
+	}
+
+	@Post('/setAdminById')
+	async setAdminById(@Body() body) {
+		let result
+		const res1 = await this.ChatService.getAdminInChannelById(body.channelId)
+		if (res1.admins.indexOf(body.userToSet) === -1)
+		{
+			result = await this.ChatService.setAdminById(body.channelId, body.userToSet)
+			return result
+		}
+		else
+		{
+			console.log("sdfgdfsgdfgdfg", res1.admins, body.userToSet)
+			throw new ForbiddenException("Error in update", {
+				cause: new Error(),
+				description: "Error",
+			});
+		}
 	}
 }
