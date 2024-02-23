@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FrontUserDto } from './UserDto';
+import { FrontUserDto, StatsDto } from './UserDto';
 import hashService from '../auth/utils/hash'
 import { Public } from 'src/auth/utils/custo.deco';
 import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { join } from 'path';
+import { stat } from 'fs';
 
 @Controller('user')
 export class UserController {
@@ -108,5 +109,31 @@ export class UserController {
 		console.log('string decryptee: ', normalString);
 		
 		return { msg: 'yep yep' };
+	}
+
+	@Get('/stats')
+	async userstats(@Req() req){
+		let stats = new StatsDto();
+		let db_stats = await this.userservice.dbStats(req.user.id);
+		stats = {...db_stats};
+		
+		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
+		if (stats.level > 5)
+		{
+			await this.userservice.updateAchivement(1, req.user.id);
+			stats.success_one = true;
+		}
+		// if (stats.level > 5)
+		// {
+		// 	this.userservice.updateAchivement(1);
+		// 	stats.success_one = true;
+		// }
+		if (stats.win + stats.lose >= 10)
+		{
+			await this.userservice.updateAchivement(3, req.user.id);
+			stats.success_one = true;
+		}
+
+		return(stats)
 	}
 }

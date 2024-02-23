@@ -35,9 +35,14 @@ const Navbar = () => {
 	}
 
 	return (
-		<nav className="navbar navbar-expand-lg navbar-light bg-light">
-			<div className="container-fluid justify-content-center">
-				<ul className="nav nav-tabs">
+		<nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+			<a className="" href="https://profile.intra.42.fr/" style={{paddingLeft: 10}} >
+				<img src="/public/42_Logo.svg.png" alt="Logo" width="35" height="35" className="img-thumbnail bg-light"></img>
+			</a>
+			<div className="justify-content-center">
+				<ul className="navbar-nav">
+
+
 					<li className="nav-item">
 						<a className="nav-link" onClick={handleLogout} >Logout</a>
 					</li>
