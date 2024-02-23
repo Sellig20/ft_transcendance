@@ -95,8 +95,9 @@ export const WebsocketSG = () => {
         context.fill();
     }
 
-    const ballAgainstPaddle = (velX: number) => {
+    const ballAgainstPaddle = (velX: number, velY: number) => {
         gameState.ball.velocityX = velX;
+        gameState.ball.velocityY = velY;
     }//collisionBall detecting aingsnt machin evenement
 
     const ballAgainstBorder = (velY: number) => {
@@ -198,8 +199,8 @@ export const WebsocketSG = () => {
             updateScorePlayer2(scoreP2);
         })
 
-        socket.on('detectCollisionW/Paddle', (velX: number) => {
-            ballAgainstPaddle(velX);
+        socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
+            ballAgainstPaddle(velX, velY);
         })//detecting Ball agaist paddles
 
         socket.on('detectBorder', (velY: number) => {

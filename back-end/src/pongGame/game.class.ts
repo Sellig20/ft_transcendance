@@ -77,6 +77,8 @@ export class Game {
         return this.player2.socketId;
     }
 
+    
+
     maxScore() {
         if (this.gameState.player1Score === 2) {
             this.server.to(this.player1.socketId).emit('winner', "one");
@@ -121,43 +123,76 @@ export class Game {
             a.y < b.y + b.height &&
             a.y + a.height > b.y;
     }
-
-    // if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
-    //     if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
-    //         this.gameState.ball.velocityX = Math.abs(this.gameState.ball.velocityX);
-    //         // *= -1;
-    //         // Math.abs(this.gameState.ball.velocityX)
-    //         ballHitPaddle = true;
-    //         this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
-    //     }
-    // }
-    // else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
-    //     if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-    //         this.gameState.ball.velocityX = -Math.abs(this.gameState.ball.velocityX); 
-    //         // *= -1;
-    //         ballHitPaddle = true;
-    //         this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
-    //     }
-    // }
-    
-
+   
     detectingCollisionWithPaddle(ballHitPaddle: boolean) {
-        
         if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
             if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
+                // const col = (this.gameState.ball.y + this.gameState.ball.height / 2) - this.gameState.paddle1.y;
+                // const normCol = col / (this.gameState.paddle1.height / 2);
+
+                // const angle = normCol * Math.PI / 4;
+
+                // const newVelX = Math.cos(angle) * Math.abs(this.gameState.ball.velocityX);
+                // this.gameState.ball.velocityX = this.gameState.paddle1.x > this.gameState.boardWidth / 2 ? newVelX : -newVelX;
+
+                // this.gameState.ball.velocityY = Math.sin(angle) * Math.abs(this.gameState.ball.velocityY);
                 this.gameState.ball.velocityX *= -1;
                 ballHitPaddle = true;
-                this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
+                this.sendToPlayerBall('detectCollisionW/Paddle',  this.gameState.ball.velocityX, this.gameState.ball.velocityY);
             }
         }
         else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
             if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-                this.gameState.ball.velocityX *= -1;
-                ballHitPaddle = true;
-                this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
+
+            // const col = (this.gameState.ball.y + this.gameState.ball.height / 2) - this.gameState.paddle2.y;
+            // const normCol = col / (this.gameState.paddle2.height / 2);
+
+            // const angle = normCol * Math.PI / 4;
+
+            // const newVelX = -Math.cos(angle) * Math.abs(this.gameState.ball.velocityX);
+            // this.gameState.ball.velocityX = this.gameState.paddle2.x < this.gameState.boardWidth / 2 ? newVelX : -newVelX;
+
+            // this.gameState.ball.velocityY = Math.sin(angle) * Math.abs(this.gameState.ball.velocityY);
+
+            this.gameState.ball.velocityX *= -1;
+            ballHitPaddle = true;
+            this.sendToPlayerBall('detectCollisionW/Paddle',  this.gameState.ball.velocityX, this.gameState.ball.velocityY);
             }
         }
     }
+        
+    // if (this.detect(ball, paddle1)) {
+    //     if (ball.x <= paddle1.x + paddle1.width) {
+    //         const collisionPoint = (ball.y + ball.height / 2) - paddle1.y; // Position de collision par rapport au centre du paddle
+    //         const normalizedCollisionPoint = collisionPoint / (paddle1.height / 2); // Normalisation à la plage [-1, 1]
+    
+    //         // Ajuster l'angle vertical en fonction de la position de collision
+    //         const angle = normalizedCollisionPoint * Math.PI / 4; // Angle maximal de rebondissement
+    
+    //         // Appliquer le rebondissement horizontal
+    //         const newVelocityX = Math.cos(angle) * Math.abs(ball.velocityX);
+    //         ball.velocityX = paddle1.x > this.gameState.boardWidth / 2 ? newVelocityX : -newVelocityX;
+    
+    //         // Appliquer le rebondissement vertical
+    //         ball.velocityY = Math.sin(angle) * Math.abs(ball.velocityY);
+    
+    //         this.sendToPlayer('detectCollisionW/Paddle', ball.velocityX, ball.velocityY);
+    //     }
+    // } else if (this.detect(ball, paddle2)) {
+    //     if (ball.x + ball.width >= paddle2.x) {
+    //         const collisionPoint = (ball.y + ball.height / 2) - paddle2.y;
+    //         const normalizedCollisionPoint = collisionPoint / (paddle2.height / 2);
+    
+    //         const angle = normalizedCollisionPoint * Math.PI / 4;
+    
+    //         const newVelocityX = -Math.cos(angle) * Math.abs(ball.velocityX);
+    //         ball.velocityX = paddle2.x < this.gameState.boardWidth / 2 ? newVelocityX : -newVelocityX;
+    
+    //         ball.velocityY = Math.sin(angle) * Math.abs(ball.velocityY);
+    
+    //         this.sendToPlayer('detectCollisionW/Paddle', ball.velocityX, ball.velocityY);
+    //     }
+    // }
 
     detectingBorder() {//borderCollision evenement
         if (this.gameState.ball.y <= 0 || this.gameState.ball.y + this.gameState.ball.height >= this.gameState.boardHeight) {
@@ -228,13 +263,6 @@ export class Game {
                 let ballHitPaddle = false;
                 this.detectingCollisionWithPaddle(ballHitPaddle);
                 this.ScoreAndResetBall(1, ballHitPaddle);
-                // this.server.to(this.player1.socketId).emit('initplayer1', this.gameState.paddle1.x);
-                // this.server.to(this.player1.socketId).emit('initplayer2', this.gameState.paddle2.x);
-                // this.server.to(this.player1.socketId).emit('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y);
-
-                // this.server.to(this.player2.socketId).emit('initplayer1', this.gameState.paddle1.x);
-                // this.server.to(this.player2.socketId).emit('initplayer2', this.gameState.paddle2.x);
-                // this.server.to(this.player2.socketId).emit('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y);
             }
 
         }, 10); // 16 ms (environ 60 FPS)
