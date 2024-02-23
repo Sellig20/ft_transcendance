@@ -37,17 +37,17 @@ export class Game {
         this.startGameLoop();
     }
 
-    statusAbandon(newStat: GameStatus, socketClient: string) {
-        this.gameState.status = newStat;
+    statusAbandon(socketClient: string) {
+        this.gameState.status = GameStatus.abortedGame;
         if (socketClient === this.player1.socketId)
         {
-            this.server.to(this.player1.socketId).emit('Aba');
-            this.server.to(this.player2.socketId).emit('Aba');
+            this.server.to(this.player1.socketId).emit('IGaveUp', this.gameState.idPlayer1);
+            this.server.to(this.player2.socketId).emit('HeGaveUp', this.gameState.idPlayer2);
         }
         else if (socketClient === this.player2.socketId)
         {
-            this.server.to(this.player1.socketId).emit('Aba');
-            this.server.to(this.player2.socketId).emit('Aba');
+            this.server.to(this.player1.socketId).emit('HeGaveUp', this.gameState.idPlayer1);
+            this.server.to(this.player2.socketId).emit('IGaveUp', this.gameState.idPlayer2);
         }
     }
 
@@ -79,17 +79,11 @@ export class Game {
 
     maxScore() {
         if (this.gameState.player1Score === 2) {
-            console.log("Le gagnent est le joueur 1");
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
-            console.log("WINNER => 1");
-            console.log("LOOSER => 2");
             this.gameState.status = GameStatus.finishedGame;
         }
         else if (this.gameState.player2Score === 2) {
-            console.log("le gagnant est le joueur 2");
-            console.log("WINNER => 2");
-            console.log("LOOSER => 1");
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
@@ -145,6 +139,7 @@ export class Game {
     //         this.sendToPlayer('detectCollisionW/Paddle',  this.gameState.ball.velocityX );
     //     }
     // }
+    
 
     detectingCollisionWithPaddle(ballHitPaddle: boolean) {
         

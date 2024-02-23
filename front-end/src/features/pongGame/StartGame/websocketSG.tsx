@@ -43,6 +43,31 @@ export const WebsocketSG = () => {
         context.textAlign = 'center';
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
     }
+
+    const partyAbandon = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        if (gameState.player1Abandon === true || gameState.player2Abandon === true)
+        {
+            partyIsAbandonned(context, board);
+        }
+        if (gameState.player1IsDeserted === true || gameState.player2IsDeserted === true)
+        {
+            partyIsDeserted(context, board);
+        }
+    }
+    
+    const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        context.fillStyle = 'white';
+        context.font = '40 px Arial';
+        context.textAlign = 'center';
+        context.fillText('abandonneur', board.width / 2, board.height / 2);
+    }
+
+    const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        context.fillStyle = 'white';
+        context.font = '40 px Arial';
+        context.textAlign = 'center';
+        context.fillText('on t a abandonne msk', board.width / 2, board.height / 2);
+    }
     
     const createBoardGame = () => {
         const board = document.getElementById("board") as HTMLCanvasElement | null;
@@ -115,6 +140,7 @@ export const WebsocketSG = () => {
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
                 }
+                partyAbandon(context, board);
                 drawPaddle1(context);
                 drawPaddle2(context);
                 drawBall(context);
@@ -126,7 +152,6 @@ export const WebsocketSG = () => {
 
     const handleAbandon = () => {
         socket.emit('Abandon', socket.id);
-        navigate('../Abandon');
     }
 
     useEffect(() => {
@@ -201,6 +226,33 @@ export const WebsocketSG = () => {
                 gameState.player2Looser = true;
         })
 
+        socket.on('IGaveUp', (name: string) => {
+            // partie over
+            // -1 dans le big tableau
+            // getPlayer de la bdd
+
+            //L'ABANDONNEUR
+
+            if (name === "one")
+                gameState.player1Abandon = true;
+            else if (name === "two")
+                gameState.player2Abandon = true;
+        })
+
+        socket.on('HeGaveUp', (name: string) => {
+            // partie over 
+            // +1 he aba
+            // getPlayer de la bdd
+            
+            //he gave up donc envoie d'un display de tu as gagne prke il a abandon
+
+            //L'ABANDONNE
+            if (name === "one")
+                gameState.player1IsDeserted = true;
+            else if (name === "two")
+                gameState.player2IsDeserted = true;
+        })
+
         return () => {
             console.log("Unregistering events...");
             socket.off('connect');
@@ -221,11 +273,16 @@ export const WebsocketSG = () => {
     }, [update]);
     
     return (
-        <div className="game-container">
-            <canvas id="board"></canvas>
-            <button className="buttonGame" onClick={handleAbandon}>
-                <span>Abandon Game</span></button>
-        </div>
+        <div className="page-container">
+            <div className="game-container">
+                <canvas id="board"></canvas>
+            </div>
+            <div className="button-container">
+                <button className="buttonGame" onClick={handleAbandon}>
+                    <span>Abandon Game</span>
+                </button>
+            </div>
+    </div>
   );
 }
 

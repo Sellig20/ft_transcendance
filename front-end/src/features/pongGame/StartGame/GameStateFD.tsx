@@ -38,6 +38,12 @@ export class GameStateFD {
     player1Looser: boolean = false;
     player2Looser: boolean = false;
 
+    player1Abandon: boolean = false;
+    player2Abandon: boolean = false;
+
+    player1IsDeserted: boolean = false;
+    player2IsDeserted: boolean = false;
+
     idPlayer1: string = "one";
     idPlayer2: string = "two";
 
@@ -90,6 +96,7 @@ export class GameStateFD {
   export interface Player {
     socketId: Socket;
     status: playerStatus;
+    level: number;
   }
   
   

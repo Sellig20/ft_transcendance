@@ -17,7 +17,6 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     @WebSocketServer()
     server: Server;
     
-    // private gameState: GameStateBD = new GameStateBD();
     private userArray: Player[] = [];// BUG CHANGE THIS
     games: Game[] = [];
 
@@ -131,12 +130,14 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
-        for (let i = 0; i < this.userArray.length; i++) {
+        for (let i = 0; i < this.games.length; i++) {
             const currentGame = this.games[i];
-            currentGame.statusAbandon(GameStatus.abortedGame, client.id);
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                currentGame.statusAbandon(socketId);
+            }
         }
-        // this.getGaObj(this.getStrGame(client.id)).status = GameStatus.abortedGame;
-        console.log("-> ", client.id, " A ABANDONNEYYYY");
     }
 
     @SubscribeMessage('goQueueList') 
@@ -194,6 +195,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
         const newPlayer: Player = {
             socketId: item,
             status: playerStatus.isSettling,
+            level: 0, //TODO BDD a catch 
         };
         this.userArray.push(newPlayer);
         // const index = this.userArray.indexOf(item);

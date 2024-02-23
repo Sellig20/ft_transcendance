@@ -30,12 +30,21 @@ export class GameStateBD {
     player2Score: number = 0;
 
     currentLevel: number = 1;
+    
+    idPlayer1: string = "one";
+    idPlayer2: string = "two";
 
     player1Winner: boolean = false;
     player2Winner: boolean = false;
 
-    idPlayer1: string = "one";
-    idPlayer2: string = "two";
+    player1Looser: boolean = false;
+    player2Looser: boolean = false;
+
+    player1Abandon: boolean = false;
+    player2Abandon: boolean = false;
+
+    player1IsDeserted: boolean = false;
+    player2IsDeserted: boolean = false;
     
     paddle1: PaddleType = {
       socket: null,
@@ -85,6 +94,7 @@ export class GameStateBD {
   export interface Player {
     socketId: string;
     status: playerStatus;
+    level: number;
   }
   
   
