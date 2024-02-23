@@ -17,7 +17,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     @WebSocketServer()
     server: Server;
     
-    private userArray: Player[] = [];// BUG CHANGE THIS
+    private userArray: Player[] = [];
     games: Game[] = [];
 
     constructor() {}
@@ -31,6 +31,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     handleConnection(client: Socket, ...args: any[]) {
         let i = 0;
         this.addUser(client.id);
+
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {

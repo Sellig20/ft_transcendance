@@ -142,6 +142,10 @@ export const WebsocketSG = () => {
                     displayFailGame(context, board);
                 }
                 partyAbandon(context, board);
+                if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame)
+                {
+                    navigate('../game/StartGame');
+                }
                 drawPaddle1(context);
                 drawPaddle2(context);
                 drawBall(context);
@@ -153,6 +157,7 @@ export const WebsocketSG = () => {
 
     const handleAbandon = () => {
         socket.emit('Abandon', socket.id);
+
     }
 
     useEffect(() => {
@@ -180,22 +185,27 @@ export const WebsocketSG = () => {
         socket.on('disconnect', handleDisconnect);
         ///////////////////// SERVEUR RENVOIE donc le FRONTEND ECOUTE : ////////////////////////////
         socket.on('initplayer1', (y: number) => {
+            console.log("paddle 1 y : ", y);
             initiatePaddle1(y);
         })
 
         socket.on('initplayer2', (y: number) => {
+            console.log("paddle 2 y : ", y);
             initiatePaddle2(y);
         })
 
         socket.on('ballIsMovingX', (x: number, y: number) => {
+            console.log("ball x : ", x, " | ball y :", y);
             initiateBallX(x, y);
         })
 
         socket.on('updateScoreP1', (scoreP1: number) => {
+            console.log(" update socre player 1 : ", scoreP1);
             updateScorePlayer1(scoreP1);
         })
 
         socket.on('updateScoreP2', (scoreP2: number) => {
+            console.log(" update socre player 1 : ", scoreP2);
             updateScorePlayer2(scoreP2);
         })
 
@@ -226,14 +236,15 @@ export const WebsocketSG = () => {
             else if (name === "two")
                 gameState.player2Looser = true;
         })
-
+        
         socket.on('IGaveUp', (name: string) => {
             // partie over
             // -1 dans le big tableau
             // getPlayer de la bdd
-
+            
             //L'ABANDONNEUR
-
+            
+            gameState.status = GameStatus.abortedGame;
             if (name === "one")
                 gameState.player1Abandon = true;
             else if (name === "two")
@@ -248,6 +259,7 @@ export const WebsocketSG = () => {
             //he gave up donc envoie d'un display de tu as gagne prke il a abandon
 
             //L'ABANDONNE
+            gameState.status = GameStatus.abortedGame;
             if (name === "one")
                 gameState.player1IsDeserted = true;
             else if (name === "two")

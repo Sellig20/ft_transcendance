@@ -2,7 +2,6 @@ import { OnModuleInit } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { GameStateBD, Player, GameStatus} from "./gameStateBD";
-import { exit } from "process";
 
 export class Game {
 
@@ -80,15 +79,21 @@ export class Game {
     
 
     maxScore() {
-        if (this.gameState.player1Score === 2) {
+        if (this.gameState.player1Score === 3) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
+            this.gameState.player1Winner = true;
+            this.gameState.player2Looser = true;
+            //AXIOS requetes gagnant player 1
         }
-        else if (this.gameState.player2Score === 2) {
+        else if (this.gameState.player2Score === 3) {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
+            this.gameState.player2Winner = true;
+            this.gameState.player1Looser = true;
+            //AXIOS requetes gagnant player 2
         }
     }
 
