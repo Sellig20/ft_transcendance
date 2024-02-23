@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffect, useRef} from 'react'
 import chatService from '../chat.service'
 import { userInfo } from 'os'
+import { toast } from 'react-toastify';
 
 const handleLeave = async (
 	userid: number,
@@ -56,6 +57,23 @@ const handleBlock = async (
 
 };
 
+const handleSetadmin = async (
+	iduserinfo: number,
+	userToSet: number,
+	reload: any,
+	channelinfo: any
+) => {
+	const res = await chatService.setAdminById(Number(channelinfo.id), Number(userToSet))
+	console.log(res, "set admin user")
+	if (res === null)
+	{
+		// toast.error("error")
+		return;
+	}
+	reload(channelinfo.id);
+
+};
+
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
@@ -91,7 +109,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"setAdmin"} id={element.id}/>
+					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Mute (1min)"} id={element.id}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
