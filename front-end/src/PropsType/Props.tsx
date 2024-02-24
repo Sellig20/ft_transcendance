@@ -15,3 +15,12 @@ export interface PlayerStats {
 	success_three: boolean;
 }
   
+export interface Matchs {
+	id: number;
+	startTime: string;
+	endTime: string | null;
+	winnerId: number;
+	loserId: number;
+	winnerName: string;
+	loserName: string;
+}

@@ -24,13 +24,25 @@ export class AuthService {
 	}
 
 	async generateAndSaveFakeData() {
+
+		const fakeMatch = Array.from({ length: 25 }, () => ({
+			winnerId: Math.floor(Math.random() * 21),
+			loserId: Math.floor(Math.random() * 21)
+		}));
+
 		const fakeUsers = Array.from({ length: 10 }, () => ({
 			email: faker.internet.email(),
 			username: faker.internet.userName(),
+			win: Math.floor(Math.random() * 10),
+			lose: Math.floor(Math.random() * 10)
 		}));
 
 		for (const user of fakeUsers) {
 			await this.prisma.user.create({ data: user });
+		}
+
+		for (const match of fakeMatch) {
+			await this.prisma.match.create({ data: match });
 		}
 	}
 	

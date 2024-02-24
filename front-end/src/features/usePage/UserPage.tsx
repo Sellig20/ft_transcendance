@@ -1,8 +1,9 @@
 import Stats from '../Homepage/Stats';
 import { useEffect, useState } from 'react';
 import userService from '../user/user.service';
-import { PlayerStats } from '../../PropsType/Props';
+import { Matchs, PlayerStats } from '../../PropsType/Props';
 import { useNavigate, useParams } from 'react-router-dom';
+import MatchComp from './MatchComp';
 
 
 const UserPage = () => {
@@ -14,19 +15,21 @@ const UserPage = () => {
 	}
 	const [stats, setStats] = useState<PlayerStats | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [match, setMatch] = useState<Matchs[] | null>(null)
 	
 	useEffect(()=> {
 		if (!id)
 			navigate('/home');	
-		const promise1: Promise<PlayerStats> =  userService.getSatsPlayer(id);
+		const promise1: Promise<PlayerStats> =  userService.getSatsPlayer(id); // a changer pour avoir le username
 		const promise2 =  userService.getMatch(id);//
 
-		Promise.all([promise1, promise2]).then(([res1, res2]) => {
-			console.log(res1);
-			console.log(res2);
+		Promise.all([promise1, promise2]).then(([stats, matchs]) => {
+			console.log(stats);
+			console.log(matchs);
 			console.log(id);
 			
-				setStats(res1);
+				setStats(stats);
+				setMatch(matchs)
 				setLoading(false);
 			})
 			.catch((error) => {
@@ -49,7 +52,25 @@ const UserPage = () => {
 			<div className="container text-center">
 				<div className="row">
 					<div className="col">
-						<h4>Friends</h4>
+						<h4>Match history</h4>
+
+						<table className="table table-dark table-striped">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Winner</th>
+									<th scope="col">Loser</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								{match && match.map((match, i)=> (
+									<MatchComp key={match.id} match={match} index={i+1} userId={id}/>
+								))}
+							</tbody>
+						</table>
+
+
 					</div>
 					<div className="col">
 						<Stats stats={stats} />

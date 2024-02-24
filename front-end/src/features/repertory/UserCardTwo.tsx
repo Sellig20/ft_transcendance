@@ -19,7 +19,8 @@ interface UserCardProps {
 const UserCardTwo: React.FC<UserCardProps> = ({ user, handle }) => {
 
 	const navigate = useNavigate();
-	const handleAddFriendClick = () => {
+	const handleAddFriendClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		e.stopPropagation();
 		handle(user.id);
 	};
 
@@ -35,7 +36,8 @@ const UserCardTwo: React.FC<UserCardProps> = ({ user, handle }) => {
 					<h5 className="card-title">{user.username}</h5>
 					<p className="card-text">{user.user_status}</p>
 					<p className="card-text">{user.elo}</p>
-					<button type="button" className="btn btn-success btn-sm" onClick={handleAddFriendClick}>Add friend</button>
+						<button type="button" className="btn btn-success btn-sm" onClick={handleAddFriendClick}>Add friend</button>
+						
 				</div>
 			</div>
 		</div>

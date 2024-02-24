@@ -384,16 +384,30 @@ export class UsersService {
 	}
 
 	async getMatchs(userId: number) {
-	try {
-		const matchHistory = await this.prisma.match.findMany({
-			where: {
-				OR: [
-					{ winnerId: userId },
-					{ loserId: userId },
-				],
-			},
-		});
-		return matchHistory;
+		try {
+			const matchHistory = await this.prisma.match.findMany({
+				where: {
+					OR: [
+						{ winnerId: userId },
+						{ loserId: userId },
+					],
+				},
+			});
+			// Fetch user names for winnerId and loserId
+			const matchsWithUsernames = await Promise.all(matchHistory.map(async (match) => {
+				const [winner, loser] = await Promise.all([
+					this.prisma.user.findUnique({ where: { id: match.winnerId } }),
+					this.prisma.user.findUnique({ where: { id: match.loserId } }),
+				]);
+
+				return {
+					...match,
+					winnerName: winner ? winner.username : null,
+					loserName: loser ? loser.username : null,
+				};
+			}));
+
+		return matchsWithUsernames;
 		} catch (error) {
 			throw new BadRequestException("Error retrieving match history", {
 				cause: new Error(),
