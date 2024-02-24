@@ -4,7 +4,6 @@ import Stats from './Stats';
 import { useEffect, useState } from 'react';
 import userService from '../user/user.service';
 import { PlayerStats } from '../../PropsType/Props';
-import { Button, Card } from 'react-bootstrap';
 import UserCard, { friend } from './UserCard';
 
 
@@ -17,7 +16,6 @@ const Home = () => {
 	useEffect(()=> {
 		const promise1: Promise<PlayerStats> =  userService.getSats();
 		const promise2 =  userService.getFriends();
-
 		Promise.all([promise1, promise2]).then(([res1, res2]) => {
 				setStats(res1);
 				setFriends(res2);
@@ -48,7 +46,12 @@ const Home = () => {
 							<UserCard key={friend.id} user={friend} />
 						))}
 					</div>
-					<div className="col">
+					<div className="col container">
+						<div className="row justify-content-center">
+							{user.img &&
+								<img src={user.img} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
+							}
+						</div>
 						<Stats stats={stats} />
 					</div>
 				</div>

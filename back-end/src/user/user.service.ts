@@ -181,6 +181,8 @@ export class UsersService {
 					id: id,
 				},
 				select: {
+					username: true,
+					img_url: true,
 					friends: true,
 					elo: true,
 					win: true,

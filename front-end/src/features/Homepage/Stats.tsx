@@ -10,7 +10,7 @@ const Stats: React.FC<ChildCompProp> = ({ stats }) => {
 		return (
 			<>
 				<div className="row">
-					<h3>User Stats</h3>
+					<h3>{stats.username} Stats</h3>
 					<table className="table table-dark table-striped">
 						<tbody>
 							<tr>
@@ -33,7 +33,7 @@ const Stats: React.FC<ChildCompProp> = ({ stats }) => {
 					</table>
 				</div>
 				<div className="row">
-					<h4>Achivements</h4>
+					<h4>Achievements</h4>
 
 					<table className="table table-dark table-striped">
 						<tbody>

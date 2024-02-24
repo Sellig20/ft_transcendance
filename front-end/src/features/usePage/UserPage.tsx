@@ -16,22 +16,32 @@ const UserPage = () => {
 	const [stats, setStats] = useState<PlayerStats | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [match, setMatch] = useState<Matchs[] | null>(null)
-	
-	useEffect(()=> {
-		if (!id)
-			navigate('/home');	
-		const promise1: Promise<PlayerStats> =  userService.getSatsPlayer(id); // a changer pour avoir le username
-		const promise2 =  userService.getMatch(id);//
+	const [avatar, setAvatar] = useState("")
 
-		Promise.all([promise1, promise2]).then(([stats, matchs]) => {
+	useEffect(() => {
+		if (!id)
+			navigate('/home');
+		const promise1: Promise<PlayerStats> = userService.getSatsPlayer(id); // a changer pour avoir le username
+		const promise2 = userService.getMatch(id);//
+		const promise3 = userService.getAvatarById(id);
+
+		Promise.all([promise1, promise2, promise3]).then(([stats, matchs, img]) => {
 			console.log(stats);
 			console.log(matchs);
-			console.log(id);
+			console.log(img);
 			
-				setStats(stats);
-				setMatch(matchs)
-				setLoading(false);
-			})
+			let url;
+			if (!img)
+				url = "/avatarDefault.png"
+			else
+				url = URL.createObjectURL(new Blob([img]));
+			console.log(url);
+			
+			setStats(stats);
+			setMatch(matchs);
+			setAvatar(url)
+			setLoading(false);
+		})
 			.catch((error) => {
 				console.log(error);
 			})
@@ -50,7 +60,9 @@ const UserPage = () => {
 	else
 		return (
 			<div className="container text-center">
+
 				<div className="row">
+
 					<div className="col">
 						<h4>Match history</h4>
 
@@ -64,8 +76,8 @@ const UserPage = () => {
 							</thead>
 
 							<tbody>
-								{match && match.map((match, i)=> (
-									<MatchComp key={match.id} match={match} index={i+1} userId={id}/>
+								{match && match.map((match, i) => (
+									<MatchComp key={match.id} match={match} index={i + 1} userId={id} />
 								))}
 							</tbody>
 						</table>
@@ -73,6 +85,9 @@ const UserPage = () => {
 
 					</div>
 					<div className="col">
+				<div className="row justify-content-center">
+					<img src={avatar} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
+				</div>
 						<Stats stats={stats} />
 					</div>
 				</div>

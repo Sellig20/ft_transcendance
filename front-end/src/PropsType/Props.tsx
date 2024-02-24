@@ -6,6 +6,8 @@ interface MessageProps {
 }
 
 export interface PlayerStats {
+	username: string;
+	img_url: string;
 	level: number;
 	win: number;
 	lose: number;
