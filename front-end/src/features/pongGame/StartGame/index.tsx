@@ -1,5 +1,3 @@
-import './index.css';
-
 const StartGame: React.FC = () => {
 
   return (

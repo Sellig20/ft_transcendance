@@ -19,27 +19,30 @@ export const WebsocketSG = () => {
     }
 
     const displayScore = (context: CanvasRenderingContext2D) => {
-        context.font = "45px sans-serif";
+        context.fillStyle = '#9900ff';
+        context.font = '40px "Press Start 2P", sans-serif';
         context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
         context.fillText(gameState.player2Score.toString(), gameState.boardWidth * 4 / 5 - 45, 45);
     }
 
     const displayLine = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-    for (let i = 10; i < board.height; i += 25) {
-            context.fillRect(board.width / 2 - 10, i, 5, 5);
-        }
+        context.fillStyle = '#a35ce6';
+        context.font = '55px "Press Start 2P", sans-serif';
+        for (let i = 10; i < board.height; i += 25) {
+                context.fillRect(board.width / 2 - 10, i, 5, 5);
+            }
     }
 
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = 'white';
-        context.font = '40 px Arial';
+        context.fillStyle = '#9900ff';
+        context.font = '45px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('CONGRATS YOU WON', board.width / 2, board.height / 2);
     }
 
     const displayFailGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = 'white';
-        context.font = '40 px Arial';
+        context.fillStyle = '#9900ff';
+        context.font = '50px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
     }
@@ -53,20 +56,23 @@ export const WebsocketSG = () => {
         {
             partyIsDeserted(context, board);
         }
+        gameState.status === GameStatus.abortedGame;
     }
     
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = 'white';
-        context.font = '40 px Arial';
+        context.strokeStyle = 'rgb(190, 154, 240)';
+        context.fillStyle = '65 px #a300e6';
+        context.font = '20px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
-        context.fillText('abandonneur', board.width / 2, board.height / 2);
+        context.fillText('YOU GAVE UP', board.width / 2, board.height / 2);
     }
 
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = 'white';
-        context.font = '40 px Arial';
+        context.strokeStyle = 'rgb(190, 154, 240)';
+        context.fillStyle =  '45 px #a300e6';
+        context.font = '20px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
-        context.fillText('on t a abandonne msk', board.width / 2, board.height / 2);
+        context.fillText('ABANDON OF YOUR OPPONENT', board.width / 2, board.height / 2);
     }
     
     const createBoardGame = () => {
@@ -90,7 +96,7 @@ export const WebsocketSG = () => {
     }
 
     const drawBall = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = "pink";
+        context.fillStyle = '#cc00ff';
         context.fillRect(gameState.ball.x, gameState.ball.y, gameState.ball.width, gameState.ball.height);
         context.fill();
     }
@@ -105,11 +111,13 @@ export const WebsocketSG = () => {
     }//borderCollision detecting borderevenemt
 
     const drawPaddle1 = (context: CanvasRenderingContext2D) => {
+        context.fillStyle = '#a35ce6';
         context.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.paddle1.width, gameState.paddle1.height);
         context.fill();
     }
 
     const drawPaddle2 = (context: CanvasRenderingContext2D) => {
+        context.fillStyle = '#a35ce6';
         context.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.paddle2.width, gameState.paddle2.height);
         context.fill();
     }
@@ -132,19 +140,22 @@ export const WebsocketSG = () => {
         if (board) {
             const context = createContextCanvas(board);
             if (context) {
-                context.clearRect(0, 0, board.width, board.height);  // Efface le contenu du canvas
-                context.fillStyle = "skyblue";
+                context.clearRect(0, 0, board.width, board.height);// Efface le contenu du canvas
+                context.fillStyle = '#9900ff';
                 displayScore(context);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
+                    gameState.status === GameStatus.finishedGame;
                 }
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
+                    gameState.status === GameStatus.finishedGame;
                 }
                 partyAbandon(context, board);
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame)
                 {
-                    navigate('../game/StartGame');
+                    // alert("Vous allez être redirigé dans quelques secondes...");
+                    setTimeout(getBack, 3000);
                 }
                 drawPaddle1(context);
                 drawPaddle2(context);
@@ -158,6 +169,10 @@ export const WebsocketSG = () => {
     const handleAbandon = () => {
         socket.emit('Abandon', socket.id);
 
+    }
+
+    const getBack = () => {
+        navigate('../')
     }
 
     useEffect(() => {
@@ -209,13 +224,13 @@ export const WebsocketSG = () => {
             updateScorePlayer2(scoreP2);
         })
 
-        socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
-            ballAgainstPaddle(velX, velY);
-        })//detecting Ball agaist paddles
+        // socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
+        //     ballAgainstPaddle(velX, velY);
+        // })//detecting Ball agaist paddles
 
-        socket.on('detectBorder', (velY: number) => {
-            ballAgainstBorder(velY);
-        })//detecting Ball against border wall
+        // socket.on('detectBorder', (velY: number) => {
+        //     ballAgainstBorder(velY);
+        // })//detecting Ball against border wall
 
         socket.on('winner', (name: string) => {
             if (name === "one")
@@ -287,6 +302,10 @@ export const WebsocketSG = () => {
     
     return (
         <div className="page-container">
+             <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+            />
             <div className="game-container">
                 <canvas id="board"></canvas>
             </div>

@@ -47,9 +47,9 @@ body {
 }
 
 #board {
-  background-color: black;
-  border-top: 5px solid skyblue;
-  border-bottom: 5px solid skyblue;
+  background-color: #a38ae6;
+  border-top: 5px solid #9966ff;
+  border-bottom: 5px solid #9966ff;
 }
 
 .page-container {
