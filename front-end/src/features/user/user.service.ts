@@ -47,6 +47,19 @@ const getAvatar = async (filename: string) => {
 	return response.data
 }
 
+const getMyAvatar = async () => {
+	let response;
+	try {
+		response = await api.get(`user/myavatar`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return null;
+	}
+	
+	return response.data
+}
+
 const getAvatarById = async (id: number) => {
 	let response;
 	try {
@@ -152,5 +165,5 @@ export default {
 	getSatsPlayer: getSatsPlayer,
 	getMatch: getMatch,
 	getAvatarById: getAvatarById,
-
+	getMyAvatar: getMyAvatar,
 }

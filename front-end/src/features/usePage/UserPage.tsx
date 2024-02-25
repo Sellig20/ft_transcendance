@@ -29,14 +29,14 @@ const UserPage = () => {
 			console.log(stats);
 			console.log(matchs);
 			console.log(img);
-			
+
 			let url;
 			if (!img)
 				url = "/avatarDefault.png"
 			else
 				url = URL.createObjectURL(new Blob([img]));
 			console.log(url);
-			
+
 			setStats(stats);
 			setMatch(matchs);
 			setAvatar(url)
@@ -45,8 +45,12 @@ const UserPage = () => {
 			.catch((error) => {
 				console.log(error);
 			})
-
-	}, [])
+		return () => {
+			if (avatar) {
+				URL.revokeObjectURL(avatar);
+			}
+		}
+		}, [])
 
 	if (loading) {
 		return (
@@ -72,6 +76,7 @@ const UserPage = () => {
 									<th scope="col">#</th>
 									<th scope="col">Winner</th>
 									<th scope="col">Loser</th>
+									<th scope="col">*</th>
 								</tr>
 							</thead>
 

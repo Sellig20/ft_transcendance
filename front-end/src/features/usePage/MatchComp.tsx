@@ -17,6 +17,7 @@ const MatchComp: React.FC<UserCardProps> = ({ match, index, userId }) => {
 				<th scope="row">{index}</th>
 				<td>{match.winnerName}</td>
 				<td>{match.loserName}</td>
+				<td>WIN</td>
 			</tr>
 		);
 	}
@@ -26,6 +27,7 @@ const MatchComp: React.FC<UserCardProps> = ({ match, index, userId }) => {
 				<th scope="row">{index}</th>
 				<td>{match.winnerName}</td>
 				<td>{match.loserName}</td>
+				<td>LOSE</td>
 			</tr>
 		)
 	}

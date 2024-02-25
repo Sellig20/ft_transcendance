@@ -19,13 +19,20 @@ const UserSetting = () => {
 	const [img, setImg] = useState("")
 
 	useEffect(() => {
-		if (user.img)
-			setAvatar(user.img)
+		userService.getMyAvatar().then(img => {
+			let url;
+			if (!img)
+				url = "/avatarDefault.png"
+			else
+				url = URL.createObjectURL(new Blob([img]));
+			setAvatar(url)
+		})
 		return () => {
 			if (avatar) {
 				URL.revokeObjectURL(avatar);
 			}
-		}}, [])
+		}
+	}, [])
 
 	const handleTfaGen = async () => {
 		if (!user.tfa_status) {

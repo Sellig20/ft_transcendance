@@ -202,6 +202,8 @@ export class UserController {
 
 	@Get('/matchs:id')
 	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
+		if (id === 0)
+			id = req.user.id;
 		let users = await this.userservice.getMatchs(id);
 		return(users)
 	}
