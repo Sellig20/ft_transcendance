@@ -6,8 +6,8 @@ import { Public } from 'src/auth/utils/custo.deco';
 import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { join } from 'path';
-import { stat } from 'fs';
+import * as path from 'path';
+import { IdDto, NameDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -40,11 +40,12 @@ export class UserController {
 	}
 
 	@Post('/name')
-	async changeUserName(@Req() req, @Body() body) {
+	async changeUserName(@Req() req, @Body() nameDto: NameDto) {
 		const user = req.user;
-		const result = await this.userservice.changeName(user.id, body.name);
-		console.log(result);
-		return result
+		await this.userservice.changeName(user.id, nameDto.username);
+		console.log(nameDto);
+		
+		return nameDto.username
 	}
 
 	@Post('/upload')
@@ -64,22 +65,24 @@ export class UserController {
 		return file.filename;
 	}
 
-	@Get('/avatar:filename')
-	serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
-		// console.log('looking for  ', filename);
-		return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
+	// @Get('/avatar:filename')
+	// serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
+	// 	// console.log('looking for  ', filename);
+	// 	return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
+	// }
+
+	@Get('/ava:id')
+	async serveAvatarById(@Param('id', ParseIntPipe) id, @Res() res: Response) {
+		const img_name = await this.userservice.myAvatar(id);
+		const imagePath = path.resolve("/app/avatar", img_name)
+		return res.sendFile(imagePath);
 	}
 
 	@Get('/myavatar')
 	async serveMyAvatar(@Req() req,  @Res() res: Response){
 		const img_name = await this.userservice.myAvatar(req.user.id)
-
-		if (img_name === 'placeholder'){
-			return res.sendFile("avatarDefault", { root: join(__dirname, '../..', 'avatar') });
-		}
-		else {
-			return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
-		}
+		const imagePath = path.resolve("/app/avatar", img_name)
+		return res.sendFile(imagePath);
 	}
 
 	@Get('/status:id')
@@ -92,7 +95,6 @@ export class UserController {
 
 	@Patch('/changeStatus')
 	async changeStatus(@Req() req, @Body() body) {
-		console.log('change status activated : page closed detected');
 			
 		const result = await this.userservice.changeStatus(req.user.id, body.status)
 		return result
@@ -111,29 +113,98 @@ export class UserController {
 		return { msg: 'yep yep' };
 	}
 
-	@Get('/stats')
-	async userstats(@Req() req){
+	@Get('/stats:id')
+	async userstats(@Req() req, @Param('id', ParseIntPipe) id){
 		let stats = new StatsDto();
-		let db_stats = await this.userservice.dbStats(req.user.id);
+		let usedId;
+		if (id)
+			usedId = id;
+		else
+			usedId = req.user.id
+
+		let db_stats = await this.userservice.dbStats(usedId);
+		const friends: number[] = db_stats.friends;
+		
 		stats = {...db_stats};
 		
 		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
 		if (stats.level > 5)
 		{
-			await this.userservice.updateAchivement(1, req.user.id);
+			await this.userservice.updateAchivement(1, usedId);
 			stats.success_one = true;
 		}
-		// if (stats.level > 5)
-		// {
-		// 	this.userservice.updateAchivement(1);
-		// 	stats.success_one = true;
-		// }
+		if (friends.length > 0)
+		{
+			this.userservice.updateAchivement(2, usedId);
+			stats.success_two = true;
+		}
 		if (stats.win + stats.lose >= 10)
 		{
-			await this.userservice.updateAchivement(3, req.user.id);
-			stats.success_one = true;
+			await this.userservice.updateAchivement(3, usedId);
+			stats.success_three = true;
 		}
 
 		return(stats)
+	}
+
+	@Get('/stats')
+	async userstatsPerso(@Req() req){
+		let stats = new StatsDto();
+		let usedId = req.user.id
+		let db_stats = await this.userservice.dbStats(usedId);
+		const friends: number[] = db_stats.friends;
+		
+		stats = {...db_stats};
+		
+		stats.level = this.userservice.calcLevel(stats.win, stats.lose);
+		if (stats.level > 5)
+		{
+			await this.userservice.updateAchivement(1, usedId);
+			stats.success_one = true;
+		}
+		if (friends.length > 0)
+		{
+			this.userservice.updateAchivement(2, usedId);
+			stats.success_two = true;
+		}
+		if (stats.win + stats.lose >= 10)
+		{
+			await this.userservice.updateAchivement(3, usedId);
+			stats.success_three = true;
+		}
+
+		return(stats)
+	}
+
+	@Get('/friends')
+	async userfriends(@Req() req){
+		let friends = await this.userservice.getAllFriends(req.user.id);
+		return(friends)
+	}
+
+	@Get('/everyone')
+	async users(@Req() req){
+		let users = await this.userservice.getAllUsers();
+		return(users)
+	}
+
+	@Patch('/addfriend')
+	async addfriend(@Req() req, @Body() IdFriend: IdDto){
+		await this.userservice.addFriend(req.user.id, IdFriend.id)
+		return {msg: "friend added"}
+	}
+
+	@Get('/everyone/filter')
+	async usersFilter(@Req() req){
+		let users = await this.userservice.getAllUsersFilter(req.user.id);
+		return(users)
+	}
+
+	@Get('/matchs:id')
+	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
+		if (id === 0)
+			id = req.user.id;
+		let users = await this.userservice.getMatchs(id);
+		return(users)
 	}
 }

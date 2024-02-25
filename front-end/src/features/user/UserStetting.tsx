@@ -19,13 +19,20 @@ const UserSetting = () => {
 	const [img, setImg] = useState("")
 
 	useEffect(() => {
-		if (user.img)
-			setAvatar(user.img)
+		userService.getMyAvatar().then(img => {
+			let url;
+			if (!img)
+				url = "/avatarDefault.png"
+			else
+				url = URL.createObjectURL(new Blob([img]));
+			setAvatar(url)
+		})
 		return () => {
 			if (avatar) {
 				URL.revokeObjectURL(avatar);
 			}
-		}}, [])
+		}
+	}, [])
 
 	const handleTfaGen = async () => {
 		if (!user.tfa_status) {
@@ -41,8 +48,7 @@ const UserSetting = () => {
 	}
 
 	const hanldeUsername =  async () => {
-		const rep = await userService.changeUserName(username)
-		console.log(rep);
+		await userService.changeUserName(username)
 	}
 
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,11 +79,12 @@ const UserSetting = () => {
 			// console.log(formData);
 			// console.log(rep);
 			
-			const rawImg = await userService.getAvatar(rep);
-			const url = URL.createObjectURL(new Blob([rawImg]));
-			dispatch(addAvatar(url))
-			setAvatar(url)
-			
+			if (rep) {
+				const rawImg = await userService.getAvatar(rep);
+				const url = URL.createObjectURL(new Blob([rawImg]));
+				dispatch(addAvatar(url))
+				setAvatar(url)
+			}
 		}
 		setFile(null);
 		setImage("");

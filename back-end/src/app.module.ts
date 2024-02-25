@@ -11,7 +11,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { gatewayPong } from './pongGame/game.gateway';
 import { GameModule } from './pongGame/game.module';
 import { join } from 'path';
-
 @Module({
   controllers: [],
   providers: [MyGateway, gatewayPong],

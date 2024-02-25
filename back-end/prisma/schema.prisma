@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -17,7 +18,8 @@ model User {
   email        String    @unique
   channel_list Channel[]
   Message      Message[]
-  friends      Int[]     @unique
+  friends	   Int[] 	 @default([])
+
   blocked_user Int[]     @unique
 
   createAt DateTime @default(now())
@@ -38,6 +40,15 @@ model User {
   lastName        String?
   TFA_secret_hash String?
   TFA_activated   Boolean @default(false)
+}
+
+model Match {
+  id         Int      @id @default(autoincrement())
+  startTime  DateTime @default(now())
+  endTime    DateTime?
+
+  winnerId	Int
+  loserId	Int
 }
 
 model Channel {

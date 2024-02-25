@@ -181,6 +181,9 @@ export class UsersService {
 					id: id,
 				},
 				select: {
+					username: true,
+					img_url: true,
+					friends: true,
 					elo: true,
 					win: true,
 					lose: true,
@@ -225,10 +228,20 @@ export class UsersService {
 					data: {
 						success_one: true
 					}
-				
+
 				});
 			}
-			else
+			else if (achNum === 2)
+				result = await this.prisma.user.update({
+					where: {
+						id: id,
+					},
+					data: {
+						success_two: true
+					}
+
+				});
+			else if (achNum === 3)
 				result = await this.prisma.user.update({
 					where: {
 						id: id,
@@ -246,5 +259,162 @@ export class UsersService {
 			});
 		}
 		return result;
+	}
+
+	async getAllFriends(id: number) {
+		let friends;
+		let result;
+
+		try {
+			friends = await this.prisma.user.findFirst({
+				where: {
+					id: id,
+				},
+				select: {
+					friends: true
+				}
+			});
+			
+			result = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: friends.friends
+					},
+				},
+				select: {
+					user_status: true,
+					username: true,
+					id: true,
+					elo: true,
+					img_url: true
+				}
+			});
+		} catch (error) {
+			throw new BadRequestException("failed to get friends", {
+				cause: new Error(),
+				description: "failed to get friends",
+			});
+		}
+		return result;
+	}
+
+	async getAllUsers() {
+		let users;
+
+		try {
+			users = await this.prisma.user.findMany()
+		} catch (error) {
+			throw new BadRequestException("Couldnt find users", {
+				cause: new Error(),
+				description: "Couldnt find users",
+			});
+		}
+
+		return users;
+	}
+
+	async getAllUsersFilter(userId: number, ) {
+		let users;
+		let friends;		
+
+		try {
+			friends = await this.prisma.user.findFirst({
+				where: {
+					id: userId,
+				},
+				select: {
+					friends: true
+				}
+			});
+
+			users = await this.prisma.user.findMany({
+				where: {
+					id: {
+						not: userId, // Exclude the current user
+					},
+					NOT: {
+						id: {
+							in: friends.friends
+						},
+					}
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("Couldnt find users", {
+				cause: new Error(),
+				description: "Couldnt find users",
+			});
+		}
+
+		return users;
+	}
+
+	async addFriend(IdMe: number, IdFriend: number) {
+
+		try {
+			// console.log(IdMe, IdFriend);
+
+			await this.prisma.user.update({
+				where: {
+					id: IdMe,
+				},
+				data: {
+					friends: {
+						push: IdFriend,
+					},
+				},
+			})
+
+			await this.prisma.user.update({
+				where: {
+					id: IdFriend,
+				},
+				data: {
+					friends: {
+						push: IdMe,
+					},
+				},
+			})
+
+		} catch (error) {
+			console.log(error)
+			throw new BadRequestException("Couldnt add friend", {
+				cause: new Error(),
+				description: "Couldnt add friend",
+			});
+		}
+	}
+
+	async getMatchs(userId: number) {
+		try {
+			const matchHistory = await this.prisma.match.findMany({
+				where: {
+					OR: [
+						{ winnerId: userId },
+						{ loserId: userId },
+					],
+				},
+			});
+			// Fetch user names for winnerId and loserId
+			const matchsWithUsernames = await Promise.all(matchHistory.map(async (match) => {
+				const [winner, loser] = await Promise.all([
+					this.prisma.user.findUnique({ where: { id: match.winnerId } }),
+					this.prisma.user.findUnique({ where: { id: match.loserId } }),
+				]);
+
+				return {
+					...match,
+					winnerName: winner ? winner.username : null,
+					loserName: loser ? loser.username : null,
+				};
+			}));
+
+		return matchsWithUsernames;
+		} catch (error) {
+			throw new BadRequestException("Error retrieving match history", {
+				cause: new Error(),
+				description: "Error retrieving match history",
+			});
+		}
 	}
 }

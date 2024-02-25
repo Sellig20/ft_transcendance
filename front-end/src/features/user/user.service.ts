@@ -1,3 +1,4 @@
+import { PlayerStats } from '../../PropsType/Props';
 import api from '../api/api';
 
 
@@ -12,13 +13,10 @@ const genQrcode = async () => {
 }
 
 const changeUserName = async (name: string) => {
-	let response
 	try {
-		response = await api.post('/user/name', {name: name})
+		await api.post('/user/name', {username: name})
 	} catch (error){
-		return error;
 	}
-	return response.data
 }
 
 const uploadFile = async (file: FormData) => {
@@ -31,7 +29,7 @@ const uploadFile = async (file: FormData) => {
 			}
 		})
 	} catch (error) {
-		return error;
+		return null;
 	}
 	return response.data
 }
@@ -43,7 +41,33 @@ const getAvatar = async (filename: string) => {
 			responseType: 'blob',
 		})
 	} catch (error) {
-		return error;
+		return null;
+	}
+	
+	return response.data
+}
+
+const getMyAvatar = async () => {
+	let response;
+	try {
+		response = await api.get(`user/myavatar`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return null;
+	}
+	
+	return response.data
+}
+
+const getAvatarById = async (id: number) => {
+	let response;
+	try {
+		response = await api.get(`user/ava${id}`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return null;
 	}
 	
 	return response.data
@@ -69,12 +93,59 @@ const getUserStatus = async (id: string) => {
 	return response.data
 }
 
-const getSats = async () => {
+const getSats = async (): Promise<PlayerStats> => {
 	let response
 	try {
 		response = await api.get(`/user/stats`)
 	} catch (error){
-		return error;
+	}
+	return response?.data 
+}
+
+const getSatsPlayer = async (id: number): Promise<PlayerStats> => {
+	let response
+	try {
+		response = await api.get(`/user/stats${id}`)
+	} catch (error){
+	}
+	return response?.data 
+}
+
+const getFriends = async (): Promise<any> => {
+	let response
+	try {
+		response = await api.get(`/user/friends`)
+	} catch (error){}
+	console.log(response?.data);
+	
+	return response?.data
+}
+
+const getUsers = async (): Promise<any> => {
+	let response
+	try {
+		response = await api.get(`/user/everyone/filter`)
+	} catch (error){}
+	console.log(response?.data);
+	return response?.data
+}
+
+const addFriend = async (id: number) => {
+	let response
+	try {
+		response = await api.patch(`/user/addfriend`, { id: id})
+	} catch (error){
+		return null;
+	}
+	return response.data
+}
+
+const getMatch = async (id: number) => {
+	let response
+	try {
+		response = await api.get(`/user/matchs${id}`)
+	} catch (error){
+		return null;
 	}
 	return response.data
 }
@@ -87,6 +158,12 @@ export default {
 	getAvatar: getAvatar,
 	changeUserStatus: changeUserStatus,
 	getUserStatus: getUserStatus,
-	getSats: getSats
-
+	getSats: getSats,
+	getFriends: getFriends,
+	getUsers: getUsers,
+	addFriend: addFriend,
+	getSatsPlayer: getSatsPlayer,
+	getMatch: getMatch,
+	getAvatarById: getAvatarById,
+	getMyAvatar: getMyAvatar,
 }

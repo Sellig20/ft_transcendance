@@ -5,6 +5,7 @@ import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/user/user.service';
+import { jwtConstants } from './constant';
 
 @Injectable()
 export class FTstrategy extends PassportStrategy(Strategy, '42') {
@@ -17,7 +18,7 @@ export class FTstrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: config.get('FT_API_CLIENT_ID'),
       clientSecret: config.get('FT_API_SECRET'),
-      callbackURL: 'http://localhost:8000/auth/42-redirect',
+      callbackURL: `http://${jwtConstants.host_id}:8000/auth/42-redirect`,
       Scope: ['profile'],
     });
   }

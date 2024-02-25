@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const api = axios.create({
-	baseURL: 'http://localhost:8000',
+	baseURL: `http://${process.env.HOST_IP}:8000`,
 });
 
 api.interceptors.request.use(config => {
@@ -14,10 +14,9 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-api.interceptors.response.use((response) => {
-
-    return response;
-}, (error) => {
+api.interceptors.response.use(
+	(response) => response,
+	(error) => {
 	if (error.response.status === 401) {
 		toast.error('please login', {
 			position: "top-center",
@@ -31,8 +30,17 @@ api.interceptors.response.use((response) => {
 		})
 	}
     if (error.response && error.response.data) {
-		// console.log(error.response.data.error);
-		toast.error(error.response.data.error, {
+		console.log(error.response.data);
+		
+		let notif;
+		if (error.response.data.statusCode === 400 && error.response.data.message instanceof Array)
+			notif = error.response.data.message[0];
+		else if (error.response.data.statusCode === 400 && error.response.data.message)
+			notif = error.response.data.message;
+		else 
+			notif = error.response.data.error
+
+		toast.error(notif, {
 			position: "top-center",
 			hideProgressBar: false,
 			closeOnClick: true,
@@ -41,9 +49,8 @@ api.interceptors.response.use((response) => {
 			progress: undefined,
 			theme: "light",
 		})
-        return Promise.reject(error.response.data);
     }
-    return Promise.reject(error.message);
+    return Promise.reject(error);
 });
 
 export default api
