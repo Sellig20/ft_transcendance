@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QrCode from './QrCode'
 import userService from './user.service'
 import { useDispatch, useSelector } from 'react-redux'
 import { Rootstate } from '../../app/store'
-import { addAvatar, changeTfa } from './user.store'
+import { changeTfa } from './user.store'
 import loginService from '../login/login.service'
 import { toast } from 'react-toastify'
 
@@ -17,6 +17,7 @@ const UserSetting = () => {
 	const [image, setImage] = useState("")
 	const [avatar, setAvatar] = useState("")
 	const [img, setImg] = useState("")
+	const reload = useRef(0);
 
 	useEffect(() => {
 		userService.getMyAvatar().then(img => {
@@ -32,7 +33,7 @@ const UserSetting = () => {
 				URL.revokeObjectURL(avatar);
 			}
 		}
-	}, [])
+	}, [reload])
 
 	const handleTfaGen = async () => {
 		if (!user.tfa_status) {
@@ -80,10 +81,10 @@ const UserSetting = () => {
 			// console.log(rep);
 			
 			if (rep) {
-				const rawImg = await userService.getAvatar(rep);
+				const rawImg = await userService.getMyAvatar();
 				const url = URL.createObjectURL(new Blob([rawImg]));
-				dispatch(addAvatar(url))
 				setAvatar(url)
+				reload.current++;
 			}
 		}
 		setFile(null);
