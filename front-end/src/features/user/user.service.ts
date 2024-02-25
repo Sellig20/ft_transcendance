@@ -41,7 +41,33 @@ const getAvatar = async (filename: string) => {
 			responseType: 'blob',
 		})
 	} catch (error) {
-		return error;
+		return null;
+	}
+	
+	return response.data
+}
+
+const getMyAvatar = async () => {
+	let response;
+	try {
+		response = await api.get(`user/myavatar`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return null;
+	}
+	
+	return response.data
+}
+
+const getAvatarById = async (id: number) => {
+	let response;
+	try {
+		response = await api.get(`user/ava${id}`, {
+			responseType: 'blob',
+		})
+	} catch (error) {
+		return null;
 	}
 	
 	return response.data
@@ -138,5 +164,6 @@ export default {
 	addFriend: addFriend,
 	getSatsPlayer: getSatsPlayer,
 	getMatch: getMatch,
-
+	getAvatarById: getAvatarById,
+	getMyAvatar: getMyAvatar,
 }

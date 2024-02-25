@@ -3,7 +3,7 @@ import { userOnConnection } from "../login/IUser";
 
 const initialState: userOnConnection = {
 	email: "",
-	id: null,
+	id: 0,
 	username: "",
 	tfa_status: false,
 	connected: false,
@@ -33,7 +33,7 @@ export const UserSlice = createSlice({
 		},
 		logout: (state) => {
 			state.email = "";
-			state.id = null;
+			state.id = 0;
 			state.username = "";
 			state.tfa_status = false;
 			state.connected = false;

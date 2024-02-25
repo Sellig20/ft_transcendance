@@ -1,8 +1,9 @@
 import Stats from '../Homepage/Stats';
 import { useEffect, useState } from 'react';
 import userService from '../user/user.service';
-import { PlayerStats } from '../../PropsType/Props';
+import { Matchs, PlayerStats } from '../../PropsType/Props';
 import { useNavigate, useParams } from 'react-router-dom';
+import MatchComp from './MatchComp';
 
 
 const UserPage = () => {
@@ -14,26 +15,42 @@ const UserPage = () => {
 	}
 	const [stats, setStats] = useState<PlayerStats | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
-	
-	useEffect(()=> {
-		if (!id)
-			navigate('/home');	
-		const promise1: Promise<PlayerStats> =  userService.getSatsPlayer(id);
-		const promise2 =  userService.getMatch(id);//
+	const [match, setMatch] = useState<Matchs[] | null>(null)
+	const [avatar, setAvatar] = useState("")
 
-		Promise.all([promise1, promise2]).then(([res1, res2]) => {
-			console.log(res1);
-			console.log(res2);
-			console.log(id);
-			
-				setStats(res1);
-				setLoading(false);
-			})
+	useEffect(() => {
+		if (!id)
+			navigate('/home');
+		const promise1: Promise<PlayerStats> = userService.getSatsPlayer(id); // a changer pour avoir le username
+		const promise2 = userService.getMatch(id);//
+		const promise3 = userService.getAvatarById(id);
+
+		Promise.all([promise1, promise2, promise3]).then(([stats, matchs, img]) => {
+			console.log(stats);
+			console.log(matchs);
+			console.log(img);
+
+			let url;
+			if (!img)
+				url = "/avatarDefault.png"
+			else
+				url = URL.createObjectURL(new Blob([img]));
+			console.log(url);
+
+			setStats(stats);
+			setMatch(matchs);
+			setAvatar(url)
+			setLoading(false);
+		})
 			.catch((error) => {
 				console.log(error);
 			})
-
-	}, [])
+		return () => {
+			if (avatar) {
+				URL.revokeObjectURL(avatar);
+			}
+		}
+		}, [])
 
 	if (loading) {
 		return (
@@ -47,11 +64,35 @@ const UserPage = () => {
 	else
 		return (
 			<div className="container text-center">
+
 				<div className="row">
+
 					<div className="col">
-						<h4>Friends</h4>
+						<h4>Match history</h4>
+
+						<table className="table table-dark table-striped">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Winner</th>
+									<th scope="col">Loser</th>
+									<th scope="col">*</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								{match && match.map((match, i) => (
+									<MatchComp key={match.id} match={match} index={i + 1} userId={id} />
+								))}
+							</tbody>
+						</table>
+
+
 					</div>
 					<div className="col">
+				<div className="row justify-content-center">
+					<img src={avatar} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
+				</div>
 						<Stats stats={stats} />
 					</div>
 				</div>

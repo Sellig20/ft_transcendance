@@ -6,9 +6,8 @@ import { Public } from 'src/auth/utils/custo.deco';
 import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { join } from 'path';
+import * as path from 'path';
 import { IdDto, NameDto } from './dto/user.dto';
-import { identity } from 'rxjs';
 
 @Controller('user')
 export class UserController {
@@ -66,16 +65,24 @@ export class UserController {
 		return file.filename;
 	}
 
-	@Get('/avatar:filename')
-	serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
-		// console.log('looking for  ', filename);
-		return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
+	// @Get('/avatar:filename')
+	// serveAvatar(@Param('filename') filename: string, @Res() res: Response) {
+	// 	// console.log('looking for  ', filename);
+	// 	return res.sendFile(filename, { root: join(__dirname, '../..', 'avatar') });
+	// }
+
+	@Get('/ava:id')
+	async serveAvatarById(@Param('id', ParseIntPipe) id, @Res() res: Response) {
+		const img_name = await this.userservice.myAvatar(id);
+		const imagePath = path.resolve("/app/avatar", img_name)
+		return res.sendFile(imagePath);
 	}
 
 	@Get('/myavatar')
 	async serveMyAvatar(@Req() req,  @Res() res: Response){
 		const img_name = await this.userservice.myAvatar(req.user.id)
-		return res.sendFile(img_name, { root: join(__dirname, '../..', 'avatar') });
+		const imagePath = path.resolve("/app/avatar", img_name)
+		return res.sendFile(imagePath);
 	}
 
 	@Get('/status:id')
@@ -195,6 +202,8 @@ export class UserController {
 
 	@Get('/matchs:id')
 	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
+		if (id === 0)
+			id = req.user.id;
 		let users = await this.userservice.getMatchs(id);
 		return(users)
 	}
