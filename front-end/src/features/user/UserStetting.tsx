@@ -22,6 +22,7 @@ const UserSetting = () => {
 	useEffect(() => {
 		userService.getMyAvatar().then(img => {
 			let url;
+			
 			if (!img)
 				url = "/avatarDefault.png"
 			else
@@ -42,7 +43,7 @@ const UserSetting = () => {
 		}
 	}
 	const handleTfaOff = async () => {
-		const rep = await loginService.getTfaOff(); //retour de axios 
+		const rep = await loginService.getTfaOff(); 
 		if (rep) {
 			dispatch(changeTfa(false))
 		}

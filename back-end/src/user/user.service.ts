@@ -12,21 +12,37 @@ export class UsersService {
 	constructor(private prisma: PrismaService) { }
 
 	async findUserId(userID: number) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				id: userID,
-			},
-		});
-		if (user) return user;
-		return null;
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userID,
+				},
+			});
+			if (user) return user;
+			return null;
+		}
+		catch {
+			throw new ForbiddenException("UserFind error", {
+				cause: new Error(),
+				description: "UserFind error",
+			});
+		}
 	}
 	async findUserByMail(mail: string) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				email: mail,
-			},
-		});
-		return user;
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					email: mail,
+				},
+			});
+			return user;
+		} catch (error) {
+			throw new ForbiddenException("UserFindByMail error", {
+				cause: new Error(),
+				description: "UserFindByMail error",
+			});
+		}
+
 	}
 
 	async setTfaSecret(userID: number, secret: string) {
@@ -85,9 +101,8 @@ export class UsersService {
 	}
 
 	async saveImg(id: number, imgUrl: string){
-		let result;
 		try {
-			result = await this.prisma.user.update({
+			await this.prisma.user.update({
 				where: {
 					id: id,
 				},
@@ -104,7 +119,7 @@ export class UsersService {
 	}
 
 	async myAvatar(id: number){
-				let result;
+		let result
 		try {
 			result = await this.prisma.user.findFirst({
 				where: {
@@ -352,8 +367,6 @@ export class UsersService {
 	async addFriend(IdMe: number, IdFriend: number) {
 
 		try {
-			// console.log(IdMe, IdFriend);
-
 			await this.prisma.user.update({
 				where: {
 					id: IdMe,

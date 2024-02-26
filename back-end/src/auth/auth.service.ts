@@ -64,7 +64,6 @@ export class AuthService {
 
 	async signinTFA(user: any) {
 		// console.log('user in tfa signin: ', user);
-		
 		const payload = {
 			username: user.username,
 			sub: user.id,

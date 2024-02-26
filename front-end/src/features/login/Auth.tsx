@@ -58,13 +58,12 @@ const Auth = () => {
 		const userId = queryparms.get('userId');
 
 		if (tfa === 'ON' && urlcode === 'none' && userId) {
-			const { access_token } = await loginService.postTFAauth(code, Number(userId));
+			const access_token = await loginService.postTFAauth(code, Number(userId));
 			if (access_token) {
 				localStorage.setItem("token", access_token);
 				const user = await userService.getUser();
 				dispatch(addUser(user));
 				navigate('/home');
-				// console.log(access_token);
 			}
 			else 
 				navigate('/');

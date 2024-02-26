@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard } from './guard/FTGuard';
 import { Public } from './utils/custo.deco';
@@ -55,7 +55,7 @@ export class AuthController {
 			req.user.id
 		)
 		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			throw new BadRequestException('Wrong authentification code');
 		}
 		await this.userService.setTfaOn(req.user.id)
 		return ({ msg: '2FA ON' })
@@ -74,17 +74,22 @@ export class AuthController {
 	@Public()
 	@Post('2fa/authenticate')
 	async authenticate(@Req() req, @Body() body) {
-		console.log(body.idFront, typeof body.idFront);
-		const isCodeValid = await this.authService.isTFAvalid(
-			body.TFACode,
-			body.idFront
+		try {
+			// console.log(body.idFront, typeof body.idFront);
+			const isCodeValid = await this.authService.isTFAvalid(
+				body.TFACode,
+				body.idFront
 			)
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			if (!isCodeValid) {
+				throw new UnauthorizedException('Wrong authentification code');
+			}
+			const user = await this.userService.findUserId(body.idFront)
+			await this.userService.changeStatus(user.id, "online");
+			return await this.authService.signinTFA(user);
+		} catch {
+			throw new BadRequestException('Wrong authentification code');
 		}
-		const user = await this.userService.findUserId(body.idFront)
-		await this.userService.changeStatus(user.id, "online");
-		return await this.authService.signinTFA(user);
+
 	}
 
 	@Get('login')

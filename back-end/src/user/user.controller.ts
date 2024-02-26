@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe, BadRequestException, HttpCode } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FrontUserDto, StatsDto } from './UserDto';
 import hashService from '../auth/utils/hash'
@@ -74,15 +74,28 @@ export class UserController {
 	@Get('/ava:id')
 	async serveAvatarById(@Param('id', ParseIntPipe) id, @Res() res: Response) {
 		const img_name = await this.userservice.myAvatar(id);
-		const imagePath = path.resolve("/app/avatar", img_name)
-		return res.sendFile(imagePath);
+		if (img_name === "placeholder")
+			return res.status(204).send(null);
+		try {
+			const imagePath = path.resolve("/app/avatar", img_name)
+			return res.sendFile(imagePath);
+		} catch {
+			throw new BadRequestException("error in find img path");
+		}
 	}
 
 	@Get('/myavatar')
-	async serveMyAvatar(@Req() req,  @Res() res: Response){
+	async serveMyAvatar(@Req() req, @Res() res: Response) {
 		const img_name = await this.userservice.myAvatar(req.user.id)
-		const imagePath = path.resolve("/app/avatar", img_name)
-		return res.sendFile(imagePath);
+		if (img_name === "placeholder") {
+			return res.status(204).send(null);
+		}
+		try {
+			const imagePath = path.resolve("/app/avatar", img_name);
+			return res.sendFile(imagePath);
+		} catch {
+			throw new BadRequestException("error in find img path");
+		}
 	}
 
 	@Get('/status:id')

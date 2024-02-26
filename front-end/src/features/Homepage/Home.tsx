@@ -27,14 +27,13 @@ const Home = () => {
 				setStats(res1);
 				setFriends(res2);
 				setMatch(matchs);
-				setLoading(false);
 				let url;
 				if (!img)
 					url = "/avatarDefault.png"
 				else
 					url = URL.createObjectURL(new Blob([img]));
 				setAvatar(url)	
-				
+				setLoading(false);
 			})
 			.catch((error) => {
 				console.log(error);
