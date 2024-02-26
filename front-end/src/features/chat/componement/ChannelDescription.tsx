@@ -74,6 +74,23 @@ const handleSetadmin = async (
 
 };
 
+const handleMute = async (
+	iduserinfo: number,
+	userToMute: number,
+	reload: any,
+	channelinfo: any
+) => {
+	const res = await chatService.muteById(Number(channelinfo.id), Number(userToMute))
+	console.log(res, "mute user")
+	if (res === null)
+	{
+		// toast.error("error")
+		return;
+	}
+	reload(channelinfo.id);
+
+};
+
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
@@ -110,7 +127,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 				<div>
 					{element.username} ({status})
 					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Mute (1min)"} id={element.id}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
@@ -135,7 +152,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Mute (1min)"} id={element.id}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>

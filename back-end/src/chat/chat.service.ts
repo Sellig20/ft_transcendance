@@ -86,6 +86,7 @@ export class ChatService {
 				admins: true,
 				banned: true,
 				owner: true,
+				muted: true,
 				password: true,
 				user_list: {select: {
 					id: true,
@@ -254,6 +255,43 @@ export class ChatService {
 			},
 		})
 		return user;
+	}
+
+	async getMutedUserInChannelById(channelId: number) {
+		try {
+			const channel = await this.prisma.channel.findFirst({
+				where: {
+					id: channelId
+				},
+				select: {
+					muted: true,
+				}
+			})
+			return (channel)
+		} catch (error) {
+			throw new BadRequestException("error while set admin", {
+				cause: new Error(),
+				description: "error while set admin",
+			});
+		}
+	}
+
+	async MuteUserInChannelById(channelId: number, dataaa: any) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelId
+				},
+				data: {
+					muted: dataaa
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while mute user", {
+				cause: new Error(),
+				description: "error while mute user",
+			});
+		}
 	}
 
 // ---------------------- TEST FUNCTION -------------------------

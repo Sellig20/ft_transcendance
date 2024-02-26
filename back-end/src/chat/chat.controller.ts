@@ -147,4 +147,49 @@ export class ChatController {
 			});
 		}
 	}
+
+	@Post('/muteById')
+	async muteById(@Body() body) {
+		let muted_users = await this.ChatService.getMutedUserInChannelById(body.channelId)
+		let muted = muted_users.muted
+		let time_now = Date.now()
+		let data = {}
+		const time_to_mute = 5000
+
+		console.log(time_now, muted)
+		if (muted === null)
+		{
+			// peut ajouter
+			// console.log(time_now)
+			data[body.userId] = time_now + time_to_mute
+			// console.log(data)
+			await this.ChatService.MuteUserInChannelById(body.channelId, data)
+		}
+		else
+		{
+			if (muted[body.userId] === undefined)
+			{
+				muted[body.userId] = time_now + time_to_mute
+				await this.ChatService.MuteUserInChannelById(body.channelId, muted)
+			}
+			else
+			{
+				muted[body.userId] = muted[body.userId] + time_to_mute
+				await this.ChatService.MuteUserInChannelById(body.channelId, muted)
+			}
+		}
+		// if (muted_users[body.channelId])
+		// {
+		// 	result = await this.ChatService.setAdminById(body.channelId, body.userToSet)
+		// 	return result
+		// }
+		// else
+		// {
+			// console.log("sdfgdfsgdfgdfg", res1.admins, body.userToSet)
+			// throw new ForbiddenException("Error in update", {
+			// 	cause: new Error(),
+			// 	description: "Error",
+			// });
+		// }
+	}
 }
