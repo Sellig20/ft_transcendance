@@ -20,6 +20,7 @@ COPY . .
 
 EXPOSE 8000
 EXPOSE 8001
+EXPOSE 8002
 
 # ENTRYPOINT ["/bin/sh", "-c", "sleep 3 && npx prisma migrate dev --name init && npm run start:dev"]
 ENTRYPOINT ["/bin/sh", "-c", "sleep 3 && npx prisma db push --force-reset && npm run start:dev"]
