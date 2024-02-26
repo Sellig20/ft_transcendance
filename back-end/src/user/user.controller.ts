@@ -7,7 +7,6 @@ import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as path from 'path';
-import * as path from 'path';
 import { IdDto, NameDto } from './dto/user.dto';
 
 @Controller('user')
