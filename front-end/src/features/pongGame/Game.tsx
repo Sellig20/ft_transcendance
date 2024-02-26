@@ -12,7 +12,7 @@ import { Rootstate } from '../../app/store';
 import { useSelector } from 'react-redux';
 import './style.css'
 
-export function Game() {
+export default function Game() {
     const [socket, setSocket] = useState<Socket | null>(null)
     const count = useRef(0)
     const userid = useSelector((state: Rootstate) => state.user.id);
@@ -25,12 +25,13 @@ export function Game() {
 	}
 
     useEffect(() => {
-		// if (count.current === 0)
-		// {
-        //     count.current++;
-        const newSocket = io(`http://${process.env.HOST_IP}:8002`)
-        first(newSocket)
-		// }
+		if (count.current === 0)
+		{
+			const newSocket = io(`http://${process.env.HOST_IP}:8002`)
+			setSocket(newSocket);
+		}
+		console.log("fdgfddh")
+		count.current++;
 	}, [first])
 
     const firstListener = (
@@ -75,8 +76,9 @@ export function Game() {
         //         }/>
         //         <Route path="*" element={<Error />} />
         // </Routes>
+		// <div>
+		// 	caca
+		// </div>
         <WebSocketPG socket={socket}/>
     )
 }
-
-export default Game;
