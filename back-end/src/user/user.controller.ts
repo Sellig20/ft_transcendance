@@ -7,6 +7,7 @@ import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as path from 'path';
+import * as path from 'path';
 import { IdDto, NameDto } from './dto/user.dto';
 
 @Controller('user')
@@ -215,6 +216,8 @@ export class UserController {
 
 	@Get('/matchs:id')
 	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
+		if (id === 0)
+			id = req.user.id;
 		if (id === 0)
 			id = req.user.id;
 		let users = await this.userservice.getMatchs(id);
