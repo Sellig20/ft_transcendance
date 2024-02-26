@@ -87,6 +87,13 @@ export class ChatController {
 	@Post('/leaveChannelById')
 	async leaveChannelById(@Body() body) {
 		// verifier si le userid est le owner 
+		let owner_id = null
+		try {
+			const result1 = await this.ChatService.findAllInfoInChannelById(body.channelId);
+		} catch (error) {
+			return "null";
+		}
+
 		const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
 		// console.log(result);
 		return result
