@@ -2,25 +2,10 @@ import api from '../api/api'
 import {userOnConnection} from './IUser'
 
 
-const url = '/auth/42'
-const urltest = '/user/test'
-
-
-const get42 = async () => {
-	const request = await api.get(url);
-	console.log('hello');
-	return request.data
-}
-
 const getUser = async (): Promise<userOnConnection> => {
 	const request = await api.get('user/login');
 	console.log(request);
 	
-	return request.data
-}
-
-const gettest = async () => {
-	const request = await api.get(urltest);
 	return request.data
 }
 
@@ -31,14 +16,20 @@ const getLoginStatus = async () => {
 	} catch (error) {
 		if (localStorage.getItem("token"))
 			localStorage.removeItem("token")
-		return null
+		return null;
 	}
 	return req.data
 }
 
 const postTFAauth = async (code: string, userId: number) => {
-	const req = await api.post('auth/2fa/authenticate', {TFACode: code, idFront: userId});
-	return req.data;
+	try {
+		const req = await api.post('auth/2fa/authenticate', { TFACode: code, idFront: userId });
+		console.log(req.data);
+		return req.data.access_token;
+	} catch (error) {
+		return null;
+	}
+
 }
 
 const getTfaOff = async () => {
@@ -64,8 +55,6 @@ const setAvatar = async () => {
 }
 
 export default {
-	get42: get42,
-	gettest: gettest,
 	getUser: getUser,
 	getLoginStatus: getLoginStatus,
 	postTFAauth: postTFAauth,

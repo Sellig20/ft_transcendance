@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
-import { join } from 'path';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -12,6 +12,10 @@ async function bootstrap() {
 		//   origin: configService.get('FRONTEND_URL'),
 		credentials: true,
 	})
+	app.useGlobalPipes(new ValidationPipe({
+		whitelist: true,
+		transform: true,
+	}));
 	app.use(passport.initialize());
 	await app.listen(8000);
 }

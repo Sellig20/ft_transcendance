@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QrCode from './QrCode'
 import userService from './user.service'
 import { useDispatch, useSelector } from 'react-redux'
 import { Rootstate } from '../../app/store'
-import { addAvatar, changeTfa } from './user.store'
+import { changeTfa } from './user.store'
 import loginService from '../login/login.service'
 import { toast } from 'react-toastify'
 
@@ -17,15 +17,24 @@ const UserSetting = () => {
 	const [image, setImage] = useState("")
 	const [avatar, setAvatar] = useState("")
 	const [img, setImg] = useState("")
+	const reload = useRef(0);
 
 	useEffect(() => {
-		if (user.img)
-			setAvatar(user.img)
+		userService.getMyAvatar().then(img => {
+			let url;
+			
+			if (!img)
+				url = "/avatarDefault.png"
+			else
+				url = URL.createObjectURL(new Blob([img]));
+			setAvatar(url)
+		})
 		return () => {
 			if (avatar) {
 				URL.revokeObjectURL(avatar);
 			}
-		}}, [])
+		}
+	}, [reload])
 
 	const handleTfaGen = async () => {
 		if (!user.tfa_status) {
@@ -34,15 +43,14 @@ const UserSetting = () => {
 		}
 	}
 	const handleTfaOff = async () => {
-		const rep = await loginService.getTfaOff(); //retour de axios 
+		const rep = await loginService.getTfaOff(); 
 		if (rep) {
 			dispatch(changeTfa(false))
 		}
 	}
 
 	const hanldeUsername =  async () => {
-		const rep = await userService.changeUserName(username)
-		console.log(rep);
+		await userService.changeUserName(username)
 	}
 
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,11 +81,12 @@ const UserSetting = () => {
 			// console.log(formData);
 			// console.log(rep);
 			
-			const rawImg = await userService.getAvatar(rep);
-			const url = URL.createObjectURL(new Blob([rawImg]));
-			dispatch(addAvatar(url))
-			setAvatar(url)
-			
+			if (rep) {
+				const rawImg = await userService.getMyAvatar();
+				const url = URL.createObjectURL(new Blob([rawImg]));
+				setAvatar(url)
+				reload.current++;
+			}
 		}
 		setFile(null);
 		setImage("");

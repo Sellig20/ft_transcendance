@@ -74,6 +74,7 @@ services:
       - HASH_SECRET=${HASH_SECRET}
       - DATABASE_URL=${DATABASE_URL}
       - FRONTEND_URL=${FRONTEND_URL}
+      - HOST_IP=${HOST_IP}
     ports:
       - "8000:8000"
       - "8001:8001"
@@ -94,6 +95,8 @@ services:
       dockerfile: ../docker-data/front.dockerfile
     container_name: front-end
     image: front-end
+    environment:
+      - HOST_IP=${HOST_IP}
     ports:
       - "8080:80"
     volumes:

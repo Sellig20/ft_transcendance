@@ -33,11 +33,14 @@ const Navbar = () => {
 	const handleHome = () => {
 		navigate('/home');
 	}
+	const handleRepertory = () => {
+		navigate('/repertory');
+	}
 
 	return (
 		<nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
 			<a className="" href="https://profile.intra.42.fr/" style={{paddingLeft: 10}} >
-				<img src="/public/42_Logo.svg.png" alt="Logo" width="35" height="35" className="img-thumbnail bg-light"></img>
+				<img src="/42_Logo.svg.png" alt="Logo" width="35" height="35" className="img-thumbnail bg-light"></img>
 			</a>
 			<div className="justify-content-center">
 				<ul className="navbar-nav">
@@ -57,6 +60,9 @@ const Navbar = () => {
 					</li>
 					<li className="nav-item">
 						<a className="nav-link" onClick={handleUser}>Settings</a>
+					</li>
+					<li className="nav-item">
+						<a className="nav-link" onClick={handleRepertory}>Repertory</a>
 					</li>
 				</ul>
 			</div>

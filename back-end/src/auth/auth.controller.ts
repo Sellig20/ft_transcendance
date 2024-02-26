@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard } from './guard/FTGuard';
 import { Public } from './utils/custo.deco';
 import { UsersService } from 'src/user/user.service';
 import { JWTAUthGuard } from './guard/JWTGuard'
 import { log } from 'console';
+import { jwtConstants } from './utils/constant';
 
 @Controller('auth')
 export class AuthController {
@@ -21,9 +22,9 @@ export class AuthController {
 	@UseGuards(FTGuard)
 	@Get('42-redirect')
 	async auth42Redirect(@Req() req, @Res() res) {
-		console.log('hello went through the redirect :)');
-		const url = new URL('http://localhost:8080/auth');
-		console.log('in this ft guard', req.user);
+		// console.log('hello went through the redirect :)');
+		const url = new URL(`http://${jwtConstants.host_id}:8080/auth`);
+		// console.log('in this ft guard', req.user);
 		if (req.user.TFA_activated) {
 			url.searchParams.append('tfa', 'ON');
 			url.searchParams.append('code', 'none');
@@ -54,7 +55,7 @@ export class AuthController {
 			req.user.id
 		)
 		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			throw new BadRequestException('Wrong authentification code');
 		}
 		await this.userService.setTfaOn(req.user.id)
 		return ({ msg: '2FA ON' })
@@ -73,17 +74,22 @@ export class AuthController {
 	@Public()
 	@Post('2fa/authenticate')
 	async authenticate(@Req() req, @Body() body) {
-		console.log(body.idFront, typeof body.idFront);
-		const isCodeValid = await this.authService.isTFAvalid(
-			body.TFACode,
-			body.idFront
+		try {
+			// console.log(body.idFront, typeof body.idFront);
+			const isCodeValid = await this.authService.isTFAvalid(
+				body.TFACode,
+				body.idFront
 			)
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			if (!isCodeValid) {
+				throw new UnauthorizedException('Wrong authentification code');
+			}
+			const user = await this.userService.findUserId(body.idFront)
+			await this.userService.changeStatus(user.id, "online");
+			return await this.authService.signinTFA(user);
+		} catch {
+			throw new BadRequestException('Wrong authentification code');
 		}
-		const user = await this.userService.findUserId(body.idFront)
-		await this.userService.changeStatus(user.id, "online");
-		return await this.authService.signinTFA(user);
+
 	}
 
 	@Get('login')
