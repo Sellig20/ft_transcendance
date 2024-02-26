@@ -51,6 +51,7 @@ model Channel {
   banned    Int[]
   owner     Int?
   password  String?   @default("")
+  muted     Json?
 }
 
 model Message {
