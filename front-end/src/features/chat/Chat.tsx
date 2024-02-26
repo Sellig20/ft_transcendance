@@ -127,7 +127,7 @@ export function Chat() {
 		messageprop: any
 	) => {
 		console.log("envoie des donnee users au server socket...", userid)
-		socket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+		socket?.emit("FIRST", {userid:userid})
 	};
 
 	useEffect(() => {
