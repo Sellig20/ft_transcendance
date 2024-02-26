@@ -19,15 +19,23 @@ export function Chat() {
 	const inputMessageRef = useRef(null);
 	const inputFriendRef = useRef(null);
 
-
+	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
 	const [channelSelect, setchannelSelect] = useState<any>(); // channel en cours d'affichage
 	const [userinfo, setUserinfo] = useState<any>(null); // info du user connected
+	
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
 	const reload = (
+		send_to_channel?: number
 	) => {
-		callApi(userid, 0, false)
+		if (send_to_channel === undefined)
+			callApi(userid, 0, false)
+		else
+		{
+			socket?.emit("RELOAD", {userinfo:userinfo, channelid:send_to_channel})
+			// callApi(userid, 0, false)
+		}
 	}
 
 	const callApi = async (
@@ -39,11 +47,19 @@ export function Chat() {
 			setUserinfo(userinfo)
 			console.log("[FROM DB] userinfo:", userinfo)
 			setChannelJoined(userinfo.channel_list)
-			if (firstcall === true)
-				newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+			if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
+			{
+				let finded = false
+				userinfo.channel_list.map((element: any) => {
+					if (element.id === channelSelect.id)
+						finded = true
+				})
+				if (finded === false)
+					setchannelSelect(null)
+			}
+			// if (firstcall === true)
+			// 	newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
 		});
-		// choper les infos du user connecte
-		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
 	}
 	
 	const first = (
@@ -68,13 +84,30 @@ export function Chat() {
 	const send = (
 		value: string
 	) => {
-		// to generate database
-		if (value === "a")
-			socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value,})
-		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value, to:channelSelect.id})
+		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, from_user_name: userinfo.username, data:value, to:channelSelect.id})
 		console.log("value:", value);
 	}
 
+	const reloadListener = async (
+		messageprop: any
+	) => {
+		// console.log("channelselected===", channelSelect, messageprop.channelid)
+		if (channelSelect === undefined)
+			return ;
+		if (messageprop.channelid === channelSelect.id)
+		{
+			await chatService.findAllInfoInChannelById(Number(messageprop.channelid)).then(messageChann => {
+				if (messageChann === "") //	le channel existe pas
+				{
+					reload();
+					return ;
+				}
+				setchannelSelect(messageChann)
+			});
+			// setchannelSelect(messageprop.channelid)
+			// reload()
+		}
+	};
 
 	const messageListener = (
 		messageprop: any
@@ -84,10 +117,25 @@ export function Chat() {
 		if (channelSelect.id === messageprop.from_channel)
 		{
 			console.log("msg recu:", messageprop)
-			setMessageSocket(messageprop)
-			setMessageSocket({content: messageprop.data, userId: messageprop.from_user})
+			reload(messageprop.from_channel)
+			// setMessageSocket(messageprop)
+			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
+
+	const firstListener = (
+		messageprop: any
+	) => {
+		console.log("envoie des donnee users au server socket...", userid)
+		socket?.emit("FIRST", {userid:userid})
+	};
+
+	useEffect(() => {
+		socket?.on("FIRST", firstListener)
+		return () => {
+			socket?.off("FIRST", firstListener)
+		}
+	}, [firstListener])
 
 	useEffect(() => {
 		socket?.on("MP", messageListener)
@@ -95,6 +143,13 @@ export function Chat() {
 			socket?.off("MP", messageListener)
 		}
 	}, [messageListener])
+
+	useEffect(() => {
+		socket?.on("RELOAD", reloadListener)
+		return () => {
+			socket?.off("RELOAD", reloadListener)
+		}
+	}, [reloadListener])
 
 
 
@@ -112,30 +167,27 @@ export function Chat() {
 			send(input);
 			inputMessageRef.current.value = "";
 		}
-
-
-		// setUpdated(inputMessageRef.current.value);
-		// // const button: HTMLButtonElement = event.currentTarget;
-		// // setClickedButton(button.name);
-		// // console.log(buttonname);
-		// // console.log(message);
-
 	};
 
 	const handleChannel = async (
-		event: React.MouseEvent<HTMLButtonElement>
+		// event: React.MouseEvent<HTMLButtonElement>
+		channelinfo: any,
 	) => {
-		event.preventDefault();
+		// event.preventDefault();
 		setMessageSocket([])
-		const id_chann = event.currentTarget.id
-		console.log("clicked on a channel, id_channel =", id_chann);
+		// const id_chann = event.currentTarget.id
+		console.log("clicked on a channel, id_channel =", channelinfo.id);
 		// setchannelSelectInfo() faire requete
-		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => {
+		await chatService.findAllInfoInChannelById(Number(channelinfo.id)).then(messageChann => {
 			if (messageChann === "") //	le channel existe pas
 			{
 				reload();
 				return ;
 			}
+			if (messageChann.password === null || messageChann.password === "")
+				setChannelLocked(false)
+			else
+				setChannelLocked(true)
 			setchannelSelect(messageChann)
 		});
 
@@ -155,23 +207,20 @@ export function Chat() {
 			inputFriendRef.current.value = "";
 		}
 	};
+
 	return (
 		<div>
-			<div>
-				<h1>App: CHAT</h1>
-			</div>
-
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo}/>
+					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
 					<div key={1}>
-						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo}/>
-						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo} locked={channelLocked}/>
+						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef} locked={channelLocked} setLocked={setChannelLocked}/>
 					</div>
 				</div>
 			</div>

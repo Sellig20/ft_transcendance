@@ -18,11 +18,12 @@ const Password = ({ passwordRef, isPassword} : {
 	}
 }
 
-export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
+export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannelSelected} : {
 	iduser: any,
 	userinfo: any,
 	setuserinfo: any,
-	reload: () => void
+	reload: any,
+	setChannelSelected: any
 }) => {
 	const inputNameRef = useRef(null);
 	const inputPasswordRef = useRef(null);
@@ -89,9 +90,11 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 			console.log("res", res)
 			console.log("userinfo", userinfo)
 			setuserinfo(userinfo.channel_list.push(res))
+			setChannelSelected(null)
 			reload()
 			// setChannelJoined(userinfo.channel_list)
 		})
+		inputNameRef.current.value = ""
 		// creer le channel avec une requete + reload la page si possible d'un maniere ou d'un autre
 		// (peut etre en passant la ref des channels info id puis en l'incrementant avec le nouveau channel ?)
 	};

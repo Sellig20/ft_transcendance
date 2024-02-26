@@ -38,10 +38,85 @@ const createChannel = async (
 	return response.data
 }
 
+const leaveChannelById = async (
+	userid: number, 
+	channelid: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
+const banChannelById = async (
+	userid: number, 
+	channelid: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/banChannelById', {userid: userid, channelid: channelid})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
+const blockUserById = async (
+	userid: number, 
+	userToBan: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/blockUserById', {userid: userid, userToBlock: userToBan})
+	} catch (error){
+		console.log(error);
+		return error;
+	}
+	return response
+}
+
+const setAdminById = async (
+	channelId: number, 
+	userToSet: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/setAdminById', {channelId: channelId, userToSet: userToSet})
+	} catch (error){
+		console.log(error);
+		return null;
+	}
+	return response
+}
+
+const muteById = async (
+	channelId: number,
+	userToMute: number,
+) => {
+	let response
+	try {
+		response = await api.post('/chat/muteById', {channelId: channelId, userId: userToMute})
+	} catch (error){
+		console.log(error);
+		return null;
+	}
+	return response
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
 	findAllInfoInChannelById: findAllInfoInChannelById,
-	createChannel: createChannel
+	createChannel: createChannel,
+	leaveChannelById: leaveChannelById,
+	banChannelById: banChannelById,
+	blockUserById: blockUserById,
+	setAdminById:setAdminById,
+	muteById: muteById
 
 }

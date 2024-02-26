@@ -53,7 +53,7 @@ const Card = ({ name, isPerso, id, password, ispublic} : {
 
 export const ChannelCards = ({ channelInfo, clickHandler } : {
 	channelInfo: any,
-	clickHandler: (e:  React.MouseEvent<HTMLButtonElement>) => void;
+	clickHandler: any
 }) => {
 	if (channelInfo === undefined)
 	{
@@ -88,7 +88,7 @@ export const ChannelCards = ({ channelInfo, clickHandler } : {
 			{
 				channel_list.map((element: any) => {
 					return (
-						<div key={element.id} id={element.id} onClick={clickHandler}>
+						<div key={element.id} id={element.id} onClick={() => clickHandler(element)}>
 							<Card name={element.name} isPerso={element.personal} id={element.id} password={element.password} ispublic={element.public}/>
 						</div>
 					)

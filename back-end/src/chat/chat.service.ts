@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ForbiddenException, BadRequestException } from '@nestjs/common';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
@@ -28,6 +29,7 @@ export class ChatService {
 				createAt: true,
 				username: true,
 				id: true,
+				blocked_user: true
 			}
 		})
 		return user;
@@ -68,10 +70,10 @@ export class ChatService {
 			}
 		})
 	}
-
+	
 	async findAllInfoInChannelById(channelId: number)
 	{
-		const messages = await this.prisma.channel.findFirst({
+		const channel = await this.prisma.channel.findFirst({
 			where: {
 				id: channelId
 			},
@@ -84,6 +86,7 @@ export class ChatService {
 				admins: true,
 				banned: true,
 				owner: true,
+				muted: true,
 				password: true,
 				user_list: {select: {
 					id: true,
@@ -96,7 +99,7 @@ export class ChatService {
 			}
 
 		})
-		return messages;
+		return channel;
 	}
 
 	async findAllChannelJoinedByIdUser(userId: number)
@@ -138,13 +141,14 @@ export class ChatService {
 		return channels;
 	}
 
-	async createMessage(content: string, idUser: number, idChannel: number)
+	async createMessage(content: string, idUser: number, idChannel: number, sender_name: string)
 	{
 		await this.prisma.message.create({
 			data: {
 				content: content,
 				sender: {connect: {id:idUser}},
-				recipient: {connect: {id:idChannel}}
+				recipient: {connect: {id:idChannel}},
+				sender_name : sender_name
 			},
 
 		})
@@ -172,13 +176,123 @@ export class ChatService {
 		return res;
 	}
 
-	// const message1: User = await this.prisma.message.create({
-	// 	data: {
-	// 		content: 'content_message1',
-	// 		sender: {connect: {id:1}},
-	// 		recipient: {connect: {id:2}}
-	// 	},
-	// })
+	async leaveChannelById(userID: number, channelID: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userID
+			},
+			data: {
+				channel_list: {disconnect: [{id:channelID}]}
+			}
+		})
+	}
+
+	async addBannedUser(userId: number, channelID: number) {
+		await this.prisma.channel.update({
+			where: {
+				id: channelID
+			},
+			data: {
+				banned: {
+					push: [userId]
+				}
+			}
+		})
+	}
+
+	async blockUserById(userId: number, userToBlock: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				blocked_user: {
+					push: [userToBlock]
+				}
+			}
+		})
+	}
+
+	async getblockedUserById(userId: number) {
+		const user = await this.prisma.user.findFirst({
+			where: {
+				id: userId
+			},
+			select: {
+				blocked_user: true,
+			},
+		})
+		return user;
+	}
+
+	async setAdminById(channelId: number, userToSet: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelId
+				},
+				data: {
+					admins: {
+						push: [userToSet]
+					}
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while set admin", {
+				cause: new Error(),
+				description: "error while set admin",
+			});
+		}
+	}
+
+	async getAdminInChannelById(channelId: number) {
+		const user = await this.prisma.channel.findFirst({
+			where: {
+				id: channelId
+			},
+			select: {
+				admins: true,
+			},
+		})
+		return user;
+	}
+
+	async getMutedUserInChannelById(channelId: number) {
+		try {
+			const channel = await this.prisma.channel.findFirst({
+				where: {
+					id: channelId
+				},
+				select: {
+					muted: true,
+				}
+			})
+			return (channel)
+		} catch (error) {
+			throw new BadRequestException("error while set admin", {
+				cause: new Error(),
+				description: "error while set admin",
+			});
+		}
+	}
+
+	async MuteUserInChannelById(channelId: number, dataaa: any) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelId
+				},
+				data: {
+					muted: dataaa
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while mute user", {
+				cause: new Error(),
+				description: "error while mute user",
+			});
+		}
+	}
 
 // ---------------------- TEST FUNCTION -------------------------
 
