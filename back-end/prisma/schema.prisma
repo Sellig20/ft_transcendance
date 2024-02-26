@@ -49,6 +49,9 @@ model Match {
 
   winnerId	Int
   loserId	Int
+
+  winnerElo Int
+  loserElo Int
 }
 
 model Channel {
