@@ -13,9 +13,11 @@ export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, button
 
 	const handlepassword = async (
 		) => {
+			const CryptoJS = require('crypto-js');
 			let psw_input = inputPasswordRef.current.value;
 			if (psw_input === null)
 				return ;
+			psw_input =	CryptoJS.SHA256(psw_input);
 			if (psw_input === channelinfo.password)
 			{
 				console.log("acces to channel via password");

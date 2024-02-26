@@ -60,6 +60,7 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 
 	const handlerSubmite = async (
 	) => {
+		const CryptoJS = require('crypto-js');
 		let channel_name = inputNameRef.current.value;
 		let channel_password = null
 		let	isPublic = true
@@ -84,8 +85,8 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 			console.log("mode private")
 			isPublic = false
 		}
+		channel_password = CryptoJS.SHA256(channel_password);
 		console.log("clique: ", mode, channel_name, channel_password)
-		
 		await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password).then(res => {
 			console.log("res", res)
 			console.log("userinfo", userinfo)
