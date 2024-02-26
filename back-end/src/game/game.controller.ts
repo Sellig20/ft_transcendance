@@ -17,14 +17,12 @@ export class GameController {
 
 	@Post('/gomeover')
 	async userMatchs(@Req() req,@Body() data: GameOverDTO ){
-		//update les joueur : nb win/lose et le elo
-
-
-		if (req.user.id === data.winnerId) {
-
-		}
-		else {
-
-		}
+		let win;
+		if (req.user.id === data.winnerId)
+			win = true;
+		else 
+			win = false;
+		const elo = this.gameservice.calcElo(data.winnerId, data.losserId, win)
+		await this.gameservice.updateUserInfo(req.user.id, win, elo);
 	}
 }

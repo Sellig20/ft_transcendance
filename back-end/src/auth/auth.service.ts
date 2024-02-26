@@ -27,7 +27,9 @@ export class AuthService {
 
 		const fakeMatch = Array.from({ length: 25 }, () => ({
 			winnerId: Math.floor(Math.random() * 21),
-			loserId: Math.floor(Math.random() * 21)
+			loserId: Math.floor(Math.random() * 21),
+			loserElo: 400,
+			winnerElo: 400
 		}));
 
 		const fakeUsers = Array.from({ length: 10 }, () => ({

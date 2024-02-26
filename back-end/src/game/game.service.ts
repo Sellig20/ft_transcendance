@@ -12,19 +12,17 @@ export class GameService {
 	constructor(private prisma: PrismaService) { }
 
 
-	calcElo(eloj1: number, eloj2: number){
+	calcElo(eloj1: number, eloj2: number, win: boolean){
 		let newElo;
 		let W;
 		let D = eloj1 - eloj2
 		let fctD = (1 / 1 + Math.pow(10, -D/400));
-		//if (win)
+		if (win)
 			W = 1
-		// else
-			// W = 0
+		else
+			W = 0
 		newElo = eloj1 + 20 * (W - fctD);
 		return newElo;
-
-
 	}
 
 	async saveMatch(winnerId: number, loserId: number) {
@@ -54,31 +52,32 @@ export class GameService {
 		}
 	}
 
-	async getMatchs(userId: number) {
+	async updateUserInfo(userId: number, won: boolean, elo: number) {
 		try {
-			const matchHistory = await this.prisma.match.findMany({
-				where: {
-					OR: [
-						{ winnerId: userId },
-						{ loserId: userId },
-					],
-				},
-			});
-			// Fetch user names for winnerId and loserId
-			const matchsWithUsernames = await Promise.all(matchHistory.map(async (match) => {
-				const [winner, loser] = await Promise.all([
-					this.prisma.user.findUnique({ where: { id: match.winnerId } }),
-					this.prisma.user.findUnique({ where: { id: match.loserId } }),
-				]);
+			if (won) {
+				await this.prisma.user.update({
+					where: {
+						id: userId
+					},
+					data: {
+						win: { increment: 1 },
+						elo: elo
+					}
+				})
+			} else {
+				await this.prisma.user.update({
+					where: {
+						id: userId
+					},
+					data: {
+						lose: { increment: 1 },
+						elo: elo
+					}
+				})
+			}
 
-				return {
-					...match,
-					winnerName: winner ? winner.username : null,
-					loserName: loser ? loser.username : null,
-				};
-			}));
 
-		return matchsWithUsernames;
+
 		} catch (error) {
 			throw new BadRequestException("Error retrieving match history", {
 				cause: new Error(),
