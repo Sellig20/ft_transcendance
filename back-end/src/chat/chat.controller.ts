@@ -154,7 +154,7 @@ export class ChatController {
 		let muted = muted_users.muted
 		let time_now = Date.now()
 		let data = {}
-		const time_to_mute = 5000
+		const time_to_mute = 60000
 
 		console.log(time_now, muted)
 		if (muted === null)
