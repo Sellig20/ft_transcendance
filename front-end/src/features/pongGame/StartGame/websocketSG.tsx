@@ -35,7 +35,7 @@ export const WebsocketSG = () => {
 
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         context.fillStyle = '#9900ff';
-        context.font = '45px "Press Start 2P", sans-serif';
+        context.font = '35px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('CONGRATS YOU WON', board.width / 2, board.height / 2);
     }
@@ -111,27 +111,27 @@ export const WebsocketSG = () => {
     }//borderCollision detecting borderevenemt
 
     const drawPaddle1 = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#a35ce6';
+        context.fillStyle = '#9900ff';
         context.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.paddle1.width, gameState.paddle1.height);
         context.fill();
     }
 
     const drawPaddle2 = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#a35ce6';
+        context.fillStyle = '#9900ff';
         context.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.paddle2.width, gameState.paddle2.height);
         context.fill();
     }
 
-    const initiateBallX = (x: number, y: number) => {
+    const initiateBallX = (x: number, y: number, idG: string) => {
         gameState.ball.x = x;
         gameState.ball.y = y;
     }
 
-    const initiatePaddle1 = (y: number) => {
+    const initiatePaddle1 = (y: number, idG: string) => {
         gameState.paddle1.y = y;
     }
 
-    const initiatePaddle2 = (y: number) => {
+    const initiatePaddle2 = (y: number, idG: string) => {
         gameState.paddle2.y = y;
     }
 
@@ -168,7 +168,6 @@ export const WebsocketSG = () => {
 
     const handleAbandon = () => {
         socket.emit('Abandon', socket.id);
-
     }
 
     const getBack = () => {
@@ -199,19 +198,19 @@ export const WebsocketSG = () => {
         window.addEventListener('keydown', handleKeyDown);
         socket.on('disconnect', handleDisconnect);
         ///////////////////// SERVEUR RENVOIE donc le FRONTEND ECOUTE : ////////////////////////////
-        socket.on('initplayer1', (y: number) => {
+        socket.on('initplayer1', (y: number, idGame: string) => {
             console.log("paddle 1 y : ", y);
-            initiatePaddle1(y);
+            initiatePaddle1(y, idGame);
         })
 
-        socket.on('initplayer2', (y: number) => {
+        socket.on('initplayer2', (y: number, idGame: string) => {
             console.log("paddle 2 y : ", y);
-            initiatePaddle2(y);
+            initiatePaddle2(y, idGame);
         })
 
-        socket.on('ballIsMovingX', (x: number, y: number) => {
+        socket.on('ballIsMovingX', (x: number, y: number, idGame: string) => {
             console.log("ball x : ", x, " | ball y :", y);
-            initiateBallX(x, y);
+            initiateBallX(x, y, idGame);
         })
 
         socket.on('updateScoreP1', (scoreP1: number) => {
@@ -224,13 +223,13 @@ export const WebsocketSG = () => {
             updateScorePlayer2(scoreP2);
         })
 
-        // socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
-        //     ballAgainstPaddle(velX, velY);
-        // })//detecting Ball agaist paddles
+        socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
+            ballAgainstPaddle(velX, velY);
+        })//detecting Ball agaist paddles
 
-        // socket.on('detectBorder', (velY: number) => {
-        //     ballAgainstBorder(velY);
-        // })//detecting Ball against border wall
+        socket.on('detectBorder', (velY: number) => {
+            ballAgainstBorder(velY);
+        })//detecting Ball against border wall
 
         socket.on('winner', (name: string) => {
             if (name === "one")

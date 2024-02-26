@@ -1,5 +1,4 @@
-import { OnModuleInit } from "@nestjs/common";
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { GameStateBD } from "./gameStateBD";
 import { Player } from "./gameStateBD";
@@ -7,7 +6,7 @@ import { Game } from "./game.class";
 import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 
-@WebSocketGateway(8001, {
+@WebSocketGateway(8002, {
     // namespace: 'game',
     cors: "*"
 })
@@ -30,8 +29,8 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     handleConnection(client: Socket, ...args: any[]) {
         let i = 0;
-        this.addUser(client.id);
-
+        console.log("YOOO new socket", client.id)
+        // this.server.to(client.id).emit("FIRST", {msg:"who?"})
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
@@ -97,6 +96,16 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
         }
     }
     
+    @SubscribeMessage('FIRST')
+    async handleMessageconnection(client: any, message: any) {
+        console.log("FIRST ouistiti", message.userid, client.id)
+        // await this.chatService.setSocket(Number(message.userid), client.id)
+        client.name = message.userid
+        this.addUser(message.userid, client.id);
+        // this.displayUserArray()
+        // this.printAllUser(this.userArray);
+    }
+
     @SubscribeMessage('keydown')
     handleKeyPressedUpDown(client: Socket, data: {key: string}) {
         const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
@@ -159,18 +168,32 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
     {
         if (playersAvailable.length == 2)
         {
-            const player1 = playersAvailable[0];
-            const player2 = playersAvailable[1];
+            let player1: any = null;
+            let player2: any = null;
+            console.log("xxxxxxxx");
+            console.log("player 1 buffer = ", player1);
+            console.log("player 2 buffer = ", player2);
+            console.log("xxxxxxxx");
+            player1 = playersAvailable[0];
+            player2 = playersAvailable[1];
             const gameId = uuidv4();
             const currentGame = new Game(gameId, this.server, player1, player2);
+            console.log("");
+            console.log("");
+            console.log("Joueur 1 : ", player1.socketId);
+            console.log("Joueur 2 : ", player2.socketId);
+            console.log("Game id : ", gameId);
+
+            console.log("");
+            console.log("");
+
             this.games.push(currentGame);
             currentGame.actualDataInClassGame();
             currentGame.start();
-            playersAvailable.length = 0;
-            this.removeUser(player1.socketId);
-            this.removeUser(player2.socketId);
+            // playersAvailable.length = 0;
+            // this.removeUser(player1.socketId);
+            // this.removeUser(player2.socketId);
     
-            // Retire les joueurs de playersAvailable
             const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
             const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
     
@@ -192,11 +215,12 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
         console.log("-------------------------------");
     }
     
-    private addUser(item: string): void {
+    private addUser(item: string, userid: number): void {
         const newPlayer: Player = {
             socketId: item,
             status: playerStatus.isSettling,
-            level: 0, //TODO BDD a catch 
+            level: 0, //TODO BDD a catch
+            userid: userid
         };
         this.userArray.push(newPlayer);
         // const index = this.userArray.indexOf(item);

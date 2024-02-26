@@ -30,7 +30,7 @@ const App = () => {
 						<Route path="/chat" element={<Chat />} />
 						<Route path='/home' element={<Home />} />
 						<Route path='/user' element={<UserSetting />} />
-						<Route path='/game/*' element={<Game />} />
+						<Route path='/game' element={<Game />} />
 						<Route path='/repertory' element={<Repertory />} />
 						<Route path="/user/:userId" element={<UserPage/>} />
 					</Route>

@@ -34,6 +34,9 @@ export class GameStateBD {
     idPlayer1: string = "one";
     idPlayer2: string = "two";
 
+    paddle1Collision: boolean = false;
+    paddle2Collision: boolean = false;
+
     player1Winner: boolean = false;
     player2Winner: boolean = false;
 
@@ -72,6 +75,7 @@ export class GameStateBD {
       velocityX: 1,
       velocityY: 2,
       color: "purple",
+      speed: 3,
     };
   }
   export interface PaddleType {
@@ -90,11 +94,13 @@ export class GameStateBD {
     velocityX: number,
     velocityY: number,
     color: string,
+    speed: number,
   }
   export interface Player {
     socketId: string;
     status: playerStatus;
     level: number;
+    userid: number;
   }
   
   
