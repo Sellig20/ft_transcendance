@@ -6,6 +6,7 @@ import { UsersService } from 'src/user/user.service';
 import { JWTAUthGuard } from './guard/JWTGuard'
 import { log } from 'console';
 import { jwtConstants } from './utils/constant';
+import { TFAcode, TFAcodeTO } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -47,8 +48,8 @@ export class AuthController {
 		return (img)
 	}
 
-	@Post('2fa/turn-on')
-	async turnOnTfa(@Req() req, @Body() body) {
+	@Post('2fa/turn-on') 
+	async turnOnTfa(@Req() req, @Body() body: TFAcodeTO) {
 
 		const isCodeValid = await this.authService.isTFAvalid(
 			body.TFACode,
@@ -63,7 +64,6 @@ export class AuthController {
 
 	@Get('2fa/off')
 	async turnOffTfa(@Req() req) {
-		console.log(req.user);
 		await this.userService.setTfaOff(req.user.id);
 		await this.userService.setTfaSecret(req.user.id, "")
 		const token = await this.authService.signin(req.user);
@@ -73,7 +73,7 @@ export class AuthController {
 
 	@Public()
 	@Post('2fa/authenticate')
-	async authenticate(@Req() req, @Body() body) {
+	async authenticate(@Req() req, @Body() body: TFAcode) {
 		try {
 			// console.log(body.idFront, typeof body.idFront);
 			const isCodeValid = await this.authService.isTFAvalid(

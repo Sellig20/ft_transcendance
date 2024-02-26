@@ -226,7 +226,7 @@ export class UsersService {
 		
 		// Calculate level based on total XP
 		const level = Math.floor(Math.sqrt(totalXP / 15)) + 1;
-		console.log('level: ', level);
+		// console.log('level: ', level);
 		
 
 		return level;

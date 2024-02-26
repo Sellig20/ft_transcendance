@@ -79,7 +79,7 @@ export class AuthService {
 
 	async TfaSecretGen(user: any) {
 		const secret = authenticator.generateSecret();
-		const otpauthUrl = authenticator.keyuri('test', 'trans', secret);
+		const otpauthUrl = authenticator.keyuri('transcendence', '42', secret);
 		const hash = encryptService.hash(secret);
 		await this.userservice.setTfaSecret(user.id, hash);
 

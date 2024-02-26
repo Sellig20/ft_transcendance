@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -19,4 +19,19 @@ export class UserDetails {
   @IsNotEmpty()
   username: string;
 }
-//pour l'instant j'ai juste besoin de ces champs mais à changer pour compléter
+
+export class TFAcode {
+	@IsString()
+  	@IsNotEmpty()
+	TFACode: string;
+
+	@IsNumber()
+	@IsNotEmpty()
+	idFront: number;
+}
+
+export class TFAcodeTO {
+	@IsString()
+  	@IsNotEmpty()
+	TFACode: string;
+}
