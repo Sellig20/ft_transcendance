@@ -174,8 +174,16 @@ export class ChatController {
 			}
 			else
 			{
-				muted[body.userId] = muted[body.userId] + time_to_mute
-				await this.ChatService.MuteUserInChannelById(body.channelId, muted)
+				if (muted[body.userId] < time_now)
+				{
+					muted[body.userId] = time_now + time_to_mute
+					await this.ChatService.MuteUserInChannelById(body.channelId, muted)
+				}
+				else
+				{
+					muted[body.userId] = muted[body.userId] + time_to_mute
+					await this.ChatService.MuteUserInChannelById(body.channelId, muted)
+				}
 			}
 		}
 		// if (muted_users[body.channelId])

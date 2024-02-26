@@ -72,12 +72,12 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     
     private async isMutedInChannel(userId: string, idChannel:number) : Promise<boolean> {
         let muted = await this.chatService.getMutedUserInChannelById(idChannel)
-        if (muted === null)
-            return false;
-        if (muted[userId] === undefined)
-        return false
         let time_now = Date.now()
-        if (time_now < muted[userId])
+        if (muted.muted === null)
+            return false;
+        if (muted.muted[userId] === undefined)
+            return false
+        if (time_now < muted.muted[userId])
             return (true);
         return (false)
     }
