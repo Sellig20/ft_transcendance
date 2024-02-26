@@ -57,8 +57,8 @@ export function Chat() {
 				if (finded === false)
 					setchannelSelect(null)
 			}
-			if (firstcall === true)
-				newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+			// if (firstcall === true)
+			// 	newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
 		});
 	}
 	
@@ -84,9 +84,6 @@ export function Chat() {
 	const send = (
 		value: string
 	) => {
-		// to generate database
-		if (value === "a")
-			socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value,})
 		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, from_user_name: userinfo.username, data:value, to:channelSelect.id})
 		console.log("value:", value);
 	}
@@ -125,6 +122,20 @@ export function Chat() {
 			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
+
+	const firstListener = (
+		messageprop: any
+	) => {
+		console.log("envoie des donnee users au server socket...", userid)
+		socket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
+	};
+
+	useEffect(() => {
+		socket?.on("FIRST", firstListener)
+		return () => {
+			socket?.off("FIRST", firstListener)
+		}
+	}, [firstListener])
 
 	useEffect(() => {
 		socket?.on("MP", messageListener)

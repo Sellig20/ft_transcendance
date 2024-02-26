@@ -98,12 +98,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     
     async handleConnection(client: Socket, ...args: any[]) {
         console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
-        // this.addUser(client.id);
-        // this.printAllUser(this.userArray);
-
-        // ajout du socket a la table user
-        // await this.chatService.setSocket(id du user connecte, client.id)
-        // await this.chatService.setSocket(1, client.id)
+        this.server.to(client.id).emit("FIRST", {msg:"who are you"})
     }
 
     async handleDisconnect(client: Socket){
@@ -115,36 +110,27 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
 
 
     @SubscribeMessage('MP')
-    async handleMessage(client: any, message: any) {
-        if (message.data === "a")
-        {
-            // this.server.to(this.userArray[0]).emit("MP", "ca marche");
-            console.log("---create test database---")
-            await this.chatService.createTest();
-        }
-        else
-        {
-            // console.log(client.name)
-            // console.log(message)
-            console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
-            // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
-            // this.server.to(message.recipient).emit("MP", message.data);
-            
-            let res = await this.findSocketChannels(message.to)
-            res.map((item, index) => {
-                // console.log("envoie de '", message.data, "' to socketid :", item)
-                this.server.to(item).emit("MP", {
-                    from_channel: message.to,
-                    from_user:message.from_user,
-                    from_user_name:message.from_user_name,
-                    data:message.data
-                });
-            })
-
-            const isMutedNow = await this.isMutedInChannel(message.from_user, message.to)
-            if (isMutedNow === false)
-                this.chatService.createMessage(message.data, message.from_user, message.to, message.from_user_name)
-        }
+    async handleMessage(client: any, message: any)
+    {
+        // console.log(client.name)
+        // console.log(message)
+        console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
+        // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
+        // this.server.to(message.recipient).emit("MP", message.data);
+        
+        let res = await this.findSocketChannels(message.to)
+        res.map((item, index) => {
+            // console.log("envoie de '", message.data, "' to socketid :", item)
+            this.server.to(item).emit("MP", {
+                from_channel: message.to,
+                from_user:message.from_user,
+                from_user_name:message.from_user_name,
+                data:message.data
+            });
+        })
+        const isMutedNow = await this.isMutedInChannel(message.from_user, message.to)
+        if (isMutedNow === false)
+            this.chatService.createMessage(message.data, message.from_user, message.to, message.from_user_name)
     }
 
     @SubscribeMessage('FIRST')
