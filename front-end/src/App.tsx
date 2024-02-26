@@ -13,6 +13,8 @@ import { ToastContainer } from 'react-toastify';
 import Repertory from './features/repertory/Repetory';
 import { Chat } from './features/chat/Chat'
 import UserPage from './features/usePage/UserPage';
+import WebsocketQG from './features/pongGame/websocketQG';
+import WebsocketSG from './features/pongGame/websocketSG';
 
 const App = () => {
 	
@@ -30,7 +32,9 @@ const App = () => {
 						<Route path="/chat" element={<Chat />} />
 						<Route path='/home' element={<Home />} />
 						<Route path='/user' element={<UserSetting />} />
-						<Route path='/game' element={<Game />} />
+						<Route path='/game/' element={<Game />} />
+						<Route path='/game/queue' element={<WebsocketQG />} />
+						<Route path='/game/startgame' element={<WebsocketSG />} />
 						<Route path='/repertory' element={<Repertory />} />
 						<Route path="/user/:userId" element={<UserPage/>} />
 					</Route>

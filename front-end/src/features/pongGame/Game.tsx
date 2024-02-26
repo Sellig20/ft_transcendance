@@ -1,16 +1,11 @@
-import GameGate from './GameGate/index'
-import StartGame from './StartGame/index'
-import { socket, WebsocketProvider } from './contexts/WebsocketContext';
-import { WebSocketPG } from './GameGate/webSocketPG';
-import { WebsocketSG } from './StartGame/websocketSG';
-import QueueGate from './QueueGate/index'
-import { Routes, Route } from 'react-router-dom';
-import Error from './Error/index'
-import { useContext, useEffect, useState, useRef } from "react"
+import { WebSocketPG } from './webSocketPG';
+import { WebsocketSG } from './websocketSG';
+import { useEffect, useState, useRef } from "react"
 import { io, Socket } from 'socket.io-client';
 import { Rootstate } from '../../app/store';
 import { useSelector } from 'react-redux';
 import './style.css'
+import WebsocketQG from './websocketQG';
 
 export default function Game() {
     const [socket, setSocket] = useState<Socket | null>(null)
@@ -20,7 +15,6 @@ export default function Game() {
     const first = (
 		newSocket: Socket
 	) => {
-		// callApi(userid, newSocket, true);
 		setSocket(newSocket)
 	}
 
@@ -30,7 +24,6 @@ export default function Game() {
 			const newSocket = io(`http://${process.env.HOST_IP}:8002`)
 			setSocket(newSocket);
 		}
-		console.log("fdgfddh")
 		count.current++;
 	}, [first])
 
@@ -42,7 +35,6 @@ export default function Game() {
 	};
 
 	useEffect(() => {
-        // console.log("dfgdfgdfgdfg", socket.id)
 		socket?.on("FIRST", firstListener)
 		return () => {
 			socket?.off("FIRST", firstListener)
@@ -50,35 +42,11 @@ export default function Game() {
     })
 
     return (
-        // <Routes>
-        //         <Route path="/" element={
-        //             <WebsocketProvider value ={socket}>
-        //                 <div>
-        //                     <GameGate />
-        //                     <WebSocketPG />
-        //                 </div>
-        //             </WebsocketProvider>
-        //         }/>
-        //         <Route path="/queue" element={
-        //             <WebsocketProvider value ={socket}>
-        //                 <div>
-        //                     <QueueGate />
-        //                 </div>
-        //             </WebsocketProvider>
-        //         }/>
-        //         <Route path="/startGame" element={
-        //             <WebsocketProvider value ={socket}>
-        //                 <div>
-        //                     <StartGame />
-        //                     <WebsocketSG />
-        //                 </div>
-        //             </WebsocketProvider>
-        //         }/>
-        //         <Route path="*" element={<Error />} />
-        // </Routes>
-		// <div>
-		// 	caca
-		// </div>
-        <WebSocketPG socket={socket}/>
+        <div>
+            <div id='GameHome' className='GH'>
+                <WebSocketPG socket={socket} updateSocket={setSocket}/>
+            </div>
+          
+        </div>
     )
 }

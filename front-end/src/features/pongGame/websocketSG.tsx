@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState, useRef } from "react"
-import { WebsocketContext } from "../contexts/WebsocketContext"
 import { GameStateFD, GameStatus } from "./GameStateFD";
 import { useNavigate } from "react-router-dom";
 
-export const WebsocketSG = () => {
+export const WebsocketSG = (socket: any) => {
 
-    const socket = useContext(WebsocketContext);
+
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
     const navigate = useNavigate();
@@ -294,7 +293,6 @@ export const WebsocketSG = () => {
             socket.off('detectBorder');
             socket.off('winnerIs');
             socket.off('congrats');
-            // clearInterval(idInterval);
             cancelAnimationFrame(animationId);
         }
     }, [update]);

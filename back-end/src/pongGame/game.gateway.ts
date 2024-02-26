@@ -152,6 +152,7 @@ export class gatewayPong implements OnGatewayDisconnect<Socket> {
 
     @SubscribeMessage('goQueueList') 
     handleGoQueueList(client: Socket, socketId: string): void {
+        console.log("OUI QUEUE LIST EVENT LU PAR LE SERVEUR")
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];
             if (socketId === player.socketId && player.status) {//si tu as clique
