@@ -1,10 +1,13 @@
 import { useContext, useEffect, useState, useRef } from "react"
 import { GameStateFD, GameStatus } from "./GameStateFD";
 import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { Rootstate } from "../../app/store";
+    
+export const WebSocketSG = ({ socket}) => {
 
-export const WebsocketSG = (socket: any) => {
-
-
+    const userid = useSelector((state: Rootstate) => state.user.id);
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
     const navigate = useNavigate();
@@ -298,21 +301,23 @@ export const WebsocketSG = (socket: any) => {
     }, [update]);
     
     return (
-        <div className="page-container">
-             <link
+        <div>
+            <link
                 rel="stylesheet"
                 href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-            />
-            <div className="game-container">
-                <canvas id="board"></canvas>
-            </div>
-            <div className="button-container">
-                <button className="buttonGame" onClick={handleAbandon}>
-                    <span>Abandon Game</span>
-                </button>
-            </div>
-    </div>
-  );
+                />
+                <div className="SG mt-4">
+                    <div className="jumbotron mt-4">
+                        <canvas id="board">
+                        </canvas>
+                        <div className="row">
+                            <button className="buttonGame" onClick={handleAbandon}>
+                                <span>Abandon Game</span></button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    );
 }
 
-export default WebsocketSG;
+export default WebSocketSG;

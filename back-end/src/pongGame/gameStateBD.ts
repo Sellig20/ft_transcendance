@@ -100,7 +100,7 @@ export class GameStateBD {
     socketId: string;
     status: playerStatus;
     level: number;
-    userid: number;
+    // userid: number;
   }
   
   

@@ -5,7 +5,7 @@ import { gatewayPong } from './game.gateway';
 
 @Module({
   controllers: [GameController],
-  providers: [GameService, gatewayPong],
+  providers: [GameService],
   exports: [GameService],
 })
 export class GameModule {}

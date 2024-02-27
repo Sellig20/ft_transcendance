@@ -1,45 +1,50 @@
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { Rootstate } from '../../app/store';
-import WebsocketQG from './websocketQG';
-import { Socket } from 'socket.io-client';
-import { useEffect } from 'react';
 
-// export const WebSocketPG = ( updateSocket: any ) => {
-interface WebSocketPGProps {
-    socket: Socket | null;
-    updateSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
-}
-
-export const WebSocketPG: React.FC<WebSocketPGProps> = ({ socket, updateSocket }) => {
+export const WebSocketPG = ({ socket }) => {
     
-
-    const userid = useSelector((state: Rootstate) => state.user.id);
     const navigate = useNavigate();
-   
-        const handleRedirectToQueueGate = () => {
-            socket?.emit('goQueueList', userid);
-            navigate('./queue');
-        }
-    
-        const handleQuitQueueGate = () => {
-            // socket?.emit('goQuitQueueGate', userid);
-            navigate('../../home');
-        }
+    const handleRedirectToQueueGate = (mapChoice: number) => {
+        console.log("MAP CHOICE => ", mapChoice);
+        socket?.emit('goQueueList', { socketId: socket.id, mapChoice });
+        navigate('../queue');
+    }
+
+    const handleQuitQueueGate = () => {
+        // socket?.emit('goQuitQueueGate', userid);
+        navigate('../../home');
+    }
 
     return (
         <div>
-            <div>
-
-                <h1>Welcome in the pong game !</h1>
-                <p>Do you wanna play ? You have to click here and wait for someone to play with !</p>
-                <button className="buttonGame" onClick={handleRedirectToQueueGate}>
-                    <span>Play</span></button>
-                <button className="buttonGame" onClick={handleQuitQueueGate}>
-                    <span>Quit</span></button>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+            />
+            <div className="PG mt-4">
+                <div className="jumbotron mt-4">
+                <h1>PONG GAME</h1>
+                <p>You have to select a map and do queue</p>
+                </div>
+        
+                <div className="row">
+                <div className="col-12">
+                    <button className="buttonGame" onClick={() => handleRedirectToQueueGate(1)}>
+                        <span>Queue for map 1</span></button>
+                </div>
+        
+                <div className="col-12 mt-2">
+                    <button className="buttonGame" onClick={() => handleRedirectToQueueGate(2)}>
+                        <span>Queue for map 2</span></button>
+                </div>
+        
+                <div className="col-12 mt-2">
+                    <button className="buttonGame" onClick={handleQuitQueueGate}>
+                        <span>Quit game home</span></button>
+                </div>
+                </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default WebSocketPG;

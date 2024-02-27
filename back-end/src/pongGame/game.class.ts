@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+import  { Server, Socket } from 'socket.io';
 import { GameStateBD, Player, GameStatus} from "./gameStateBD";
 export class Game {
 
@@ -73,12 +73,6 @@ export class Game {
         return this.player2.socketId;
     }
 
-    //     chatService.getUserById(userid)
-    //     const getUserById = async (iduser: number) => {
-    //     const request = await api.get(/chat/getUserById/${iduser})
-    //     return request.data
-    // }
-
     maxScore() {
         if (this.gameState.player1Score === 30) {
             this.server.to(this.player1.socketId).emit('winner', "one");
@@ -86,7 +80,6 @@ export class Game {
             this.gameState.status = GameStatus.finishedGame;
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
-            //AXIOS requetes gagnant player 1
         }
         else if (this.gameState.player2Score === 30) {
             this.server.to(this.player2.socketId).emit('winner', "two");
@@ -94,7 +87,6 @@ export class Game {
             this.gameState.status = GameStatus.finishedGame;
             this.gameState.player2Winner = true;
             this.gameState.player1Looser = true;
-            //AXIOS requetes gagnant player 2
         }
     }
 
@@ -106,34 +98,19 @@ export class Game {
         this.gameState.ball.velocityX = direction;
         this.gameState.ball.velocityY = 2;
         this.gameState.ball.color = "red";
-        console.log("----------------------------");
-        console.log("Reset de la balle dans : ", this.gameId);
-        console.log("----------------------------");
-    }
-
-    handleCollisionWithLeftBorder() {
-        this.gameState.player2Score += 1;
-        this.maxScore();
-        this.server.emit('updateScoreP2', this.gameState.player2Score);
-    }
-
-    handleCollisionWithRightBorder() {
-        this.gameState.player1Score += 1;
-        this.maxScore();
-        this.server.emit('updateScoreP1', this.gameState.player1Score);
     }
 
     ScoreAndResetBall(direction: number) {
         if (this.gameState.ball.x < 0) {
-            console.log("");
-            console.log("point pour 2 in : ", this.gameId);
-            this.handleCollisionWithLeftBorder();
+            this.gameState.player2Score += 1;
+            this.maxScore();
+            this.sendToPlayer('updateScoreP2', this.gameState.player2Score, this.gameId);
             this.resetBall(1);
         }
         else if (this.gameState.ball.x + this.gameState.ballWidth > this.gameState.boardWidth) {
-            console.log("");
-            console.log("point pour 1 in : ", this.gameId);
-            this.handleCollisionWithRightBorder();
+            this.gameState.player1Score += 1;
+            this.maxScore();
+            this.sendToPlayer('updateScoreP1', this.gameState.player1Score, this.gameId);
             this.resetBall(-1);
         }
     }
@@ -151,12 +128,7 @@ export class Game {
                 this.gameState.ball.velocityX = Math.cos(bounceAngle) * this.gameState.ball.speed;
                 this.gameState.ball.velocityY = Math.sin(bounceAngle) * this.gameState.ball.speed;
             } else if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
-                console.log("");
-                console.log("ball.x:", this.gameState.ball.x, "est inferieur a ", (this.gameState.paddle1.x + this.gameState.paddle1.width), "(", this.gameState.paddle1.x,") + (", this.gameState.paddle1.width, ") in : ", this.gameId);
-                console.log("vel avant : ", this.gameState.ball.velocityX);
                 this.gameState.ball.velocityX *= -1;
-                console.log("DETECT PADDLE 1 for game : ", this.gameId);
-                // this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
 
             }
         }
@@ -172,11 +144,7 @@ export class Game {
                 this.gameState.ball.velocityX = -Math.cos(bounceAngle) * this.gameState.ball.speed;
                 this.gameState.ball.velocityY = Math.sin(bounceAngle) * this.gameState.ball.speed;
             } else if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-                console.log("paddle 2.x : ", this.gameState.paddle2.x, " est inferieur a : (ball.x + ball.width)", (this.gameState.ball.x + this.gameState.ball.width), "(", this.gameState.ball.x,") + (", this.gameState.ball.width, ") in : ", this.gameId);
-                console.log("vel avant : ", this.gameState.ball.velocityX);
                 this.gameState.ball.velocityX *= -1;
-                console.log("DETECT PADDLE 2 for game : ", this.gameId);
-                // this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
             }
         }
     }
@@ -188,72 +156,33 @@ export class Game {
             a.y + a.height > b.y;
     }
 
-    // ScoreAndResetBall(direction: number) {
-    //     if (this.gameState.ball.x < 0) {
-    //         this.gameState.player2Score += 1;
-    //         this.maxScore();
-    //         this.sendToPlayer('updateScoreP2', this.gameState.player2Score );
-    //         this.resetBall(1);
-    //     }
-    //     else if (this.gameState.ball.x + this.gameState.ballWidth > this.gameState.boardWidth) {
-    //         this.gameState.player1Score += 1;
-    //         this.maxScore();
-    //         this.sendToPlayer('updateScoreP1', this.gameState.player1Score );
-    //         this.resetBall(-1);
-    //     }
-    // }
-
-
-    // if ( player.pos.x < ball.pos.x + ball.size.x &&
-    //     player.pos.x + player.size.x > ball.pos.x &&
-    //     player.pos.y < ball.pos.y + ball.size.y &&
-    //     player.size.y + player.pos.y > ball.pos.y ) {
-    //     ball.vel.x = -ball.vel.x;
-    //   }
-   
-    // detectingCollisionWithPaddle() {
-    //     if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
-    //         // if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
-    //             this.gameState.ball.velocityX *= -1;
-    //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
-    //         // }
-    //     }
-    //     else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
-    //         // if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-    //             this.gameState.ball.velocityX *= -1;
-    //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
-    //         // }
-    //     }
-    // }
-
     detectingBorder() {//borderCollision evenement
-        if (this.gameState.ball.y <= 0 || this.gameState.ball.y + this.gameState.ball.height >= this.gameState.boardHeight) {
+        if (this.gameState.ball.y <= 0 || this.gameState.ball.y + this.gameState.ball.height >= this.gameState.boardHeight)
             this.gameState.ball.velocityY = -this.gameState.ball.velocityY;
-        }
     }
-    
+
     initialisationBall() {
         this.gameState.ball.x += (this.gameState.ball.velocityX);
         this.gameState.ball.y += (this.gameState.ball.velocityY);
-        // this.sendToPlayerBall('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y, this.gameId);
+        this.sendToPlayerBall('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y, this.gameId);
     }
-    
+
     initialisationPaddle1() {
         this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
         this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
-        // this.sendToPlayer('initplayer1', this.gameState.paddle1.y, this.gameId)
+        this.sendToPlayer('initplayer1', this.gameState.paddle1.y, this.gameId)
     }
-    
+
     initialisationPaddle2() {
         this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
         this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
-        // this.sendToPlayer('initplayer2', this.gameState.paddle2.y, this.gameId)
+        this.sendToPlayer('initplayer2', this.gameState.paddle2.y, this.gameId)
     }
-    
+
     updateVelPaddle1(tmp: number) {
         this.gameState.paddle1.velocityY = tmp;
     }
-    
+                
     updateVelPaddle2(tmp: number) {
         this.gameState.paddle2.velocityY = tmp;
     }
@@ -266,25 +195,14 @@ export class Game {
                 this.initialisationPaddle1();
                 this.initialisationPaddle2();
                 this.detectingBorder();
-                // this.server.emit('detectBorder', this.gameState.ball.velocityY)
-                // let ballHit = false;
                 let ballHitPaddle = false;
                 this.detectingCollisionWithPaddle();
                 this.ScoreAndResetBall(1);
-                this.sendToPlayerBall('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y, this.gameId);
-                this.sendToPlayer('initplayer1', this.gameState.paddle1.y, this.gameId)
-                this.sendToPlayer('initplayer2', this.gameState.paddle2.y, this.gameId)
-                // this.server.emit('initplayer1', this.gameState.paddle1.y)
-                // this.server.emit('initplayer2', this.gameState.paddle2.y)
-                // this.server.emit('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y);
             }   
     
         }, 10); // 16 ms (environ 60 FPS)
     }
 }
-
-
-
 
     // detectingCollisionWithPaddle() {
     //     const speed = 2;
@@ -312,3 +230,33 @@ export class Game {
     //         console.log("COLLISION WITH PADDLE 2");
     //     }
     // }
+
+
+
+
+
+    
+
+
+    // if ( player.pos.x < ball.pos.x + ball.size.x &&
+    //     player.pos.x + player.size.x > ball.pos.x &&
+    //     player.pos.y < ball.pos.y + ball.size.y &&
+    //     player.size.y + player.pos.y > ball.pos.y ) {
+    //     ball.vel.x = -ball.vel.x;
+    //   }
+   
+    // detectingCollisionWithPaddle() {
+    //     if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
+    //         // if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
+        //             this.gameState.ball.velocityX *= -1;
+        //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
+        //         // }
+        //     }
+        //     else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
+            //         // if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
+                //             this.gameState.ball.velocityX *= -1;
+                //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
+                //         // }
+                //     }
+                // }
+                
