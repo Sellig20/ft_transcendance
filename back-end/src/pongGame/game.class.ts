@@ -7,6 +7,7 @@ export class Game {
     private server: Server;
     private player1: Player;
     private player2: Player;
+    private mapChoice: number;
     private initializeGameState(): GameStateBD {
       const gameState = new GameStateBD();
       gameState.paddle1.socket = this.player1.socketId;
@@ -15,12 +16,13 @@ export class Game {
       return gameState;
     }
 
-    constructor(Id: string, server: Server, player1: Player, player2: Player) {
+    constructor(Id: string, server: Server, player1: Player, player2: Player, mapChoice: number) {
         this.player1 = player1;
         this.player2 = player2;
         this.server = server;
         this.gameId = Id;
         this.gameState = this.initializeGameState();
+        this.mapChoice = mapChoice;
     }
 
     actualDataInClassGame() {
@@ -161,6 +163,10 @@ export class Game {
             this.gameState.ball.velocityY = -this.gameState.ball.velocityY;
     }
 
+    initChoiceMap() {
+        this.sendToPlayer('choiceMap', this.mapChoice, this.gameId);
+    }
+
     initialisationBall() {
         this.gameState.ball.x += (this.gameState.ball.velocityX);
         this.gameState.ball.y += (this.gameState.ball.velocityY);
@@ -186,11 +192,13 @@ export class Game {
     updateVelPaddle2(tmp: number) {
         this.gameState.paddle2.velocityY = tmp;
     }
-    
+
     startGameLoop() {
         setInterval(() => {
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
+                
+                this.initChoiceMap();
                 this.initialisationBall();
                 this.initialisationPaddle1();
                 this.initialisationPaddle2();

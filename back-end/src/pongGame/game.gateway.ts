@@ -157,10 +157,10 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             }
         }
         const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
-        this.toPlay(playersAvailable);
+        this.toPlay(playersAvailable, data.mapChoice);
     }
     
-    toPlay(playersAvailable: Player[])
+    toPlay(playersAvailable: Player[], mapChoice: number)
     {
         if (playersAvailable.length == 2)
         {
@@ -169,11 +169,18 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             player1 = playersAvailable[0];
             player2 = playersAvailable[1];
             const gameId = uuidv4();
-            const currentGame = new Game(gameId, this.server, player1, player2);
+            let gameIdChoice: string;
+            if (mapChoice === 1) {
+                gameIdChoice = gameId + "_1";
+            }
+            else if (mapChoice === 2) {
+                gameIdChoice = gameId + "_2";
+            }
+            const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice);
             console.log("");
             console.log("Joueur 1 : ", player1.socketId);
             console.log("Joueur 2 : ", player2.socketId);
-            console.log("Game id : ", gameId);
+            console.log("Game id : ", gameIdChoice);
             console.log("");
             this.games.push(currentGame);
             currentGame.actualDataInClassGame();
