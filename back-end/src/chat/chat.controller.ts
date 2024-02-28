@@ -59,9 +59,10 @@ export class ChatController {
 	@Get('/findAllInfoInChannelById/:id')
 	async findAllInfoInChannelById(@Param() param) {
 		try {
-			return await this.ChatService.findAllInfoInChannelById(Number(param.id));
+			const res = await this.ChatService.findAllInfoInChannelById(Number(param.id));
+			return (res)
 		} catch (error) {
-			return (error)
+			throw error
 		}
 	}
 

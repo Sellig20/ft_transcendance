@@ -9,6 +9,7 @@ import chatService from './chat.service'
 
 import { useSelector } from 'react-redux';
 import { Rootstate } from '../../app/store';
+import { toast } from 'react-toastify';
 
 export function Chat() {
 	
@@ -173,24 +174,37 @@ export function Chat() {
 		// event: React.MouseEvent<HTMLButtonElement>
 		channelinfo: any,
 	) => {
-		// event.preventDefault();
+		let found;
+		found = false;
 		setMessageSocket([])
-		// const id_chann = event.currentTarget.id
 		console.log("clicked on a channel, id_channel =", channelinfo.id);
-		// setchannelSelectInfo() faire requete
-		await chatService.findAllInfoInChannelById(Number(channelinfo.id)).then(messageChann => {
-			if (messageChann === "") //	le channel existe pas
+		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
+		if (messageChann === null) //	le channel existe pas
+		{
+			reload();
+			return ;
+		}
+		console.log(messageChann)
+		messageChann.user_list.map((element: any, index:any) => {
+			if (element.id === userid)
 			{
-				reload();
+				found = true
 				return ;
 			}
-			if (messageChann.password === null || messageChann.password === "")
-				setChannelLocked(false)
-			else
-				setChannelLocked(true)
-			setchannelSelect(messageChann)
-		});
+		})
+		if (found === false) // userid n'est plus dans le channel
+		{
+			reload();
+			toast.error("error acces denied")
+			return ;
+		}
 
+
+		if (messageChann.password === null || messageChann.password === "")
+			setChannelLocked(false)
+		else
+			setChannelLocked(true)
+		setchannelSelect(messageChann)
 	};
 	
 	const HandleAddFriendButton = (

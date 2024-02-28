@@ -8,18 +8,32 @@ import api from '../api/api';
 // }
 
 const getUserById = async (iduser: number) => {
-	const request = await api.get(`/chat/getUserById/${iduser}`)
-	return request.data
+	try {
+		const request = await api.get(`/chat/getUserById/${iduser}`)
+		return request.data
+		
+	} catch (error) {
+		return (null)
+	}
 }
 
 const findAllChannelJoinedByIdUser = async (iduser: number) => {
-	const request = await api.get(`/chat/findAllChannelJoinedByIdUser/${iduser}`)
-	return request.data
+	try {
+		const request = await api.get(`/chat/findAllChannelJoinedByIdUser/${iduser}`)
+		return request.data
+		
+	} catch (error) {
+		return null
+	}
 }
 
 const findAllInfoInChannelById = async (idchannel: number) => {
-	const request = await api.get(`/chat/findAllInfoInChannelById/${idchannel}`)
-	return request.data
+	try {
+		const request = await api.get(`/chat/findAllInfoInChannelById/${idchannel}`)
+		return request.data
+	} catch (error) {
+		return null
+	}
 }
 
 const createChannel = async (
