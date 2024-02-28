@@ -43,7 +43,6 @@ export class UserController {
 	async changeUserName(@Req() req, @Body() nameDto: NameDto) {
 		const user = req.user;
 		await this.userservice.changeName(user.id, nameDto.username);
-		console.log(nameDto);
 		
 		return nameDto.username
 	}
@@ -111,19 +110,6 @@ export class UserController {
 			
 		const result = await this.userservice.changeStatus(req.user.id, body.status)
 		return result
-	}
-
-	@Public()
-	@Get('/cipher')
-	async hello() {
-		let normalString = 'bonjour'
-		console.log('on va cipher: ', normalString);
-		normalString = await hashService.hash(normalString);
-		console.log('string cryptee: ', normalString);
-		normalString = await hashService.decipher(normalString);
-		console.log('string decryptee: ', normalString);
-		
-		return { msg: 'yep yep' };
 	}
 
 	@Get('/stats:id')
@@ -215,8 +201,6 @@ export class UserController {
 
 	@Get('/matchs:id')
 	async userMatchs(@Req() req, @Param('id', ParseIntPipe) id){
-		if (id === 0)
-			id = req.user.id;
 		if (id === 0)
 			id = req.user.id;
 		let users = await this.userservice.getMatchs(id);
