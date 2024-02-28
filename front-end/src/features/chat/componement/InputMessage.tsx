@@ -3,6 +3,7 @@ import { useState, useEffect, useRef} from 'react'
 import chatService from '../chat.service'
 // import sha256 from 'crypto-js/sha256';
 import { sha256 } from 'js-sha256';
+import { toast } from 'react-toastify';
 
 export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, buttonHandler, locked, setLocked} : {
 	channelinfo: any
@@ -23,6 +24,10 @@ export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, button
 			{
 				console.log("acces to channel via password");
 				setLocked(false)
+			}
+			else
+			{
+				toast.error("error wrong password")
 			}
 			inputPasswordRef.current.value = null
 		};

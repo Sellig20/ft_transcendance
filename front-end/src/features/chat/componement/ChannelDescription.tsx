@@ -231,6 +231,37 @@ const InviteUser = ({ channelinfo, userinfo, reload } : {
 	)
 }
 
+const ChangePassword = ({ channelinfo, userinfo, reload } : {
+	channelinfo: any,
+	userinfo: any,
+	reload: any
+}) => {
+
+	const buttonHandler = async (
+		channelinfo: any,
+		userinfo: any,
+		reload: any,
+	) => {
+		if (inputPasswordRef.current.value === "")
+			return ;
+		const res = await chatService.changePassword(channelinfo.id, inputPasswordRef.current.value)
+		if (res !== null)
+			reload(channelinfo.id)
+		inputPasswordRef.current.value = "";
+	};
+
+	const inputPasswordRef = useRef("");
+	if (channelinfo.password !== null && channelinfo.password !== "")
+	{
+		return (
+			<div>
+				<input type="text" name="inputSend" placeholder="username to invite" id="inputSend" ref={inputPasswordRef}/>
+				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>add to channel</button>
+			</div>
+		)
+	}
+}
+
 export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 	channelinfo: any,
 	userinfo:	any,
@@ -249,6 +280,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 			WELCOME TO : {channelinfo.name}
 			<br />
 			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
+			<ChangePassword channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
 			<InviteUser channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
 			{
 				channelinfo.user_list.map((element: any, index:any) => {

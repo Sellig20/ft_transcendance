@@ -43,14 +43,12 @@ const createChannel = async (
 	idUser: number,
 	password: string
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/createChannel', {name: name, isPersonal: isPersonal, isPublic: isPublic, idUser: idUser, password: password})
+		const response = await api.post('/chat/createChannel', {name: name, isPersonal: isPersonal, isPublic: isPublic, idUser: idUser, password: password})
+		return response
 	} catch (error){
-		console.log(error);
-		return error;
+		return null;
 	}
-	return response.data
 }
 
 const leaveChannelById = async (

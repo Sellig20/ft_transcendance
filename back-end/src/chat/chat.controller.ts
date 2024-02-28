@@ -88,23 +88,17 @@ export class ChatController {
 
 	@Post('/createChannel')
 	async createChannel(@Body() body) {
-		let final_password: string | null;
-		let result
-		// if (body.password !== null && body.password !== "")
-		// {
-		// 	final_password = hash.hash(String(body.password))
-		// }
-		// else
-		// 	final_password = null
-		// console.log(final_password)
+		let password_final;
+		if (body.password === undefined || body.password === null || body.password === "")
+			password_final = null
+		else
+			password_final = body.password
 		try {
-			result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, body.password);
+			const result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, password_final);
 			await this.ChatService.connectUserToChannel(body.idUser, result.id);
 		} catch (error) {
-			return (error)
+			throw (error)
 		}
-		// console.log(result);
-		return result
 	}
 
 	@Post('/leaveChannelById')
