@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
 import chatService from '../chat.service'
+// import sha256 from 'crypto-js/sha256';
+import { sha256 } from 'js-sha256';
 
 export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, buttonHandler, locked, setLocked} : {
 	channelinfo: any
@@ -13,11 +15,10 @@ export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, button
 
 	const handlepassword = async (
 		) => {
-			const CryptoJS = require('crypto-js');
 			let psw_input = inputPasswordRef.current.value;
 			if (psw_input === null)
 				return ;
-			psw_input =	CryptoJS.SHA256(psw_input);
+			psw_input = sha256(psw_input);
 			if (psw_input === channelinfo.password)
 			{
 				console.log("acces to channel via password");

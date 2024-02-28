@@ -207,21 +207,6 @@ export function Chat() {
 		setchannelSelect(messageChann)
 	};
 	
-	const HandleAddFriendButton = (
-		event: React.MouseEvent<HTMLButtonElement>
-	) => {
-		event.preventDefault();
-		if (inputFriendRef.current.value === null)
-			return ;
-
-		const input = inputFriendRef.current.value
-		if (input != "")
-		{
-			console.log("click on friend button, value=", input);
-			inputFriendRef.current.value = "";
-		}
-	};
-
 	return (
 		<div>
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">

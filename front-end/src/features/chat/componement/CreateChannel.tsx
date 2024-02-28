@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef} from 'react'
 import React from 'react'
 import chatService from '../chat.service'
+import { sha256 } from 'js-sha256';
+
 
 const Password = ({ passwordRef, isPassword} : {
 	passwordRef: React.MutableRefObject<null>
@@ -60,7 +62,6 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 
 	const handlerSubmite = async (
 	) => {
-		const CryptoJS = require('crypto-js');
 		let channel_name = inputNameRef.current.value;
 		let channel_password = null
 		let	isPublic = true
@@ -74,6 +75,7 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 			isPublic = true
 			if (channel_password === "")
 				return ;
+			channel_password = sha256(channel_password)
 		}
 		else if (mode == "public")
 		{
@@ -85,10 +87,9 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 			console.log("mode private")
 			isPublic = false
 		}
-		channel_password = CryptoJS.SHA256(channel_password);
 		console.log("clique: ", mode, channel_name, channel_password)
 		try {
-			const res = await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password)
+			const res = await chatService.createChannel(channel_name, false, isPublic, iduser, String(channel_password))
 			console.log("res", res)
 			console.log("userinfo", userinfo)
 			setuserinfo(userinfo.channel_list.push(res))

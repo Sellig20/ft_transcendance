@@ -90,15 +90,15 @@ export class ChatController {
 	async createChannel(@Body() body) {
 		let final_password: string | null;
 		let result
-		if (body.password !== null && body.password !== "")
-		{
-			final_password = hash.hash(String(body.password))
-		}
-		else
-			final_password = null
-		console.log(final_password)
+		// if (body.password !== null && body.password !== "")
+		// {
+		// 	final_password = hash.hash(String(body.password))
+		// }
+		// else
+		// 	final_password = null
+		// console.log(final_password)
 		try {
-			result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, final_password);
+			result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, body.password);
 			await this.ChatService.connectUserToChannel(body.idUser, result.id);
 		} catch (error) {
 			return (error)

@@ -213,7 +213,6 @@ const InviteUser = ({ channelinfo, userinfo, reload } : {
 		userinfo: any,
 		reload: any,
 	) => {
-		console.log(inputMessageRef.current.value)
 		if (inputMessageRef.current.value === "")
 			return ;
 		const res = await chatService.inviteUser(channelinfo.id, inputMessageRef.current.value)
