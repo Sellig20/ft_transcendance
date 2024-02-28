@@ -48,20 +48,20 @@ export const WebSocketSG = ({ socket}) => {
     const createContextCanvas = (board: HTMLCanvasElement) => {
         const context = board.getContext('2d');
         if (context) {
-            canvasContextRef.current = context
+            canvasContextRef.current = context;
             return context;
         }
         return null;
     }
     
-    const ballAgainstPaddle = (velX: number, velY: number) => {
-        gameState.ball.velocityX = velX;
-        gameState.ball.velocityY = velY;
-    }//collisionBall detecting aingsnt machin evenement
+    // const ballAgainstPaddle = (velX: number, velY: number) => {
+    //     gameState.ball.velocityX = velX;
+    //     gameState.ball.velocityY = velY;
+    // }//collisionBall detecting aingsnt machin evenement
     
-    const ballAgainstBorder = (velY: number) => {
-        gameState.ball.velocityY = velY;
-    }//borderCollision detecting borderevenemt
+    // const ballAgainstBorder = (velY: number) => {
+    //     gameState.ball.velocityY = velY;
+    // }//borderCollision detecting borderevenemt
     
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         if (gameState.mapChoiceLocked === 2)
@@ -182,9 +182,9 @@ export const WebSocketSG = ({ socket}) => {
                 if (gameState.mapChoiceLocked === 2) {
                     drawWaves(time, context);
                 }
+                displayLine(context, board);
                 displayScore(context);
                 drawPaddle1(context);
-                displayLine(context, board);
                 drawPaddle2(context);
                 drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {

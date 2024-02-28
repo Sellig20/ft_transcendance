@@ -37,13 +37,16 @@ h1 {
   font-size: 190px;
   padding: 120px;
 }
-/* 
-p {
-  font-size: 20px;
-  padding: 60px;
-} */
 
-.jumbotron {
+.myGameText {
+  color: white;
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 13px;
+  padding: 100px;
+}
+
+.myGameSelection {
+
 }
 
 #board {
