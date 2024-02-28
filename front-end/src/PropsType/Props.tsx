@@ -26,4 +26,6 @@ export interface Matchs {
 	
 	winnerName: string;
 	loserName: string;
+	loserElo: number;
+	winnerElo: number;
 }
