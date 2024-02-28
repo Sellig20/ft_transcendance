@@ -6,14 +6,11 @@ import { UserModule } from './user/user.module';
 import { LoggingMiddleware } from './logger/loggerBasic';
 import { MyGateway } from './chat/chat.gateway';
 import { ChatModule } from './chat/chat.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { GameModule } from './game/game.module';
-
+import { gatewayPong } from './pongGame/game.gateway';
+import { GameModule } from './pongGame/game.module';
 @Module({
   controllers: [],
-  providers: [MyGateway],
+  providers: [MyGateway, gatewayPong],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,

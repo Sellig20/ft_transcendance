@@ -1,21 +1,23 @@
-import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe, BadRequestException, HttpCode } from '@nestjs/common';
-import { UsersService } from '../user/user.service';
-import { GameOverDTO } from './dto/game.dto';
+import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game.service';
+import { GameOverDTO } from './dto';
+import { UsersService } from 'src/user/user.service';
 
-@Controller('/game/stats')
+@Controller('game')
 export class GameController {
 	constructor(
+		private prisma: PrismaService,
 		private userservice: UsersService,
 		private gameservice: GameService
-		) { }
+	) { }
 
 	@Post('/saveMatch')
 	async saveMatchs(@Req() req,@Body() data: GameOverDTO ){
 		await this.gameservice.saveMatch(data.winnerId, data.losserId)
 	}
 
-	@Post('/gomeover')
+	@Post('/gomeOver')
 	async userMatchs(@Req() req,@Body() data: GameOverDTO ){
 		let win;
 		if (req.user.id === data.winnerId)

@@ -1,17 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BadRequestException } from '@nestjs/common';
 import { GameDTO } from './dto';
-
-// This should be a real class/interface representing a user entity
-export type User = any;
-export type Channel = any;
 
 @Injectable()
 export class GameService {
 	constructor(private prisma: PrismaService) { }
-
-
 	calcElo(eloj1: number, eloj2: number, win: boolean){
 		let newElo;
 		let W;
