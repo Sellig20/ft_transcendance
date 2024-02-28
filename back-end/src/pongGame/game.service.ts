@@ -5,37 +5,77 @@ import { GameDTO } from './dto';
 @Injectable()
 export class GameService {
 	constructor(private prisma: PrismaService) { }
-	calcElo(eloj1: number, eloj2: number, win: boolean){
-		let newElo;
-		let W;
-		let D = eloj1 - eloj2
-		let fctD = (1 / 1 + Math.pow(10, -D/400));
-		if (win)
-			W = 1
-		else
-			W = 0
-		newElo = eloj1 + 20 * (W - fctD);
-		return newElo;
-	}
-
-	async saveMatch(winnerId: number, loserId: number) {
-		const useArr = [winnerId, loserId]
+	async calcElo(me: number, other: number, win: boolean) {
+		const useArr = [me, other]
 		try {
-			const users = this.prisma.user.findMany({
+			const users = await this.prisma.user.findMany({
 				where: {
 					id: {
 						in: useArr
 					},
 				},
 				select: {
-					elo: true
+					elo: true,
+					id: true
+				}
+			})
+
+			let eloj1: number
+			let eloj2: number
+			if (users[0].id === me) {
+				eloj1 = users[0].elo;
+				eloj2 = users[1].elo;
+			}
+			else {
+				eloj1 = users[1].elo;
+				eloj2 = users[0].elo;
+			}
+			let newElo;
+			let W;
+			let D = eloj1 - eloj2
+			let fctD = (1 / (1 + Math.pow(10, (-D) / 400)));
+
+			if (win)
+				W = 1
+			else
+				W = 0
+			newElo = eloj1 + Math.floor(40 * (W - fctD)) + 1;
+			return newElo;
+		} catch (error) {
+			throw new BadRequestException("Error in saving elo saving", {
+				cause: new Error(),
+				description: "Error in saving elo saving",
+			});
+		}
+	}
+
+	async saveMatch(winnerId: number, loserId: number) {
+		
+		const useArr = [winnerId, loserId]
+		try {
+			const users = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: useArr
+					},
+				},
+				select: {
+					elo: true,
+					id: true,
 				}
 			})
 			let data = new GameDTO();
 			data.winnerId = winnerId;
-			data.winnerElo = users[0];
 			data.loserId = loserId;
-			data.loserElo = users[1];
+			if (users[0].id === winnerId) {
+				data.winnerElo = users[0].elo;
+				data.loserElo = users[1].elo;
+			}
+			else { 
+				data.winnerElo = users[1].elo;
+				data.loserElo = users[0].elo;
+			}
+
 			await this.prisma.match.create({data})
 		} catch (error) {
 			throw new BadRequestException("Error in saving match", {
@@ -68,9 +108,6 @@ export class GameService {
 					}
 				})
 			}
-
-
-
 		} catch (error) {
 			throw new BadRequestException("Error retrieving match history", {
 				cause: new Error(),

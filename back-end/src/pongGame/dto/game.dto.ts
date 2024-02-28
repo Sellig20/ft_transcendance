@@ -3,12 +3,10 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 export class GameOverDTO {
 
   @IsNumber()
-  @IsNotEmpty()
   winnerId: number;
 
   @IsNumber()
-  @IsNotEmpty()
-  losserId: number;
+  loserId: number;
 }
 
 export class GameDTO {
