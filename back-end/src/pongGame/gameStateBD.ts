@@ -15,7 +15,7 @@ export enum GameStatus {
 export class GameStateBD {
   
     status: GameStatus;
-    
+
     boardWidth: number = 500;
     boardHeight: number = 500;
   
@@ -100,7 +100,7 @@ export class GameStateBD {
     socketId: string;
     status: playerStatus;
     level: number;
-    userid: number;
+    // userid: number;
   }
   
   

@@ -6,7 +6,7 @@ import { UserModule } from 'src/user/user.module';
 
 @Module({
   controllers: [GameController],
-  providers: [GameService, gatewayPong],
+  providers: [GameService],
   exports: [GameService],
   imports: [UserModule]
 })
