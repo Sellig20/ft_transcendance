@@ -9,11 +9,13 @@ const handleLeave = async (
 	channelid: number,
 	reload: any
 ) => {
-	await chatService.leaveChannelById(Number(userid), Number(channelid)).then(res => {
-		// setchannelSelect(null)
-		reload();
+	try {
+		const res = await chatService.leaveChannelById(Number(userid), Number(channelid))
 		console.log(res)
-	});
+		reload();
+	} catch (error) {
+		console.log(error)
+	}
 
 };
 
@@ -22,12 +24,14 @@ const handleKick = async (
 	channelinfo: any,
 	reload: any
 ) => {
-	await chatService.leaveChannelById(Number(userToKick), Number(channelinfo.id)).then(res => {
+	try {
+		const res = await chatService.leaveChannelById(Number(userToKick), Number(channelinfo.id))
 		// setchannelSelect(null)
 		console.log(res, "kick user", userToKick, "from channel", channelinfo.name)
 		reload(channelinfo.id);
-	});
-
+	} catch (error) {
+		return ;
+	}
 };
 
 const handleBan = async (
@@ -35,10 +39,13 @@ const handleBan = async (
 	channelinfo: any,
 	reload: any
 ) => {
-	await chatService.banChannelById(Number(userToBan), Number(channelinfo.id)).then(res => {
+	try {
+		const res = await chatService.banChannelById(Number(userToBan), Number(channelinfo.id))
 		console.log(res, "Ban user", userToBan, "from channel", channelinfo.name)
 		reload(channelinfo.id);
-	});
+	} catch (error) {
+		return ;
+	}
 
 };
 
@@ -48,12 +55,14 @@ const handleBlock = async (
 	reload: any,
 	channelinfo: any
 ) => {
-	await chatService.blockUserById(Number(iduserinfo), Number(userToBan)).then(res => {
+	try {
+		const res = await chatService.blockUserById(Number(iduserinfo), Number(userToBan))
 		console.log(res, "block user")
-		// if (res === null || res === "")
-		// 	return ;
 		reload();
-	});
+	
+	} catch (error) {
+		return ;
+	}
 
 };
 
@@ -112,7 +121,6 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 
 	if (isOwner === true)
 	{
-
 		if(yourself === true)
 		{
 			return (
@@ -137,7 +145,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			)
 		}
 	}
-	if (isAdmin === true)
+	else if (isAdmin === true)
 	{
 		if (status !== "owner")
 		{
@@ -161,7 +169,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 				</div>
 			)
 		}
-		else
+		else if (status === "owner")
 		{
 			if (yourself === true)
 			{
@@ -169,6 +177,28 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					{element.username} ({status}) (you)
 				</div>
 			}
+			return (
+				<div>
+					{element.username} ({status})
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Profil"} id={element.id}/>
+					<input type="button" value={"PlayWith"} id={element.id}/>
+				</div>
+			)
+		}
+	}
+	else
+	{
+		if (yourself === true)
+		{
+			return (
+				<div>
+					{element.username} ({status}) (you)
+				</div>
+			)
+		}
+		else
+		{
 			return (
 				<div>
 					{element.username} ({status})

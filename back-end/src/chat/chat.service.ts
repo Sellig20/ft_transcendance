@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ForbiddenException, BadRequestException } from '@nestjs/common';
+import { connect } from 'http2';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
@@ -70,7 +71,7 @@ export class ChatService {
 			}
 		})
 	}
-	
+
 	async findAllInfoInChannelById(channelId: number)
 	{
 		const channel = await this.prisma.channel.findFirst({
@@ -136,7 +137,6 @@ export class ChatService {
 					socket: true,
 				}}
 			}
-
 		})
 		return channels;
 	}
@@ -290,6 +290,42 @@ export class ChatService {
 			throw new BadRequestException("error while mute user", {
 				cause: new Error(),
 				description: "error while mute user",
+			});
+		}
+	}
+
+	async connectUserToChannel(userid: number, channelid: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					user_list: {connect: {id:userid}}
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while connect user", {
+				cause: new Error(),
+				description: "error while connect user",
+			});
+		}
+	}
+
+	async setOwner(channelid: number, userid: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					owner: {set: userid}
+				}
+			})
+		} catch (error) {
+			throw new BadRequestException("error while connect user", {
+				cause: new Error(),
+				description: "error while connect user",
 			});
 		}
 	}

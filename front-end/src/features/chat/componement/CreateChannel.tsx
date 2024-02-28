@@ -86,14 +86,17 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 		}
 		console.log("clique: ", mode, channel_name, channel_password)
 		
-		await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password).then(res => {
+		try {
+			const res = await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password)
 			console.log("res", res)
 			console.log("userinfo", userinfo)
 			setuserinfo(userinfo.channel_list.push(res))
 			setChannelSelected(null)
 			reload()
 			// setChannelJoined(userinfo.channel_list)
-		})
+		} catch (error) {
+			console.log("error create chann", error);
+		}
 		inputNameRef.current.value = ""
 		// creer le channel avec une requete + reload la page si possible d'un maniere ou d'un autre
 		// (peut etre en passant la ref des channels info id puis en l'incrementant avec le nouveau channel ?)

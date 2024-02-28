@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import hash from 'src/auth/utils/hash';
 import { ForbiddenException, BadRequestException } from '@nestjs/common';
+import { info } from 'console';
 
 
 @Controller('chat')
@@ -38,40 +39,56 @@ export class ChatController {
 
 	@Get('/test/:id')
 	async hello(@Param() param) {
-		
-		return await this.ChatService.findUserById(Number(param.id));
+		try {
+			return await this.ChatService.findUserById(Number(param.id));
+		} catch (error) {
+			return (error)
+		}
 	}
 	
 	@Get('/getUserById/:id')
 	async getUserById(@Param() param) {
-		
-		return await this.ChatService.findUserById(Number(param.id));
+		try {
+			return await this.ChatService.findUserById(Number(param.id));
+		} catch (error) {
+			return (error)
+		}
 	}
 
 	// find toutes les infos du channel(id) + tous les messages
 	@Get('/findAllInfoInChannelById/:id')
 	async findAllInfoInChannelById(@Param() param) {
-		
-		return await this.ChatService.findAllInfoInChannelById(Number(param.id));
+		try {
+			return await this.ChatService.findAllInfoInChannelById(Number(param.id));
+		} catch (error) {
+			return (error)
+		}
 	}
 
 	// find tous les channels joined par le user(id)
 	@Get('/findAllChannelJoinedByIdUser/:id')
 	async findAllChannelJoinedByIdUser(@Param() param) {
-		
-		return await this.ChatService.findAllChannelJoinedByIdUser(Number(param.id));
+		try {
+			return await this.ChatService.findAllChannelJoinedByIdUser(Number(param.id));
+		} catch (error) {
+			return (error)
+		}
 	}
 
 	// find toutes les socket actuellement connecte au channel(id)
 	@Get('/findAllSocketOnChannelByIdChannel/:id')
 	async findAllSocketOnChannelByIdChannel(@Param() param) {
-		
-		return await this.ChatService.findAllSocketOnChannelByIdChannel(Number(param.id));
+		try {
+			return await this.ChatService.findAllSocketOnChannelByIdChannel(Number(param.id));
+		} catch (error) {
+			return (error)
+		}
 	}
 
 	@Post('/createChannel')
 	async createChannel(@Body() body) {
 		let final_password: string | null;
+		let result
 		if (body.password !== null && body.password !== "")
 		{
 			final_password = hash.hash(String(body.password))
@@ -79,7 +96,12 @@ export class ChatController {
 		else
 			final_password = null
 		console.log(final_password)
-		const result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, final_password);
+		try {
+			result = await this.ChatService.createChannel(body.name, body.isPersonal, body.isPublic, body.idUser, final_password);
+			await this.ChatService.connectUserToChannel(body.idUser, result.id);
+		} catch (error) {
+			return (error)
+		}
 		// console.log(result);
 		return result
 	}
@@ -88,20 +110,55 @@ export class ChatController {
 	async leaveChannelById(@Body() body) {
 		// verifier si le userid est le owner 
 		let owner_id = null
+		let is_alone = false
+		const infochann = await this.ChatService.findAllInfoInChannelById(body.channelid);
+		// console.log("sdfsdfsdfsdfsdfsfsf", infochann, body.channelid)
 		try {
-			const result1 = await this.ChatService.findAllInfoInChannelById(body.channelId);
+			if(infochann.owner === body.userid)
+			{
+				// replace_owner(body.userid, infochann)
+				if (infochann.admins.length !== 0)
+				{
+					const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+					await this.ChatService.setOwner(body.channelid, infochann.admins[0]);
+					return (result)
+				}
+				else
+				{
+					if (infochann.user_list.length <= 1) // alone in chann
+					{
+						is_alone = true
+						const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+						await this.ChatService.setOwner(body.channelid, -1);
+					}
+					else
+					{
+						const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+						await this.ChatService.setOwner(body.channelid, infochann.user_list[0].id);
+					}
+				}
+				
+			}
+			else
+			{
+				await this.ChatService.leaveChannelById(body.userid, body.channelid);
+			}
+			return "200"
 		} catch (error) {
-			return "null";
+			return (error)
 		}
-
-		const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+		// try {
+		// 	const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
+		// 	if (is_alone === false)
+		// 	return result
+		// } catch (error) {
+		// 	return "null"
+		// }
 		// console.log(result);
-		return result
 	}
 
 	@Post('/banChannelById')
 	async banChannelById(@Body() body) {
-		let result
 		try {
 			const result = await this.ChatService.leaveChannelById(body.userid, body.channelid)
 		} catch (error) {
@@ -114,44 +171,39 @@ export class ChatController {
 		} catch (error) {
 			return (error)
 		}	
-		// console.log(result);
-		return result
 	}
 
 	@Post('/blockUserById')
 	async blockUserById(@Body() body) {
-		let result
-		
-		const promise1 = this.ChatService.getblockedUserById(body.userid)
-		Promise.all([promise1]).then(([res1]) => {
-			if (res1.blocked_user.indexOf(body.userToBlock) !== -1)
+		try {
+			const res = await this.ChatService.getblockedUserById(body.userid)
+			if (res.blocked_user.indexOf(body.userToBlock) !== -1)
 					return null;
-
-			try {
-				this.ChatService.blockUserById(body.userid, body.userToBlock)
-			} catch (error) {
-				return (error)
-			}
-		})
-		return result
+			await this.ChatService.blockUserById(body.userid, body.userToBlock)
+		} catch (error) {
+			return (error)
+		}
 	}
 
 	@Post('/setAdminById')
 	async setAdminById(@Body() body) {
-		let result
-		const res1 = await this.ChatService.getAdminInChannelById(body.channelId)
-		if (res1.admins.indexOf(body.userToSet) === -1)
-		{
-			result = await this.ChatService.setAdminById(body.channelId, body.userToSet)
-			return result
-		}
-		else
-		{
-			console.log("sdfgdfsgdfgdfg", res1.admins, body.userToSet)
-			throw new ForbiddenException("Error in update", {
-				cause: new Error(),
-				description: "Error",
-			});
+		try {
+			const res1 = await this.ChatService.getAdminInChannelById(body.channelId)
+			if (res1.admins.indexOf(body.userToSet) === -1)
+			{
+				const result = await this.ChatService.setAdminById(body.channelId, body.userToSet)
+				return result
+			}
+			else
+			{
+				console.log("sdfgdfsgdfgdfg", res1.admins, body.userToSet)
+				throw new ForbiddenException("Error in setadmin", {
+					cause: new Error(),
+					description: "error in setadmin",
+				});
+			}
+		} catch (error) {
+			return (error)
 		}
 	}
 
