@@ -49,6 +49,10 @@ export class Game {
         }
     }
 
+    setCrash(socketClient: string) {
+        this.gameState.status = GameStatus.abortedGame;
+    }
+
     sendToPlayer(event: string, data: any, id: string) {
         this.server.to(this.player1.socketId).emit(event, data, id);
         this.server.to(this.player2.socketId).emit(event, data, id);
@@ -76,14 +80,14 @@ export class Game {
     }
 
     maxScore() {
-        if (this.gameState.player1Score === 30) {
+        if (this.gameState.player1Score === 11) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
-        else if (this.gameState.player2Score === 30) {
+        else if (this.gameState.player2Score === 11) {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
@@ -168,21 +172,21 @@ export class Game {
     }
 
     initialisationBall() {
-        this.gameState.ball.x += (this.gameState.ball.velocityX);
-        this.gameState.ball.y += (this.gameState.ball.velocityY);
+        this.gameState.ball.x += (this.gameState.ball.velocityX * this.gameState.currentLevel);
+        this.gameState.ball.y += (this.gameState.ball.velocityY * this.gameState.currentLevel);
         this.sendToPlayerBall('ballIsMovingX', this.gameState.ball.x, this.gameState.ball.y, this.gameId);
     }
 
     initialisationPaddle1() {
         this.gameState.paddle1.y += this.gameState.paddle1.velocityY;
         this.gameState.paddle1.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle1.height, this.gameState.paddle1.y));
-        this.sendToPlayer('initplayer1', this.gameState.paddle1.y, this.gameId)
+        this.sendToPlayer('initplayer1', this.gameState.paddle1.y, this.player1.socketId)
     }
 
     initialisationPaddle2() {
         this.gameState.paddle2.y += this.gameState.paddle2.velocityY;
         this.gameState.paddle2.y = Math.max(0, Math.min(this.gameState.boardHeight - this.gameState.paddle2.height, this.gameState.paddle2.y));
-        this.sendToPlayer('initplayer2', this.gameState.paddle2.y, this.gameId)
+        this.sendToPlayer('initplayer2', this.gameState.paddle2.y, this.player2.socketId)
     }
 
     updateVelPaddle1(tmp: number) {
@@ -193,21 +197,60 @@ export class Game {
         this.gameState.paddle2.velocityY = tmp;
     }
 
+    checkLevelChangeVelocity() {
+        let flag1: boolean = false;
+        let flag2: boolean = false;
+        let flag8: boolean = false;
+        if (this.gameState.player1Score === 4 || this.gameState.player1Score === 8) {
+            flag1 = true;
+            if (this.gameState.player1Score === 8)
+                flag8 = true;
+        }
+        if (this.gameState.player2Score === 4 || this.gameState.player2Score === 8) {
+            flag2 = true;
+            if (this.gameState.player1Score === 8)
+                flag8 = true;
+        }
+        else {
+            flag1 = false;
+            flag2 = false;
+        }
+        if (flag8 === false && flag1 && flag2)
+            this.gameState.currentLevel = 1.5;
+        else if (flag8 && flag1 && flag2)
+            this.gameState.currentLevel = 1.9;
+    }
+
+    checkGameStatus(): boolean {
+    if (this.gameState.status === GameStatus.abortedGame || 
+        this.gameState.status === GameStatus.finishedGame)
+        {
+            this.sendToPlayer('gameIsOver', 1, this.gameId);
+            return true;
+        }
+        else
+            return false
+    }
+
     startGameLoop() {
         setInterval(() => {
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
-                
                 this.initChoiceMap();
                 this.initialisationBall();
+                if (this.mapChoice === 2)
+                {
+                    this.checkLevelChangeVelocity();
+                }
                 this.initialisationPaddle1();
                 this.initialisationPaddle2();
                 this.detectingBorder();
-                let ballHitPaddle = false;
                 this.detectingCollisionWithPaddle();
                 this.ScoreAndResetBall(1);
-            }   
-    
+                this.checkGameStatus();
+            }
+            else {
+            }
         }, 10); // 16 ms (environ 60 FPS)
     }
 }

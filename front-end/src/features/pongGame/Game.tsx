@@ -31,7 +31,6 @@ export default function Game() {
 	return (
 	    <Routes>
 			<Route path="/" element={
-				
 				<div>
 				
 					<WebSocketPG socket={socket}/>

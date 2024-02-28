@@ -29,12 +29,13 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     handleConnection(client: Socket, ...args: any[]) {
         console.log(`[GAME] Client connected: ${client.id}`);
-        this.addUser(client.id);
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
+        this.server.to(client.id).emit('user-disconnected');
+        const oppoSocket = this.getOpponentSocket(client.id);
+        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
         this.removeUser(client.id);
-        this.server.emit('user-disconnected', { clientId: client.id, userArray: this.userArray});
     }
 
     getStrGame(id: string)//trouve la id socket du game
@@ -144,10 +145,27 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         }
     }
 
+    @SubscribeMessage('Crash')
+    handleCrash(client: Socket, socketId: string): void {
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                currentGame.setCrash(socketId);
+            }
+        }
+    }
+
+    @SubscribeMessage('quitQueue')
+    handleQuitQueue(client: Socket) {
+        console.log("A quitte la quuuuueuuuuuue");
+        this.removeUser(client.id);
+    }
+
     @SubscribeMessage('goQueueList') 
     handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number}): void {
-        console.log("map choice = ", data.mapChoice);
-        console.log("socket id => ", data.socketId);
+        this.addUser(client.id, data.mapChoice);
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];
             if (data.socketId === player.socketId && player.status) {//si tu as clique
@@ -164,40 +182,51 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     {
         if (playersAvailable.length == 2)
         {
-            let player1: any = null;
-            let player2: any = null;
-            player1 = playersAvailable[0];
-            player2 = playersAvailable[1];
-            const gameId = uuidv4();
-            let gameIdChoice: string;
-            if (mapChoice === 1) {
-                gameIdChoice = gameId + "_1";
-            }
-            else if (mapChoice === 2) {
-                gameIdChoice = gameId + "_2";
-            }
-            const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice);
-            console.log("");
-            console.log("Joueur 1 : ", player1.socketId);
-            console.log("Joueur 2 : ", player2.socketId);
-            console.log("Game id : ", gameIdChoice);
-            console.log("");
-            this.games.push(currentGame);
-            currentGame.actualDataInClassGame();
-            currentGame.start();
-            playersAvailable.length = 0;
-            this.removeUser(player1.socketId);
-            this.removeUser(player2.socketId);
-    
-            const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
-            const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
-    
-            if (indexPlayer1 !== -1) {
-                playersAvailable.splice(indexPlayer1, 1);
-            }
-    
-            if (indexPlayer2 !== -1) {
-                playersAvailable.splice(indexPlayer2, 1);
+
+            const [player1, player2] = playersAvailable; // Utilisez la déstructuration pour extraire les joueurs
+
+        // Assurez-vous que les deux joueurs ont fait le même choix de map
+            if (player1.map === player2.map) {
+                console.log("Ca rentre dans le if pour demarrer la game");
+                let player1: any = null;
+                let player2: any = null;
+                player1 = playersAvailable[0];
+                player2 = playersAvailable[1];
+                const gameId = uuidv4();
+                let gameIdChoice: string;
+                if (mapChoice === 1) {
+                    gameIdChoice = gameId + "_1";
+                }
+                else if (mapChoice === 2) {
+                    gameIdChoice = gameId + "_2";
+                }
+                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice);
+                console.log("");
+                console.log("Joueur 1 : ", player1.socketId);
+                console.log("Joueur 2 : ", player2.socketId);
+                console.log("Game id : ", gameIdChoice);
+                console.log("");
+                this.games.push(currentGame);
+                currentGame.actualDataInClassGame();
+                currentGame.start();
+                playersAvailable.length = 0;
+                this.removeUser(player1.socketId);
+                this.removeUser(player2.socketId);
+                // this.removeGameById(gameIdChoice);
+                if (currentGame.checkGameStatus() === true) {
+                    this.removeGameById(gameIdChoice);
+                }
+        
+                const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
+                const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
+        
+                if (indexPlayer1 !== -1) {
+                    playersAvailable.splice(indexPlayer1, 1);
+                }
+        
+                if (indexPlayer2 !== -1) {
+                    playersAvailable.splice(indexPlayer2, 1);
+                }
             }
         }
     }
@@ -210,19 +239,32 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         console.log("-------------------------------");
     }
     
-    private addUser(item: string): void {
-        const newPlayer: Player = {
-            socketId: item,
-            status: playerStatus.isSettling,
-            level: 0,
-        };
-        this.userArray.push(newPlayer);
+    private addUser(item: string, mapChoice: number): void {
+        console.log("[ADD USER : ", item, "] choix : ", mapChoice);
+        const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
+        if (existingUserIndex === -1) {
+            const newPlayer: Player = {
+                socketId: item,
+                status: playerStatus.isSettling,
+                level: 0,
+                map: mapChoice,
+            };
+            this.userArray.push(newPlayer);
+        }
+        else {
+        }
     }
     
     private removeUser(userId: string): void {
         const indexToRemove = this.userArray.findIndex(player => player.socketId === userId);
+        console.log("Je supprime du userarray : ", userId);
         if (indexToRemove !== -1) {
             this.userArray.splice(indexToRemove, 1);
         }
     }
+
+    private removeGameById = (idToRemove: string) => {
+        console.log("Je supprime : ", idToRemove);
+        this.games = this.games.filter((game) => game.getGameId() !== idToRemove);
+    };
 }

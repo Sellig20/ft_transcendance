@@ -99,6 +99,7 @@ export class GameStateFD {
     socketId: Socket;
     status: playerStatus;
     level: number;
+    map: number;
   }
   
   

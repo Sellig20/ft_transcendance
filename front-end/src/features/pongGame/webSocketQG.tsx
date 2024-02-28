@@ -5,9 +5,11 @@ export const WebSocketQG = ({ socket}) => {
 
     const navigate = useNavigate();
     const handleQuitQueue = () => {
-        socket?.emit('goQuitQueue');
+        socket?.emit('quitQueue', socket.id);
         navigate('../');
     }
+
+
 
     useEffect(() => {
         const handlePrepareMatch = () => {

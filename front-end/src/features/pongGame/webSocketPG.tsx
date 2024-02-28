@@ -4,13 +4,12 @@ export const WebSocketPG = ({ socket }) => {
     
     const navigate = useNavigate();
     const handleRedirectToQueueGate = (mapChoice: number) => {
-        console.log("MAP CHOICE => ", mapChoice);
+        console.log("MAP CHOICE => ", mapChoice, " de ", socket.id);
         socket?.emit('goQueueList', { socketId: socket.id, mapChoice });
         navigate('../queue');
     }
 
-    const handleQuitQueueGate = () => {
-        // socket?.emit('goQuitQueueGate', userid);
+    const handleSelectGame = () => {
         navigate('../../home');
     }
 
@@ -38,7 +37,7 @@ export const WebSocketPG = ({ socket }) => {
                 </div>
         
                 <div className="col-12 mt-2">
-                    <button className="buttonGame" onClick={handleQuitQueueGate}>
+                    <button className="buttonGame" onClick={handleSelectGame}>
                         <span>Quit game home</span></button>
                 </div>
                 </div>
