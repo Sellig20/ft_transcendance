@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import api from '../api/api';
 
 
@@ -42,70 +43,67 @@ const leaveChannelById = async (
 	userid: number, 
 	channelid: number,
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
+		await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
 	} catch (error){
-		console.log(error);
-		return error;
+		return null;
 	}
-	return response
 }
 
 const banChannelById = async (
 	userid: number, 
 	channelid: number,
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/banChannelById', {userid: userid, channelid: channelid})
+		await api.post('/chat/banChannelById', {userid: userid, channelid: channelid})
 	} catch (error){
-		console.log(error);
-		return error;
+		return null;
 	}
-	return response
 }
 
 const blockUserById = async (
 	userid: number, 
 	userToBan: number,
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/blockUserById', {userid: userid, userToBlock: userToBan})
+		await api.post('/chat/blockUserById', {userid: userid, userToBlock: userToBan})
 	} catch (error){
-		console.log(error);
-		return error;
+		return null;
 	}
-	return response
 }
 
 const setAdminById = async (
 	channelId: number, 
 	userToSet: number,
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/setAdminById', {channelId: channelId, userToSet: userToSet})
+		await api.post('/chat/setAdminById', {channelId: channelId, userToSet: userToSet})
 	} catch (error){
-		console.log(error);
 		return null;
 	}
-	return response
 }
 
 const muteById = async (
 	channelId: number,
 	userToMute: number,
 ) => {
-	let response
 	try {
-		response = await api.post('/chat/muteById', {channelId: channelId, userId: userToMute})
+		await api.post('/chat/muteById', {channelId: channelId, userId: userToMute})
 	} catch (error){
-		console.log(error);
+		// console.log(error);
 		return null;
 	}
-	return response
+}
+
+const inviteUser = async (
+	channelid: number,
+	userid: number,
+) => {
+	try {
+		await api.post('/chat/inviteUser', {channelid: channelid, userid: userid})
+	} catch (error){
+		return null;
+	}
 }
 
 export default {
@@ -117,6 +115,7 @@ export default {
 	banChannelById: banChannelById,
 	blockUserById: blockUserById,
 	setAdminById:setAdminById,
-	muteById: muteById
+	muteById: muteById,
+	inviteUser: inviteUser
 
 }

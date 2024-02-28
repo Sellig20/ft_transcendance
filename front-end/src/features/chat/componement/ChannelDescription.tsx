@@ -24,14 +24,11 @@ const handleKick = async (
 	channelinfo: any,
 	reload: any
 ) => {
-	try {
-		const res = await chatService.leaveChannelById(Number(userToKick), Number(channelinfo.id))
-		// setchannelSelect(null)
-		console.log(res, "kick user", userToKick, "from channel", channelinfo.name)
-		reload(channelinfo.id);
-	} catch (error) {
+	const res = await chatService.leaveChannelById(Number(userToKick), Number(channelinfo.id))
+	if (res === null)
 		return ;
-	}
+	// setchannelSelect(null)
+	reload(channelinfo.id);
 };
 
 const handleBan = async (
@@ -39,13 +36,12 @@ const handleBan = async (
 	channelinfo: any,
 	reload: any
 ) => {
-	try {
-		const res = await chatService.banChannelById(Number(userToBan), Number(channelinfo.id))
-		console.log(res, "Ban user", userToBan, "from channel", channelinfo.name)
-		reload(channelinfo.id);
-	} catch (error) {
+	const res = await chatService.banChannelById(Number(userToBan), Number(channelinfo.id))
+	if (res === null)
+	{
 		return ;
 	}
+	reload(channelinfo.id);
 
 };
 
@@ -55,14 +51,12 @@ const handleBlock = async (
 	reload: any,
 	channelinfo: any
 ) => {
-	try {
-		const res = await chatService.blockUserById(Number(iduserinfo), Number(userToBan))
-		console.log(res, "block user")
-		reload();
-	
-	} catch (error) {
+	const res = await chatService.blockUserById(Number(iduserinfo), Number(userToBan))
+	if (res === null)
+	{
 		return ;
 	}
+	reload();
 
 };
 
@@ -73,10 +67,8 @@ const handleSetadmin = async (
 	channelinfo: any
 ) => {
 	const res = await chatService.setAdminById(Number(channelinfo.id), Number(userToSet))
-	console.log(res, "set admin user")
 	if (res === null)
 	{
-		// toast.error("error")
 		return;
 	}
 	reload(channelinfo.id);
@@ -90,11 +82,9 @@ const handleMute = async (
 	channelinfo: any
 ) => {
 	const res = await chatService.muteById(Number(channelinfo.id), Number(userToMute))
-	console.log(res, "mute user")
 	if (res === null)
 	{
-		// toast.error("error")
-		return;
+		return ;
 	}
 	reload(channelinfo.id);
 
@@ -212,6 +202,36 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 
 }
 
+const InviteUser = ({ channelinfo, userinfo, reload } : {
+	channelinfo: any,
+	userinfo: any,
+	reload: any
+}) => {
+
+	const buttonHandler = async (
+		channelinfo: any,
+		userinfo: any,
+		reload: any,
+	) => {
+		console.log(inputMessageRef.current.value)
+		if (inputMessageRef.current.value === "")
+			return ;
+		const res = await chatService.inviteUser(channelinfo.id, inputMessageRef.current.value)
+		if (res !== null)
+			reload(channelinfo.id)
+		inputMessageRef.current.value = "";
+	};
+
+	const inputMessageRef = useRef("");
+
+	return (
+		<div>
+			<input type="text" name="inputSend" placeholder="username to invite" id="inputSend" ref={inputMessageRef}/>
+			<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>add to channel</button>
+		</div>
+	)
+}
+
 export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 	channelinfo: any,
 	userinfo:	any,
@@ -230,6 +250,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 			WELCOME TO : {channelinfo.name}
 			<br />
 			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
+			<InviteUser channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
 			{
 				channelinfo.user_list.map((element: any, index:any) => {
 					return (
