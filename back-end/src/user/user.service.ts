@@ -389,6 +389,20 @@ export class UsersService {
 				},
 			})
 
+			// if "MP_"+String(IdMe)+"_"+String(IdFriend) or "MP_"+String(IdFriend)+"_"+String(IdMe) existe pas
+			// pour securiser ca
+			await this.prisma.channel.create({
+				data: {
+					name: "MP_"+String(IdMe)+"_"+String(IdFriend),
+					password: null,
+					personal: true,
+					public: false,
+					user_list: {connect: [{id:IdMe}, {id:IdFriend}]},
+					owner: -1,
+				},
+	
+			})
+
 		} catch (error) {
 			console.log(error)
 			throw new BadRequestException("Couldnt add friend", {
