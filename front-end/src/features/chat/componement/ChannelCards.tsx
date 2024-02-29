@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import chatService from '../chat.service';
 
 const whatColor = ({password, ispublic, personal} : {
 	password: string,
@@ -51,7 +52,57 @@ const Card = ({ name, isPerso, id, password, ispublic} : {
 	);
 }
 
-export const ChannelCards = ({ channelInfo, clickHandler } : {
+export const ChannelPublic = ({userid, clickHandler} : {
+	userid: number,
+	clickHandler: any
+}) => {
+	const [public_channels, setpublic_channels] = useState<any>([]);
+	const [joined_channels, setJoined_channels] = useState<any>([]);
+	
+	useEffect(() => {
+		async function getToken() {
+			const res2 = await chatService.findAllChannelJoinedId(userid);
+			if (res2 !== null)
+				setJoined_channels(res2)
+			const res = await chatService.findAllPublicChannel();
+			if (res !== null)
+				setpublic_channels(res);
+		}
+		getToken();
+	}, [])
+
+	let channelNotJoined : any = []
+	public_channels.map((element: any, index : any) => {
+		var val = element.id
+		// console.log(element.name)
+		
+		const found = joined_channels.channel_list.find((x: { id: string; }) => x.id === val);
+
+		if (found === undefined)
+		{
+			channelNotJoined.push(element)
+		}
+	})
+	
+	// console.log("tesssssssssssss", public_channels, joined_channels.channel_list, channelNotJoined)
+	return (
+		<div>
+			public channels not joined:
+			<br />
+			{
+				channelNotJoined.map((element: any) => {
+					return (
+						<div key={element.id} id={element.id} onClick={() => clickHandler(element)}>
+							<Card name={element.name} isPerso={element.personal} id={element.id} password={element.password} ispublic={element.public}/>
+						</div>
+					)
+				})
+			}
+		</div>
+	);
+}
+
+export const ChannelCards = ({ channelInfo, clickHandler} : {
 	channelInfo: any,
 	clickHandler: any
 }) => {
@@ -83,8 +134,10 @@ export const ChannelCards = ({ channelInfo, clickHandler } : {
 			</div>
 		);
 	}
+
 	return (
 		<div>
+			channels joined:
 			{
 				channel_list.map((element: any) => {
 					return (
@@ -94,6 +147,7 @@ export const ChannelCards = ({ channelInfo, clickHandler } : {
 					)
 				})
 			}
+			{/* <ChannelPublic /> */}
 		</div>
 	);
 }

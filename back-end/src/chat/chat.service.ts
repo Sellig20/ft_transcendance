@@ -464,4 +464,66 @@ export class ChatService {
 			throw error
 		}
 	}
+
+	async findAllPublicChannel()
+	{
+		try {
+			const channel = await this.prisma.channel.findMany({
+				where: {
+					public: true
+				},
+				select : {
+					id: true,
+					name: true,
+					personal: true,
+					password: true,
+					public: true,
+				}
+	
+			})
+			if (channel === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
+			return channel;
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async findAllChannelJoinedId(iduser: number)
+	{
+		try {
+			const channels = await this.prisma.user.findFirst({
+				where: {
+					id: 11
+				},
+				select : {
+					channel_list : {
+						select : {
+							id: true,
+							name: true,
+							personal: true,
+							password: true,
+							public: true,
+						}
+					}
+				}
+	
+			})
+			if (channels === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
+			return channels;
+		} catch (error) {
+			throw error
+		}
+	}
 }

@@ -104,10 +104,10 @@ export class ChatController {
 	@Post('/leaveChannelById')
 	async leaveChannelById(@Body() body) {
 		// verifier si le userid est le owner 
-		let owner_id = null
-		let is_alone = false
 		// console.log("sdfsdfsdfsdfsdfsfsf", infochann, body.channelid)
 		try {
+			let owner_id = null
+			let is_alone = false
 			const infochann = await this.ChatService.findAllInfoInChannelById(body.channelid);
 			if(infochann.owner === body.userid)
 			{
@@ -141,14 +141,6 @@ export class ChatController {
 		} catch (error) {
 			throw error
 		}
-		// try {
-		// 	const result = await this.ChatService.leaveChannelById(body.userid, body.channelid);
-		// 	if (is_alone === false)
-		// 	return result
-		// } catch (error) {
-		// 	return "null"
-		// }
-		// console.log(result);
 	}
 
 	@Post('/banChannelById')
@@ -251,6 +243,7 @@ export class ChatController {
 		}
 	}
 
+	// invite des user en fonction de leurs username
 	@Post('/inviteUser')
 	async inviteUser(@Body() body){
 		try {
@@ -292,6 +285,45 @@ export class ChatController {
 		}
 	}
 
+	// invite des user en fonction de leurs user ID
+	@Post('/inviteUserId')
+	async inviteUserId(@Body() body){
+		try {
+			let found;
+			found = false
+			const infochann = await this.ChatService.findAllInfoInChannelById(body.channelid)
+			// console.log("caca", infochann.user_list)
+			infochann.user_list.map((element: any, index:any) => {
+				if (element.id === body.userid)
+				{
+					found = true
+					return ;
+				}
+			})
+			if (found === true)
+			{
+				
+				throw new BadRequestException("error user already in channel", {
+					cause: new Error(),
+					description: "error user already in channel",
+				});
+			}
+
+			const id = body.userid
+			if (infochann.banned.indexOf(id) !== -1)
+			{
+				throw new BadRequestException("error banned user", {
+					cause: new Error(),
+					description: "error banned user",
+				});
+			}
+
+			await this.ChatService.connectUserToChannel(id, body.channelid)
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	@Post('/changePassword')
 	async changePassword(@Body() body){
 		try {
@@ -307,6 +339,24 @@ export class ChatController {
 			await this.ChatService.setpassword(body.channelid, body.password)
 		} catch (error) {
 			throw error;
+		}
+	}
+
+	@Get('/findAllPublicChannel/')
+	async findAllPublicChannel(@Param() param) {
+		try {
+			return await this.ChatService.findAllPublicChannel();
+		} catch (error) {
+			return (error)
+		}
+	}
+
+	@Get('/findAllChannelJoinedId/:iduser')
+	async findAllChannelJoinedId(@Param() param) {
+		try {
+			return await this.ChatService.findAllChannelJoinedId(Number(param.iduser));
+		} catch (error) {
+			return (error)
 		}
 	}
 }

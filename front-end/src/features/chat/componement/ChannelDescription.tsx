@@ -10,13 +10,9 @@ const handleLeave = async (
 	channelid: number,
 	reload: any
 ) => {
-	try {
-		const res = await chatService.leaveChannelById(Number(userid), Number(channelid))
-		console.log(res)
-		reload();
-	} catch (error) {
-		console.log(error)
-	}
+	const res = await chatService.leaveChannelById(Number(userid), Number(channelid))
+	// console.log(res)
+	reload();
 
 };
 
