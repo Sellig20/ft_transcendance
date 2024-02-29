@@ -243,7 +243,10 @@ const ChangePassword = ({ channelinfo, userinfo, reload } : {
 		reload: any,
 	) => {
 		if (inputPasswordRef.current.value === "")
+		{
+			toast.error("error wrong password")
 			return ;
+		}
 		const res = await chatService.changePassword(channelinfo.id, inputPasswordRef.current.value)
 		if (res !== null)
 			reload(channelinfo.id)
@@ -255,7 +258,7 @@ const ChangePassword = ({ channelinfo, userinfo, reload } : {
 	{
 		return (
 			<div>
-				<input type="text" name="inputSend" placeholder="username to invite" id="inputSend" ref={inputPasswordRef}/>
+				<input type="text" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
 				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>add to channel</button>
 			</div>
 		)

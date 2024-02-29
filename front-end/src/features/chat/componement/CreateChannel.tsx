@@ -64,11 +64,14 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 
 	const handlerSubmite = async (
 	) => {
-		let channel_name = inputNameRef.current.value;
-		let channel_password = inputPasswordRef.current.value
 		let	isPublic = true
-
-		if (channel_name === null || channel_name === "")
+		let psw = ""
+		console.log(inputNameRef.current)
+		if (inputNameRef.current === null)
+			return ;
+		let channel_name = inputNameRef.current.value
+		
+		if (channel_name === "")
 		{
 			toast.error("error invalid name")
 			return ;
@@ -76,15 +79,17 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 
 		if (mode == "password")
 		{
-
-			console.log("caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", channel_password)
+			if (inputPasswordRef.current === null || inputPasswordRef.current === undefined)
+				return ;
+			let channel_password = inputPasswordRef.current.value
 			isPublic = true
-			if (channel_password === null || channel_password === "")
+			if (channel_password === "" || channel_password === null)
 			{
 				toast.error("error invalid password")
 				return ;
 			}
-			channel_password = sha256(channel_password)
+			psw = sha256(channel_password)
+			inputPasswordRef.current.value = null
 		}
 		else if (mode == "public")
 		{
@@ -96,22 +101,22 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannel
 			console.log("mode private")
 			isPublic = false
 		}
-		if (channel_password === undefined && mode !== "password")
-			channel_password = null
-		console.log("clique: ", mode, channel_password, channel_name)
-		const res = await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password)
+		// if (channel_password === undefined && mode !== "password")
+		// 	channel_password = null
+		// console.log("clique: ", mode, channel_password, channel_name)
+		// inputNameRef.current = null
+		// inputPasswordRef.current = null
+		console.log("end", inputPasswordRef, inputNameRef)
+		inputNameRef.current.value = ""
+		const res = await chatService.createChannel(channel_name, false, isPublic, iduser, psw)
 		if (res === null)
 		{
 			reload()
 			return ;
 		}
-		// console.log("res", res)
-		// console.log("userinfo", userinfo)
-		setuserinfo(userinfo.channel_list.push(res.data))
-		setChannelSelected(null)
 		reload()
-		inputNameRef.current.value = null
-		inputPasswordRef.current.value = null
+		// setuserinfo(userinfo.channel_list.push(res.data))
+		setChannelSelected(null)
 	};
 
 	return (
