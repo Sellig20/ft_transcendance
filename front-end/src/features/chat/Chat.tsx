@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
-import { ChannelCards } from './componement/ChannelCards';
+import { ChannelCards, ChannelPublic } from './componement/ChannelCards';
 import { PrintChannel } from './componement/PrintChannel';
 import { CreateChannel } from './componement/CreateChannel';
 import { InputMessage } from './componement/InputMessage';
@@ -31,7 +31,7 @@ export function Chat() {
 		send_to_channel?: number
 	) => {
 		if (send_to_channel === undefined)
-			callApi(userid, 0, false)
+			callApi(userid)
 		else
 		{
 			socket?.emit("RELOAD", {userinfo:userinfo, channelid:send_to_channel})
@@ -41,8 +41,6 @@ export function Chat() {
 
 	const callApi = async (
 		userid: any,
-		newSocket: any,
-		firstcall: boolean
 		) => {
 		const userinfo = await chatService.getUserById(userid)
 		if (userinfo === null)
@@ -58,14 +56,16 @@ export function Chat() {
 					finded = true
 			})
 			if (finded === false)
+			{
 				setchannelSelect(null)
+			}
 		}
 	}
 	
 	const first = (
 		newSocket: Socket
 	) => {
-		callApi(userid, newSocket, true);
+		callApi(userid);
 		setSocket(newSocket)
 	}
 
@@ -92,8 +92,9 @@ export function Chat() {
 		messageprop: any
 	) => {
 		reload();
-		const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
-		setchannelSelect(messageChann)
+		// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+		// setchannelSelect(messageChann)
+		
 		// if (channelSelect === undefined)
 		// 	return ;
 		// if (messageprop.channelid === channelSelect.id)
@@ -204,6 +205,49 @@ export function Chat() {
 			setChannelLocked(true)
 		setchannelSelect(messageChann)
 	};
+
+	const handleChannelPublic = async (
+		// event: React.MouseEvent<HTMLButtonElement>
+		channelinfo: any,
+	) => {
+		let found;
+		found = false;
+		setMessageSocket([])
+		console.log("clicked on a channel, id_channel =", channelinfo.id);
+		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
+		if (messageChann === null) //	le channel existe pas
+		{
+			reload();
+			return ;
+		}
+		console.log(messageChann)
+		messageChann.user_list.map((element: any, index:any) => {
+			if (element.id === userid)
+			{
+				found = true
+				return ;
+			}
+		})
+		if (found === true) // userid est dans le channel
+		{
+			reload();
+			toast.error("error already joined")
+			return ;
+		}
+		console.log("ccacacacacacacacacacacac")
+		const res3 = await chatService.inviteUserId(channelinfo.id, userid)
+		if (res3 === null)
+		{
+			reload()
+			return ;
+		}
+		reload(channelinfo.id)
+		// if (messageChann.password === null || messageChann.password === "")
+		// 	setChannelLocked(false)
+		// else
+		// 	setChannelLocked(true)
+		// setchannelSelect(messageChann)
+	};
 	
 	return (
 		<div>
@@ -211,6 +255,7 @@ export function Chat() {
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
+					<ChannelPublic userid={userid} clickHandler={handleChannelPublic}/>
 					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}

@@ -56,7 +56,7 @@ const leaveChannelById = async (
 	channelid: number,
 ) => {
 	try {
-		await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
+		return await api.post('/chat/leaveChannelById', {userid: userid, channelid: channelid})
 	} catch (error){
 		return null;
 	}
@@ -118,6 +118,17 @@ const inviteUser = async (
 	}
 }
 
+const inviteUserId = async (
+	channelid: number,
+	userid: number,
+) => {
+	try {
+		await api.post('/chat/inviteUserId', {channelid: channelid, userid: userid})
+	} catch (error){
+		return null;
+	}
+}
+
 const changePassword = async (
 	channelid: number,
 	password: string,
@@ -126,6 +137,24 @@ const changePassword = async (
 		await api.post('/chat/changePassword', {channelid: channelid, password: password})
 	} catch (error){
 		return null;
+	}
+}
+
+const findAllPublicChannel = async () => {
+	try {
+		const request = await api.get(`/chat/findAllPublicChannel/`)
+		return request.data
+	} catch (error) {
+		return null
+	}
+}
+
+const findAllChannelJoinedId = async (iduser: number) => {
+	try {
+		const request = await api.get(`/chat/findAllChannelJoinedId/${iduser}`)
+		return request.data
+	} catch (error) {
+		return null
 	}
 }
 
@@ -140,6 +169,9 @@ export default {
 	setAdminById:setAdminById,
 	muteById: muteById,
 	inviteUser: inviteUser,
-	changePassword: changePassword
+	changePassword: changePassword,
+	findAllPublicChannel: findAllPublicChannel,
+	findAllChannelJoinedId: findAllChannelJoinedId,
+	inviteUserId: inviteUserId
 
 }
