@@ -91,22 +91,22 @@ export function Chat() {
 	const reloadListener = async (
 		messageprop: any
 	) => {
-		reload();
 		// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
 		// setchannelSelect(messageChann)
 		
-		// if (channelSelect === undefined)
-		// 	return ;
-		// if (messageprop.channelid === channelSelect.id)
-		// {
-		// 	const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
-		// 	if (messageChann === "") //	le channel existe pas
-		// 	{
-		// 		reload();
-		// 		return ;
-		// 	}
-		// 	setchannelSelect(messageChann)
-		// }
+		reload();
+		if (channelSelect === undefined)
+			return ;
+		if (messageprop.channelid === channelSelect.id)
+		{
+			const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+			if (messageChann === "") //	le channel existe pas
+			{
+				reload();
+				return ;
+			}
+			setchannelSelect(messageChann)
+		}
 	};
 
 	const messageListener = (
@@ -254,8 +254,8 @@ export function Chat() {
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>
-					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<ChannelPublic userid={userid} clickHandler={handleChannelPublic}/>
+					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel} userid={userid}/>
+					<ChannelPublic userid={userid} clickHandler={handleChannelPublic} channelInfo={channelJoined}/>
 					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}

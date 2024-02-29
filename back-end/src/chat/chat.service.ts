@@ -24,7 +24,11 @@ export class ChatService {
 						name: true,
 						personal: true,
 						password: true,
-						public: true
+						public: true,
+						user_list : {select :{
+							id: true,
+							username: true
+						}}
 	
 					}},
 					friends: true,
@@ -158,11 +162,17 @@ export class ChatService {
 						personal: true,
 						public: true,
 						banned: true,
-						password: true
-					}}
+						password: true,
+						user_list: {select: {
+							id: true,
+							username: true,
+							friends: true,
+							blocked_user: true,
+						}}
+					}
 				}
 	
-			})
+			}})
 			if (channels === null)
 			{
 				throw new BadRequestException("error while channel not found", {

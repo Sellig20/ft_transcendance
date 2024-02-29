@@ -278,22 +278,43 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 	if(isOwner === false && channelinfo.admins.length !== 0 && channelinfo.admins.indexOf(userinfo.id) !== -1)
 		isAdmin = true
 	console.log("channelinfoooo", channelinfo)
-	return (
-		<div>
-			WELCOME TO : {channelinfo.name}
-			<br />
-			<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
-			<ChangePassword channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
-			<InviteUser channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
-			{
-				channelinfo.user_list.map((element: any, index:any) => {
-					return (
-						<div key={index}>
-							<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo} reload={reload}/>
-						</div>
-					)
-				})
-			}
-		</div>
-	)
+	if (channelinfo.personal === true)
+	{
+		return (
+			<div>
+				WELCOME TO : {channelinfo.name}
+				<br />
+				{
+					channelinfo.user_list.map((element: any, index:any) => {
+						return (
+							<div key={index}>
+								<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo} reload={reload}/>
+							</div>
+						)
+					})
+				}
+			</div>
+		)
+	}
+	else
+	{
+		return (
+			<div>
+				WELCOME TO : {channelinfo.name}
+				<br />
+				<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
+				<ChangePassword channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
+				<InviteUser channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
+				{
+					channelinfo.user_list.map((element: any, index:any) => {
+						return (
+							<div key={index}>
+								<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo} reload={reload}/>
+							</div>
+						)
+					})
+				}
+			</div>
+		)
+	}
 }
