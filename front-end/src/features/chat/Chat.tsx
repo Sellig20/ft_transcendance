@@ -44,23 +44,22 @@ export function Chat() {
 		newSocket: any,
 		firstcall: boolean
 		) => {
-		await chatService.getUserById(userid).then(userinfo => {
-			setUserinfo(userinfo)
-			console.log("[FROM DB] userinfo:", userinfo)
-			setChannelJoined(userinfo.channel_list)
-			if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
-			{
-				let finded = false
-				userinfo.channel_list.map((element: any) => {
-					if (element.id === channelSelect.id)
-						finded = true
-				})
-				if (finded === false)
-					setchannelSelect(null)
-			}
-			// if (firstcall === true)
-			// 	newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
-		});
+		const userinfo = await chatService.getUserById(userid)
+		if (userinfo === null)
+			return ;
+		setUserinfo(userinfo)
+		console.log("[FROM DB] userinfo:", userinfo)
+		setChannelJoined(userinfo.channel_list)
+		if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
+		{
+			let finded = false
+			userinfo.channel_list.map((element: any) => {
+				if (element.id === channelSelect.id)
+					finded = true
+			})
+			if (finded === false)
+				setchannelSelect(null)
+		}
 	}
 	
 	const first = (
@@ -92,22 +91,21 @@ export function Chat() {
 	const reloadListener = async (
 		messageprop: any
 	) => {
-		// console.log("channelselected===", channelSelect, messageprop.channelid)
-		if (channelSelect === undefined)
-			return ;
-		if (messageprop.channelid === channelSelect.id)
-		{
-			await chatService.findAllInfoInChannelById(Number(messageprop.channelid)).then(messageChann => {
-				if (messageChann === "") //	le channel existe pas
-				{
-					reload();
-					return ;
-				}
-				setchannelSelect(messageChann)
-			});
-			// setchannelSelect(messageprop.channelid)
-			// reload()
-		}
+		reload();
+		const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+		setchannelSelect(messageChann)
+		// if (channelSelect === undefined)
+		// 	return ;
+		// if (messageprop.channelid === channelSelect.id)
+		// {
+		// 	const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+		// 	if (messageChann === "") //	le channel existe pas
+		// 	{
+		// 		reload();
+		// 		return ;
+		// 	}
+		// 	setchannelSelect(messageChann)
+		// }
 	};
 
 	const messageListener = (
