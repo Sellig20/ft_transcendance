@@ -449,4 +449,19 @@ export class ChatService {
 			throw error
 		}
 	}
+
+	async setpassword(channelid: number, password: string) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					password: {set: password}
+				}
+			})
+		} catch (error) {
+			throw error
+		}
+	}
 }

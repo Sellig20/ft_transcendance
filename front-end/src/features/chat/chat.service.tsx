@@ -118,6 +118,17 @@ const inviteUser = async (
 	}
 }
 
+const changePassword = async (
+	channelid: number,
+	password: string,
+) => {
+	try {
+		await api.post('/chat/changePassword', {channelid: channelid, password: password})
+	} catch (error){
+		return null;
+	}
+}
+
 export default {
 	getUserById: getUserById,
 	findAllChannelJoinedByIdUser: findAllChannelJoinedByIdUser,
@@ -128,6 +139,7 @@ export default {
 	blockUserById: blockUserById,
 	setAdminById:setAdminById,
 	muteById: muteById,
-	inviteUser: inviteUser
+	inviteUser: inviteUser,
+	changePassword: changePassword
 
 }

@@ -291,4 +291,22 @@ export class ChatController {
 			throw error;
 		}
 	}
+
+	@Post('/changePassword')
+	async changePassword(@Body() body){
+		try {
+			if (body.password === undefined || body.password === null)
+			{
+				throw new BadRequestException("error invalid password", {
+					cause: new Error(),
+					description: "error invalid password",
+				});
+			}
+			if (body.password === "")
+				body.password = null
+			await this.ChatService.setpassword(body.channelid, body.password)
+		} catch (error) {
+			throw error;
+		}
+	}
 }

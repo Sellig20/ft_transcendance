@@ -3,6 +3,7 @@ import { useState, useEffect, useRef} from 'react'
 import chatService from '../chat.service'
 import { userInfo } from 'os'
 import { toast } from 'react-toastify';
+import { sha256 } from 'js-sha256';
 
 const handleLeave = async (
 	userid: number,
@@ -242,24 +243,27 @@ const ChangePassword = ({ channelinfo, userinfo, reload } : {
 		userinfo: any,
 		reload: any,
 	) => {
+		// console.log(inputPasswordRef.current.value)
+		let hashed = ""
 		if (inputPasswordRef.current.value === "")
-		{
-			toast.error("error wrong password")
+			toast.error("password deleted")
+		else
+			hashed = sha256(inputPasswordRef.current.value)
+		const res = await chatService.changePassword(channelinfo.id, hashed)
+		if (res === null)
 			return ;
-		}
-		const res = await chatService.changePassword(channelinfo.id, inputPasswordRef.current.value)
-		if (res !== null)
-			reload(channelinfo.id)
+		toast.success("password updated")
+		reload(channelinfo.id)
 		inputPasswordRef.current.value = "";
 	};
 
 	const inputPasswordRef = useRef("");
-	if (channelinfo.password !== null && channelinfo.password !== "")
+	if (userinfo.id === channelinfo.owner)
 	{
 		return (
 			<div>
-				<input type="text" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
-				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>add to channel</button>
+				<input type="password" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
+				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>change password</button>
 			</div>
 		)
 	}
