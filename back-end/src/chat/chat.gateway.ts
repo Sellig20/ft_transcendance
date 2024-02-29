@@ -144,15 +144,22 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
 
     @SubscribeMessage('RELOAD')
     async handleReload(client: any, message: any) {
-        console.log("reload all the user in channel", message.channelid)
-        await this.findSocketChannels(message.channelid).then(res => {
-            res.map((item, index) => {
-                // console.log("envoie de '", message.data, "' to socketid :", item)
-                this.server.to(item).emit("RELOAD", {
-                    channelid: message.channelid
-                });
-            })
-        })
+        console.log("reload all the user", message.channelid)
+        // await this.findSocketChannels(message.channelid).then(res => {
+        //     res.map((item, index) => {
+        //         // console.log("envoie de '", message.data, "' to socketid :", item)
+        //         this.server.to(item).emit("RELOAD", {
+        //             channelid: message.channelid
+        //         });
+        //     })
+        // })
+        
+        // this.userArray.map((item, index) => {
+            // console.log("envoie de '", message.data, "' to socketid :", item)
+            this.server.emit("RELOAD", {
+                channelid: message.channelid
+            });
+        // })
     }
 
 }
