@@ -59,3 +59,4 @@ dkms.conf
 en.subject-1.pdf
 back-end/types/fake-data.ts
 /back-end/avatar/*
+package-lock.json
