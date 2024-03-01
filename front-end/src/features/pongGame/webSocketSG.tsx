@@ -26,12 +26,15 @@ export const WebSocketSG = ({ socket}) => {
         if (gameState.player1Abandon === true || gameState.player2Abandon === true)
         {
             partyIsAbandonned(context, board);
+            gameState.status === GameStatus.abortedGame;
+
         }
         if (gameState.player1IsDeserted === true || gameState.player2IsDeserted === true)
         {
             partyIsDeserted(context, board);
+            gameState.status === GameStatus.abortedGame;
+
         }
-        gameState.status === GameStatus.abortedGame;
     }
     
     const createBoardGame = () => {
@@ -64,6 +67,7 @@ export const WebSocketSG = ({ socket}) => {
     // }//borderCollision detecting borderevenemt
     
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        gameState.status === GameStatus.finishedGame;
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #7CFC00';
         else
@@ -74,6 +78,7 @@ export const WebSocketSG = ({ socket}) => {
     }
     
     const displayFailGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        gameState.status === GameStatus.finishedGame;
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #00BFFF';
         else
@@ -84,6 +89,7 @@ export const WebSocketSG = ({ socket}) => {
     }
     
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        gameState.status === GameStatus.abortedGame;
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #1E90FF';
@@ -95,6 +101,8 @@ export const WebSocketSG = ({ socket}) => {
     }
     
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        gameState.status === GameStatus.abortedGame;
+        console.log("stausss game ", gameState.status);
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #FF1493';
@@ -189,15 +197,22 @@ export const WebSocketSG = ({ socket}) => {
                 drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
-                    gameState.status === GameStatus.finishedGame;
+                    console.log("coucou 3");
                 }
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
                     gameState.status === GameStatus.finishedGame;
                 }
+                if (gameState.status === GameStatus.over) {
+                    console.log('OVER DE SG');
+                }
                 partyAbandon(context, board);
-                if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame)
+                console.log("coucou 1");
+                console.log("Game status juste avnt le if : ", gameState.status);
+                if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
+                    gameState.status === GameStatus.over)
                 {
+                    console.log("coucou 2");
                     // alert("Vous allez être redirigé dans quelques secondes...");
                     console.log("ca va bouger 3 2 1...");
                     setTimeout(getBack, 1000);
@@ -250,7 +265,7 @@ export const WebSocketSG = ({ socket}) => {
         }
 
         const handleDisconnect = () => {
-            console.log("a quittey la zone");
+            console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
 
             // socket?.emit('quitInGame');
         }
@@ -266,6 +281,7 @@ export const WebSocketSG = ({ socket}) => {
         // socket?.on('connect', handleConnect);
         window.addEventListener('keydown', handleKeyDown);
         socket?.on('disconnect', handleDisconnect)
+
         ///////////////////// SERVEUR RENVOIE donc le FRONTEND ECOUTE : ////////////////////////////
         socket?.on('initplayer1', (y: number, idGame: string) => {
             initiatePaddle1(y, idGame);
@@ -291,14 +307,6 @@ export const WebSocketSG = ({ socket}) => {
             gameState.mapChoiceLocked = mapChoice;
         })
 
-        // socket?.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
-        //     ballAgainstPaddle(velX, velY);
-        // })//detecting Ball agaist paddles
-
-        // socket?.on('detectBorder', (velY: number) => {
-        //     ballAgainstBorder(velY);
-        // })//detecting Ball against border wall
-
         socket?.on('winner', (name: string) => {
             if (name === "one")
             {
@@ -320,12 +328,6 @@ export const WebSocketSG = ({ socket}) => {
         })
         
         socket?.on('IGaveUp', (name: string) => {
-            // partie over
-            // -1 dans le big tableau
-            // getPlayer de la bdd
-            
-            //L'ABANDONNEUR
-            
             gameState.status = GameStatus.abortedGame;
             if (name === "one")
                 gameState.player1Abandon = true;
@@ -334,13 +336,6 @@ export const WebSocketSG = ({ socket}) => {
         })
 
         socket?.on('HeGaveUp', (name: string) => {
-            // partie over 
-            // +1 he aba
-            // getPlayer de la bdd
-            
-            //he gave up donc envoie d'un display de tu as gagne prke il a abandon
-
-            //L'ABANDONNE
             gameState.status = GameStatus.abortedGame;
             if (name === "one")
                 gameState.player1IsDeserted = true;
@@ -348,29 +343,21 @@ export const WebSocketSG = ({ socket}) => {
                 gameState.player2IsDeserted = true;
         })
 
-        // socket?.on('user-disconnected', () => {
-            // console.log("Je suis passe de user disconnected du serveur au frontend");
-            // navigate('../')
-            // socket?.emit('Abandon');
-        // })
-
-        socket?.on('gameIsOver', (nb: number, gameId: string) => {
-            
+        socket?.on('GameOver', (socketClient: string, gameId: string) => {
+            gameState.status = GameStatus.over;
         })
 
         socket?.on('oppo-crashed', (socket: string) => {
-            console.log("socket? = ", socket);
-            console.log("paddle 1 sock =", gameState.paddle1.socket);
-            console.log("paddle 2 sock =", gameState.paddle2.socket);
+            // console.log("socket? = ", socket);
+            // console.log("paddle 1 sock =", gameState.paddle1.socket);
+            // console.log("paddle 2 sock =", gameState.paddle2.socket);
 
             if (socket === gameState.paddle1.socket) {
-                // console.log("C'est le joueur un car : ", gameState.paddle1.socket);
                 gameState.player2IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
             }
             else if (socket === gameState.paddle2.socket) {
-                // console.log("C'est le joueur deux car : ", gameState.paddle2.socket);
                 gameState.player1IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
@@ -379,6 +366,8 @@ export const WebSocketSG = ({ socket}) => {
         })
 
         return () => {
+            console.log("unregistering events for ", socket.id);
+            socket.emit('IsFinished', socket.id);
             socket?.off('connect');
             socket?.off('disconnect');
             window.removeEventListener('keydown', handleKeyDown);
@@ -392,7 +381,7 @@ export const WebSocketSG = ({ socket}) => {
             socket?.off('winnerIs');
             socket?.off('congrats');
             gameState.status = GameStatus.finishedGame;
-            navigate('../');
+            // navigate('../');
             cancelAnimationFrame(animationId);
         }
     }, [update]);

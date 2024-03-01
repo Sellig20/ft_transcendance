@@ -32,8 +32,10 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
+        console.log("jepasse zizi");
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
+        console.log("oppo crashed handle disconnect function");
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
         this.removeUser(client.id);
     }
@@ -141,6 +143,24 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
                 currentGame.statusAbandon(socketId);
+                // this.removeUser(d1);
+                // this.removeUser(d2);
+            }
+        }
+
+    }
+
+    @SubscribeMessage('IsFinished')
+    handleIsFinished(client: Socket, socketId: string) {
+        console.log("IS FINISHED SOCKET ID MAMEN => ", socketId);
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                currentGame.setIsFinished(socketId);
+                // this.removeUser(d1);
+                // this.removeUser(d2);
             }
         }
     }
@@ -153,6 +173,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
                 currentGame.setCrash(socketId);
+                // this.removeUser(d1);
+                // this.removeUser(d2);
             }
         }
     }

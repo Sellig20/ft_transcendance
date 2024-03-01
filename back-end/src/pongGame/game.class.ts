@@ -52,6 +52,13 @@ export class Game {
     setCrash(socketClient: string) {
         this.gameState.status = GameStatus.abortedGame;
     }
+    
+    setIsFinished(socketClient: string) {
+        console.log("Je IS FINISHED la game");
+        this.gameState.status = GameStatus.finishedGame;
+        // this.statusAbandon(socketClient);
+        this.sendToPlayer('GameOver', socketClient, this.gameId);
+    }
 
     sendToPlayer(event: string, data: any, id: string) {
         this.server.to(this.player1.socketId).emit(event, data, id);
@@ -80,14 +87,14 @@ export class Game {
     }
 
     maxScore() {
-        if (this.gameState.player1Score === 11) {
+        if (this.gameState.player1Score === 3) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
-        else if (this.gameState.player2Score === 11) {
+        else if (this.gameState.player2Score === 3) {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
@@ -229,7 +236,7 @@ export class Game {
             return true;
         }
         else
-            return false
+            return false;
     }
 
     startGameLoop() {

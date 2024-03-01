@@ -12,6 +12,7 @@ export enum GameStatus {
   abortedGame = 'ABORTED',
   finishedGame = 'FINISHED',
   playingGame = 'PLAYING',
+  over = 'OVER',
 }
 export class GameStateFD {
 
