@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Param, Body, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import hash from 'src/auth/utils/hash';
 import { ForbiddenException, BadRequestException } from '@nestjs/common';
 import { info } from 'console';
+import { CreateChannelDto } from './dto';
 
 
 @Controller('chat')
@@ -38,18 +39,19 @@ export class ChatController {
 
 
 	@Get('/test/:id')
-	async hello(@Param() param) {
+	async hello(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findUserById(Number(param.id));
+			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)
 		}
 	}
 	
 	@Get('/getUserById/:id')
-	async getUserById(@Param() param) {
+	async getUserById(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findUserById(Number(param.id));
+			console.log(id)
+			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)
 		}
@@ -87,7 +89,7 @@ export class ChatController {
 	}
 
 	@Post('/createChannel')
-	async createChannel(@Body() body) {
+	async createChannel(@Body() body: CreateChannelDto) {
 		let password_final;
 		if (body.password === undefined || body.password === null || body.password === "")
 			password_final = null
