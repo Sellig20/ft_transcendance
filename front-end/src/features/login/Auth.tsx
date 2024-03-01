@@ -27,7 +27,7 @@ const Auth = () => {
 			const tmp = queryparms.get('code');
 			const tfa = queryparms.get('tfa');
 
-			if (tfa === 'OFF') {
+			if (tfa === 'OFF' && !(tmp === 'none')) {
 				if (tmp)
 					localStorage.setItem("token", tmp);
 					userService.setAvatar().then((rawImg) => {
@@ -58,13 +58,12 @@ const Auth = () => {
 		const userId = queryparms.get('userId');
 
 		if (tfa === 'ON' && urlcode === 'none' && userId) {
-			const { access_token } = await loginService.postTFAauth(code, Number(userId));
+			const access_token = await loginService.postTFAauth(code, Number(userId));
 			if (access_token) {
 				localStorage.setItem("token", access_token);
 				const user = await userService.getUser();
 				dispatch(addUser(user));
 				navigate('/home');
-				// console.log(access_token);
 			}
 			else 
 				navigate('/');
@@ -76,10 +75,15 @@ const Auth = () => {
 
 
 	return (
-		<>{tfa &&
-			<form onSubmit={handleTfa}>
-				<input onChange={handleChange} name="code" type="number" value={code} />
-			</form>
+		<>
+		{tfa &&
+
+			<div className="container-fluid d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
+				<form onSubmit={handleTfa}>
+				<h5 className="container-fluid d-flex justify-content-center" >Enter TFA code</h5>
+					<input onChange={handleChange} className="form-control" name="code" type="password" value={code} />
+				</form>
+			</div >
 		}
 		</>
 	)

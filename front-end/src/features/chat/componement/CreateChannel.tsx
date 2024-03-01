@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef} from 'react'
 import React from 'react'
 import chatService from '../chat.service'
+import { sha256 } from 'js-sha256';
+import { toast } from 'react-toastify';
+
 
 const Password = ({ passwordRef, isPassword} : {
-	passwordRef: React.MutableRefObject<null>
+	passwordRef: any
 	isPassword: boolean,
 }) => {
 	if (isPassword === true)
@@ -18,14 +21,16 @@ const Password = ({ passwordRef, isPassword} : {
 	}
 }
 
-export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
+export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannelSelected} : {
 	iduser: any,
 	userinfo: any,
 	setuserinfo: any,
-	reload: () => void
+	reload: any,
+	setChannelSelected: any
 }) => {
 	const inputNameRef = useRef(null);
 	const inputPasswordRef = useRef(null);
+
 	const [checkboxPrivate, setCheckboxPrivate] = useState(false);
 	const [checkboxPublic, setcheckboxPublic] = useState(true);
 	const [checkboxPassword, setcheckboxPassword] = useState(false);
@@ -59,19 +64,32 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 
 	const handlerSubmite = async (
 	) => {
-		let channel_name = inputNameRef.current.value;
-		let channel_password = null
 		let	isPublic = true
-
-		if (channel_name === "")
+		let psw = ""
+		console.log(inputNameRef.current)
+		if (inputNameRef.current === null)
 			return ;
+		let channel_name = inputNameRef.current.value
+		
+		if (channel_name === "")
+		{
+			toast.error("error invalid name")
+			return ;
+		}
 
 		if (mode == "password")
 		{
-			channel_password = inputPasswordRef.current.value;
-			isPublic = true
-			if (channel_password === "")
+			if (inputPasswordRef.current === null || inputPasswordRef.current === undefined)
 				return ;
+			let channel_password = inputPasswordRef.current.value
+			isPublic = true
+			if (channel_password === "" || channel_password === null)
+			{
+				toast.error("error invalid password")
+				return ;
+			}
+			psw = sha256(channel_password)
+			inputPasswordRef.current.value = null
 		}
 		else if (mode == "public")
 		{
@@ -83,17 +101,22 @@ export const CreateChannel = ({iduser, userinfo, setuserinfo, reload} : {
 			console.log("mode private")
 			isPublic = false
 		}
-		console.log("clique: ", mode, channel_name, channel_password)
-		
-		await chatService.createChannel(channel_name, false, isPublic, iduser, channel_password).then(res => {
-			console.log("res", res)
-			console.log("userinfo", userinfo)
-			setuserinfo(userinfo.channel_list.push(res))
+		// if (channel_password === undefined && mode !== "password")
+		// 	channel_password = null
+		// console.log("clique: ", mode, channel_password, channel_name)
+		// inputNameRef.current = null
+		// inputPasswordRef.current = null
+		console.log("end", inputPasswordRef, inputNameRef)
+		inputNameRef.current.value = ""
+		const res = await chatService.createChannel(channel_name, false, isPublic, iduser, psw)
+		if (res === null)
+		{
 			reload()
-			// setChannelJoined(userinfo.channel_list)
-		})
-		// creer le channel avec une requete + reload la page si possible d'un maniere ou d'un autre
-		// (peut etre en passant la ref des channels info id puis en l'incrementant avec le nouveau channel ?)
+			return ;
+		}
+		reload()
+		// setuserinfo(userinfo.channel_list.push(res.data))
+		setChannelSelected(null)
 	};
 
 	return (

@@ -7,7 +7,6 @@ const Login: React.FC = () => {
 		<div className="container-fluid d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
 			<div className="text-center">
 				<h1>FT_TRANSCENDANCE
-					{process.env.HOST_IP}
 				</h1>
 				<button className="btn btn-primary" onClick={hanldeFTlogin}>Login 42</button>
 			</div>

@@ -3,13 +3,22 @@ import api from '../api/api';
 
 
 const setTfaOn = async (code: string) => {
-	const request = await api.post('/auth/2fa/turn-on', {TFACode: code})
-	return request.data
+	try {
+		const request = await api.post('/auth/2fa/turn-on', {TFACode: code})
+		return request.data
+	} catch {
+		return null;
+	}
 }
 
 const genQrcode = async () => {
-	const request = await api.get('auth/2fa/generate')
-	return request.data
+	try {
+		const request = await api.get('auth/2fa/generate')
+		return request.data	
+	} catch (error) {
+		return "";	
+	}
+
 }
 
 const changeUserName = async (name: string) => {
@@ -34,18 +43,6 @@ const uploadFile = async (file: FormData) => {
 	return response.data
 }
 
-const getAvatar = async (filename: string) => {
-	let response;
-	try {
-		response = await api.get(`user/avatar${filename}`, {
-			responseType: 'blob',
-		})
-	} catch (error) {
-		return null;
-	}
-	
-	return response.data
-}
 
 const getMyAvatar = async () => {
 	let response;
@@ -53,10 +50,12 @@ const getMyAvatar = async () => {
 		response = await api.get(`user/myavatar`, {
 			responseType: 'blob',
 		})
+		if (response.status === 204) {
+			return null
+		}
 	} catch (error) {
 		return null;
 	}
-	
 	return response.data
 }
 
@@ -66,6 +65,9 @@ const getAvatarById = async (id: number) => {
 		response = await api.get(`user/ava${id}`, {
 			responseType: 'blob',
 		})
+		if (response.status === 204) {
+			return null
+		}
 	} catch (error) {
 		return null;
 	}
@@ -116,8 +118,6 @@ const getFriends = async (): Promise<any> => {
 	try {
 		response = await api.get(`/user/friends`)
 	} catch (error){}
-	console.log(response?.data);
-	
 	return response?.data
 }
 
@@ -126,7 +126,6 @@ const getUsers = async (): Promise<any> => {
 	try {
 		response = await api.get(`/user/everyone/filter`)
 	} catch (error){}
-	console.log(response?.data);
 	return response?.data
 }
 
@@ -155,7 +154,6 @@ export default {
 	genQrcode: genQrcode,
 	changeUserName: changeUserName,
 	uploadFile: uploadFile,
-	getAvatar: getAvatar,
 	changeUserStatus: changeUserStatus,
 	getUserStatus: getUserStatus,
 	getSats: getSats,

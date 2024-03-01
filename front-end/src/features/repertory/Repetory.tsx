@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import userService from '../user/user.service';
 import { friend } from '../Homepage/UserCard';
-import { PlayerStats } from '../../PropsType/Props';
 import UserCardTwo from './UserCardTwo';
 
 const Repertory = () => {
@@ -10,10 +9,10 @@ const Repertory = () => {
 	const [friends, setFriends] = useState<number>(0)
 	
 	useEffect(()=> {
-		const promise1: Promise<PlayerStats> =  userService.getSats();
+		
 		const promise2 =  userService.getUsers();
 
-		Promise.all([promise1, promise2]).then(([res1, res2]) => {
+		Promise.all([promise2]).then(([res2]) => {
 				setUsers(res2);
 				setLoading(false);
 			})

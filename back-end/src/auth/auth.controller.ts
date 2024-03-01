@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, Req, UnauthorizedException, UseGuards, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FTGuard } from './guard/FTGuard';
 import { Public } from './utils/custo.deco';
@@ -6,6 +6,7 @@ import { UsersService } from 'src/user/user.service';
 import { JWTAUthGuard } from './guard/JWTGuard'
 import { log } from 'console';
 import { jwtConstants } from './utils/constant';
+import { TFAcode, TFAcodeTO } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -47,15 +48,15 @@ export class AuthController {
 		return (img)
 	}
 
-	@Post('2fa/turn-on')
-	async turnOnTfa(@Req() req, @Body() body) {
+	@Post('2fa/turn-on') 
+	async turnOnTfa(@Req() req, @Body() body: TFAcodeTO) {
 
 		const isCodeValid = await this.authService.isTFAvalid(
 			body.TFACode,
 			req.user.id
 		)
 		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			throw new BadRequestException('Wrong authentification code');
 		}
 		await this.userService.setTfaOn(req.user.id)
 		return ({ msg: '2FA ON' })
@@ -63,7 +64,6 @@ export class AuthController {
 
 	@Get('2fa/off')
 	async turnOffTfa(@Req() req) {
-		console.log(req.user);
 		await this.userService.setTfaOff(req.user.id);
 		await this.userService.setTfaSecret(req.user.id, "")
 		const token = await this.authService.signin(req.user);
@@ -73,18 +73,23 @@ export class AuthController {
 
 	@Public()
 	@Post('2fa/authenticate')
-	async authenticate(@Req() req, @Body() body) {
-		console.log(body.idFront, typeof body.idFront);
-		const isCodeValid = await this.authService.isTFAvalid(
-			body.TFACode,
-			body.idFront
+	async authenticate(@Req() req, @Body() body: TFAcode) {
+		try {
+			// console.log(body.idFront, typeof body.idFront);
+			const isCodeValid = await this.authService.isTFAvalid(
+				body.TFACode,
+				body.idFront
 			)
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentification code');
+			if (!isCodeValid) {
+				throw new UnauthorizedException('Wrong authentification code');
+			}
+			const user = await this.userService.findUserId(body.idFront)
+			await this.userService.changeStatus(user.id, "online");
+			return await this.authService.signinTFA(user);
+		} catch {
+			throw new BadRequestException('Wrong authentification code');
 		}
-		const user = await this.userService.findUserId(body.idFront)
-		await this.userService.changeStatus(user.id, "online");
-		return await this.authService.signinTFA(user);
+
 	}
 
 	@Get('login')

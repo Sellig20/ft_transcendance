@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect, useRef} from 'react'
-import { ChannelCards } from './componement/ChannelCards';
+import { ChannelCards, ChannelPublic } from './componement/ChannelCards';
 import { PrintChannel } from './componement/PrintChannel';
 import { CreateChannel } from './componement/CreateChannel';
 import { InputMessage } from './componement/InputMessage';
@@ -9,6 +9,7 @@ import chatService from './chat.service'
 
 import { useSelector } from 'react-redux';
 import { Rootstate } from '../../app/store';
+import { toast } from 'react-toastify';
 
 export function Chat() {
 	
@@ -19,37 +20,52 @@ export function Chat() {
 	const inputMessageRef = useRef(null);
 	const inputFriendRef = useRef(null);
 
-
+	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
 	const [channelSelect, setchannelSelect] = useState<any>(); // channel en cours d'affichage
 	const [userinfo, setUserinfo] = useState<any>(null); // info du user connected
+	
 	const userid = useSelector((state: Rootstate) => state.user.id);
 	
 	const reload = (
+		send_to_channel?: number
 	) => {
-		callApi(userid, 0, false)
+		if (send_to_channel === undefined)
+			callApi(userid)
+		else
+		{
+			socket?.emit("RELOAD", {userinfo:userinfo, channelid:send_to_channel})
+			// callApi(userid, 0, false)
+		}
 	}
 
 	const callApi = async (
 		userid: any,
-		newSocket: any,
-		firstcall: boolean
 		) => {
-		await chatService.getUserById(userid).then(userinfo => {
-			setUserinfo(userinfo)
-			console.log("[FROM DB] userinfo:", userinfo)
-			setChannelJoined(userinfo.channel_list)
-			if (firstcall === true)
-				newSocket?.emit("FIRST", {userid:userinfo.id, userinfo:userinfo})
-		});
-		// choper les infos du user connecte
-		// await chatService.findAllInfoInChannelById(1).then(messageChann => setMessageInChannel(messageChann));
+		const userinfo = await chatService.getUserById(userid)
+		if (userinfo === null)
+			return ;
+		setUserinfo(userinfo)
+		console.log("[FROM DB] userinfo:", userinfo)
+		setChannelJoined(userinfo.channel_list)
+		if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
+		{
+			let finded = false
+			userinfo.channel_list.map((element: any) => {
+				if (element.id === channelSelect.id)
+					finded = true
+			})
+			if (finded === false)
+			{
+				setchannelSelect(null)
+			}
+		}
 	}
 	
 	const first = (
 		newSocket: Socket
 	) => {
-		callApi(userid, newSocket, true);
+		callApi(userid);
 		setSocket(newSocket)
 	}
 
@@ -68,13 +84,30 @@ export function Chat() {
 	const send = (
 		value: string
 	) => {
-		// to generate database
-		if (value === "a")
-			socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value,})
-		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, data:value, to:channelSelect.id})
+		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, from_user_name: userinfo.username, data:value, to:channelSelect.id})
 		console.log("value:", value);
 	}
 
+	const reloadListener = async (
+		messageprop: any
+	) => {
+		// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+		// setchannelSelect(messageChann)
+		
+		reload();
+		if (channelSelect === undefined)
+			return ;
+		if (messageprop.channelid === channelSelect.id)
+		{
+			const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
+			if (messageChann === "") //	le channel existe pas
+			{
+				reload();
+				return ;
+			}
+			setchannelSelect(messageChann)
+		}
+	};
 
 	const messageListener = (
 		messageprop: any
@@ -84,10 +117,25 @@ export function Chat() {
 		if (channelSelect.id === messageprop.from_channel)
 		{
 			console.log("msg recu:", messageprop)
-			setMessageSocket(messageprop)
-			setMessageSocket({content: messageprop.data, userId: messageprop.from_user})
+			reload(messageprop.from_channel)
+			// setMessageSocket(messageprop)
+			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
+
+	const firstListener = (
+		messageprop: any
+	) => {
+		console.log("envoie des donnee users au server socket...", userid)
+		socket?.emit("FIRST", {userid:userid})
+	};
+
+	useEffect(() => {
+		socket?.on("FIRST", firstListener)
+		return () => {
+			socket?.off("FIRST", firstListener)
+		}
+	}, [firstListener])
 
 	useEffect(() => {
 		socket?.on("MP", messageListener)
@@ -95,6 +143,13 @@ export function Chat() {
 			socket?.off("MP", messageListener)
 		}
 	}, [messageListener])
+
+	useEffect(() => {
+		socket?.on("RELOAD", reloadListener)
+		return () => {
+			socket?.off("RELOAD", reloadListener)
+		}
+	}, [reloadListener])
 
 
 
@@ -112,66 +167,102 @@ export function Chat() {
 			send(input);
 			inputMessageRef.current.value = "";
 		}
-
-
-		// setUpdated(inputMessageRef.current.value);
-		// // const button: HTMLButtonElement = event.currentTarget;
-		// // setClickedButton(button.name);
-		// // console.log(buttonname);
-		// // console.log(message);
-
 	};
 
 	const handleChannel = async (
-		event: React.MouseEvent<HTMLButtonElement>
+		// event: React.MouseEvent<HTMLButtonElement>
+		channelinfo: any,
 	) => {
-		event.preventDefault();
+		let found;
+		found = false;
 		setMessageSocket([])
-		const id_chann = event.currentTarget.id
-		console.log("clicked on a channel, id_channel =", id_chann);
-		// setchannelSelectInfo() faire requete
-		await chatService.findAllInfoInChannelById(Number(id_chann)).then(messageChann => {
-			if (messageChann === "") //	le channel existe pas
+		console.log("clicked on a channel, id_channel =", channelinfo.id);
+		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
+		if (messageChann === null) //	le channel existe pas
+		{
+			reload();
+			return ;
+		}
+		console.log(messageChann)
+		messageChann.user_list.map((element: any, index:any) => {
+			if (element.id === userid)
 			{
-				reload();
+				found = true
 				return ;
 			}
-			setchannelSelect(messageChann)
-		});
+		})
+		if (found === false) // userid n'est plus dans le channel
+		{
+			reload();
+			toast.error("error acces denied")
+			return ;
+		}
 
+
+		if (messageChann.password === null || messageChann.password === "")
+			setChannelLocked(false)
+		else
+			setChannelLocked(true)
+		setchannelSelect(messageChann)
+	};
+
+	const handleChannelPublic = async (
+		// event: React.MouseEvent<HTMLButtonElement>
+		channelinfo: any,
+	) => {
+		let found;
+		found = false;
+		setMessageSocket([])
+		console.log("clicked on a channel, id_channel =", channelinfo.id);
+		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
+		if (messageChann === null) //	le channel existe pas
+		{
+			reload();
+			return ;
+		}
+		console.log(messageChann)
+		messageChann.user_list.map((element: any, index:any) => {
+			if (element.id === userid)
+			{
+				found = true
+				return ;
+			}
+		})
+		if (found === true) // userid est dans le channel
+		{
+			reload();
+			toast.error("error already joined")
+			return ;
+		}
+		console.log("ccacacacacacacacacacacac")
+		const res3 = await chatService.inviteUserId(channelinfo.id, userid)
+		if (res3 === null)
+		{
+			reload()
+			return ;
+		}
+		reload(channelinfo.id)
+		// if (messageChann.password === null || messageChann.password === "")
+		// 	setChannelLocked(false)
+		// else
+		// 	setChannelLocked(true)
+		// setchannelSelect(messageChann)
 	};
 	
-	const HandleAddFriendButton = (
-		event: React.MouseEvent<HTMLButtonElement>
-	) => {
-		event.preventDefault();
-		if (inputFriendRef.current.value === null)
-			return ;
-
-		const input = inputFriendRef.current.value
-		if (input != "")
-		{
-			console.log("click on friend button, value=", input);
-			inputFriendRef.current.value = "";
-		}
-	};
 	return (
 		<div>
-			<div>
-				<h1>App: CHAT</h1>
-			</div>
-
 			<div className="ps-5 pb-5 pe-5 pt-5 d-flex flex-row">
 				{/* <div id='panel' className='bg-info w-25'> */}
 				<div id='panel' className='w-25'>
-					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo}/>
+					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel} userid={userid}/>
+					<ChannelPublic userid={userid} clickHandler={handleChannelPublic} channelInfo={channelJoined}/>
+					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
 					<div key={1}>
-						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo}/>
-						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef}/>
+						<PrintChannel channelinfo={channelSelect} newMessages={messageSocket} reload={reload} userinfo={userinfo} locked={channelLocked}/>
+						<InputMessage channelinfo={channelSelect} newMessages={messageSocket} buttonHandler={buttonHandler} inputMessageRef={inputMessageRef} locked={channelLocked} setLocked={setChannelLocked}/>
 					</div>
 				</div>
 			</div>

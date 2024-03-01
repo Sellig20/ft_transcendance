@@ -27,7 +27,9 @@ export class AuthService {
 
 		const fakeMatch = Array.from({ length: 25 }, () => ({
 			winnerId: Math.floor(Math.random() * 21),
-			loserId: Math.floor(Math.random() * 21)
+			loserId: Math.floor(Math.random() * 21),
+			loserElo: 400,
+			winnerElo: 400
 		}));
 
 		const fakeUsers = Array.from({ length: 10 }, () => ({
@@ -64,7 +66,6 @@ export class AuthService {
 
 	async signinTFA(user: any) {
 		// console.log('user in tfa signin: ', user);
-		
 		const payload = {
 			username: user.username,
 			sub: user.id,
@@ -80,7 +81,7 @@ export class AuthService {
 
 	async TfaSecretGen(user: any) {
 		const secret = authenticator.generateSecret();
-		const otpauthUrl = authenticator.keyuri('test', 'trans', secret);
+		const otpauthUrl = authenticator.keyuri('transcendence', '42', secret);
 		const hash = encryptService.hash(secret);
 		await this.userservice.setTfaSecret(user.id, hash);
 

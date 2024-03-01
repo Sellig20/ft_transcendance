@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Patch, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Param, ParseIntPipe, BadRequestException, HttpCode } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FrontUserDto, StatsDto } from './UserDto';
 import hashService from '../auth/utils/hash'
@@ -43,7 +43,6 @@ export class UserController {
 	async changeUserName(@Req() req, @Body() nameDto: NameDto) {
 		const user = req.user;
 		await this.userservice.changeName(user.id, nameDto.username);
-		console.log(nameDto);
 		
 		return nameDto.username
 	}
@@ -74,15 +73,28 @@ export class UserController {
 	@Get('/ava:id')
 	async serveAvatarById(@Param('id', ParseIntPipe) id, @Res() res: Response) {
 		const img_name = await this.userservice.myAvatar(id);
-		const imagePath = path.resolve("/app/avatar", img_name)
-		return res.sendFile(imagePath);
+		if (img_name === "placeholder")
+			return res.status(204).send(null);
+		try {
+			const imagePath = path.resolve("/app/avatar", img_name)
+			return res.sendFile(imagePath);
+		} catch {
+			throw new BadRequestException("error in find img path");
+		}
 	}
 
 	@Get('/myavatar')
-	async serveMyAvatar(@Req() req,  @Res() res: Response){
+	async serveMyAvatar(@Req() req, @Res() res: Response) {
 		const img_name = await this.userservice.myAvatar(req.user.id)
-		const imagePath = path.resolve("/app/avatar", img_name)
-		return res.sendFile(imagePath);
+		if (img_name === "placeholder") {
+			return res.status(204).send(null);
+		}
+		try {
+			const imagePath = path.resolve("/app/avatar", img_name);
+			return res.sendFile(imagePath);
+		} catch {
+			throw new BadRequestException("error in find img path");
+		}
 	}
 
 	@Get('/status:id')
@@ -98,19 +110,6 @@ export class UserController {
 			
 		const result = await this.userservice.changeStatus(req.user.id, body.status)
 		return result
-	}
-
-	@Public()
-	@Get('/cipher')
-	async hello() {
-		let normalString = 'bonjour'
-		console.log('on va cipher: ', normalString);
-		normalString = await hashService.hash(normalString);
-		console.log('string cryptee: ', normalString);
-		normalString = await hashService.decipher(normalString);
-		console.log('string decryptee: ', normalString);
-		
-		return { msg: 'yep yep' };
 	}
 
 	@Get('/stats:id')

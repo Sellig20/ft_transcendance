@@ -43,6 +43,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         // const index = this.userArray.indexOf(item);
     }
 
+    
     private async removeUser(idsocket: string): Promise<void> {
         if (this.userArray.length !== 0)
         {
@@ -50,31 +51,43 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
             this.userArray.map((item, index) => {
                 // console.log("[DEBUGGG] LISTE DES SOCKET DANS USER_ARRAY", item.idsocket)
                 if(idsocket === item.idsocket)
-                    indexx = index
-            })
-            // console.log("[DEBUGGG] INDEX A VIRER", indexx)
-            if(indexx !== -1)
-            {
-                // console.log(`[REMOVE USER LIST] SOCKET ID: ${idsocket} ${this.userArray[indexx].iduser}`);
-                // await this.chatService.findSocketUserById(Number(this.userArray[indexx].iduser)).then(res => {
+                indexx = index
+        })
+        // console.log("[DEBUGGG] INDEX A VIRER", indexx)
+        if(indexx !== -1)
+        {
+            // console.log(`[REMOVE USER LIST] SOCKET ID: ${idsocket} ${this.userArray[indexx].iduser}`);
+            // await this.chatService.findSocketUserById(Number(this.userArray[indexx].iduser)).then(res => {
                 //     let list_socket = res.socket
                 //     list_socket.map((item, index) => {
-                //         // console.log(item, index)
-                //         if (item === idsocket)
-                //         list_socket.splice(index, 1)
-                //     })
-                //     // console.log(list_socket)
-                //     this.chatService.setSocketUserById(Number(this.userArray[indexx].iduser), list_socket)
-                this.userArray.splice(indexx, 1);
-                // })
+                    //         // console.log(item, index)
+                    //         if (item === idsocket)
+                    //         list_socket.splice(index, 1)
+                    //     })
+                    //     // console.log(list_socket)
+                    //     this.chatService.setSocketUserById(Number(this.userArray[indexx].iduser), list_socket)
+                    this.userArray.splice(indexx, 1);
+                    // })
+                }
             }
-        }
+    }
+    
+    private async isMutedInChannel(userId: string, idChannel:number) : Promise<boolean> {
+        let muted = await this.chatService.getMutedUserInChannelById(idChannel)
+        let time_now = Date.now()
+        if (muted.muted === null)
+            return false;
+        if (muted.muted[userId] === undefined)
+            return false
+        if (time_now < muted.muted[userId])
+            return (true);
+        return (false)
     }
 
     // cherche tout les socket du channel
     async findSocketChannels(channel_id: number) {
         let liste_socket = []
-        await this.chatService.findAllSocketOnChannelByIdChannel(channel_id).then(res => {
+        let res = await this.chatService.findAllSocketOnChannelByIdChannel(channel_id)
             const liste = res.user_list
             liste.map((item, index) => {
                 // console.log(item.socket)
@@ -82,51 +95,44 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
             })
             // console.log(liste_socket)
             // return (liste_socket)
-        })
         return (liste_socket)
     }
     
     async handleConnection(client: Socket, ...args: any[]) {
         console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
-        // this.addUser(client.id);
-        // this.printAllUser(this.userArray);
-
-        // ajout du socket a la table user
-        // await this.chatService.setSocket(id du user connecte, client.id)
-        // await this.chatService.setSocket(1, client.id)
+        this.server.to(client.id).emit("FIRST", {msg:"who are you"})
     }
 
     async handleDisconnect(client: Socket){
         console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
         this.removeUser(client.id);
         this.printAllUser(this.userArray);
-        // await this.chatService.setSocket(1, null)
+        // emit la question de qui tu es ??????
     }
 
 
     @SubscribeMessage('MP')
-    async handleMessage(client: any, message: any) {
-        if (message.data === "a")
-        {
-            // this.server.to(this.userArray[0]).emit("MP", "ca marche");
-            console.log("---create test database---")
-            await this.chatService.createTest();
-        }
-        else
-        {
-            console.log(client.name)
-            console.log("from_socket:", message.from_socket, "-->", message.data, ", to:", message.to);
-            // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
-            // this.server.to(message.recipient).emit("MP", message.data);
-            
-            await this.findSocketChannels(message.to).then(res => {
-                res.map((item, index) => {
-                    // console.log("envoie de '", message.data, "' to socketid :", item)
-                    this.server.to(item).emit("MP", {from_channel: message.to, from_user:message.from_user, data:message.data});
-                })
-                this.chatService.createMessage(message.data, message.from_user, message.to)
-            })
-        }
+    async handleMessage(client: any, message: any)
+    {
+        // console.log(client.name)
+        // console.log(message)
+        console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
+        // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
+        // this.server.to(message.recipient).emit("MP", message.data);
+        
+        let res = await this.findSocketChannels(message.to)
+        res.map((item, index) => {
+            // console.log("envoie de '", message.data, "' to socketid :", item)
+            this.server.to(item).emit("MP", {
+                from_channel: message.to,
+                from_user:message.from_user,
+                from_user_name:message.from_user_name,
+                data:message.data
+            });
+        })
+        const isMutedNow = await this.isMutedInChannel(message.from_user, message.to)
+        if (isMutedNow === false)
+            this.chatService.createMessage(message.data, message.from_user, message.to, message.from_user_name)
     }
 
     @SubscribeMessage('FIRST')
@@ -137,4 +143,25 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
         this.addUser(message.userid, client.id);
         this.printAllUser(this.userArray);
     }
+
+    @SubscribeMessage('RELOAD')
+    async handleReload(client: any, message: any) {
+        console.log("reload all the user", message.channelid)
+        // await this.findSocketChannels(message.channelid).then(res => {
+        //     res.map((item, index) => {
+        //         // console.log("envoie de '", message.data, "' to socketid :", item)
+        //         this.server.to(item).emit("RELOAD", {
+        //             channelid: message.channelid
+        //         });
+        //     })
+        // })
+        
+        // this.userArray.map((item, index) => {
+            // console.log("envoie de '", message.data, "' to socketid :", item)
+            this.server.emit("RELOAD", {
+                channelid: message.channelid
+            });
+        // })
+    }
+
 }

@@ -21,22 +21,16 @@ const UserPage = () => {
 	useEffect(() => {
 		if (!id)
 			navigate('/home');
-		const promise1: Promise<PlayerStats> = userService.getSatsPlayer(id); // a changer pour avoir le username
-		const promise2 = userService.getMatch(id);//
+		const promise1: Promise<PlayerStats> = userService.getSatsPlayer(id);
+		const promise2 = userService.getMatch(id);
 		const promise3 = userService.getAvatarById(id);
 
 		Promise.all([promise1, promise2, promise3]).then(([stats, matchs, img]) => {
-			console.log(stats);
-			console.log(matchs);
-			console.log(img);
-
 			let url;
 			if (!img)
 				url = "/avatarDefault.png"
 			else
 				url = URL.createObjectURL(new Blob([img]));
-			console.log(url);
-
 			setStats(stats);
 			setMatch(matchs);
 			setAvatar(url)
