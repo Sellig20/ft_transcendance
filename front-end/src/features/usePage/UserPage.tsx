@@ -44,7 +44,7 @@ const UserPage = () => {
 				URL.revokeObjectURL(avatar);
 			}
 		}
-		}, [])
+	}, [])
 
 	if (loading) {
 		return (
@@ -70,6 +70,9 @@ const UserPage = () => {
 									<th scope="col">#</th>
 									<th scope="col">Winner</th>
 									<th scope="col">Loser</th>
+									<th scope="col">Welo</th>
+									<th scope="col">vs</th>
+									<th scope="col">Lelo</th>
 									<th scope="col">*</th>
 								</tr>
 							</thead>
@@ -84,9 +87,9 @@ const UserPage = () => {
 
 					</div>
 					<div className="col">
-				<div className="row justify-content-center">
-					<img src={avatar} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
-				</div>
+						<div className="row justify-content-center">
+							<img src={avatar} style={{ maxWidth: '150px' }} className="rounded float-end mt-3 img-thumbnail" alt="..."></img>
+						</div>
 						<Stats stats={stats} />
 					</div>
 				</div>

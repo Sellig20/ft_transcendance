@@ -16,6 +16,8 @@ export enum GameStatus {
 export class GameStateFD {
 
     status: GameStatus;
+
+    mapChoiceLocked: number;
     
     boardWidth: number = 500;
     boardHeight: number = 500;

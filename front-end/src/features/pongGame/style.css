@@ -1,49 +1,98 @@
+
+.PG {
+  background-color: #9932CC;
+  color: #7B68EE;
+  text-align: center;
+  font-family:'Press Start 2P', sans-serif;
+  font-size: 12px;
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+}
+
+.QG {
+  background-color: #9932CC;
+  color: #7B68EE;
+  text-align: center;
+  font-family:'Press Start 2P', sans-serif;
+  font-size: 12px;
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+}
+
+.SG {
+  background-color: #9932CC;
+  color: #7B68EE;
+  align-items: center;
+  font-family:'Press Start 2P', sans-serif;
+  font-size: 12px;
+  /* justify-content: center; */
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 150px;
+  padding: 120px;
+}
+
+/* p {
+  font-size: 20px;
+  padding: 60px;
+} */
+
+.jumbotron {
+}
+
+#board {
+  height: 100%;
+  width: 100%;
+}
+
 .buttonGame {
-    display: inline-block;
-    background-color: #7b38d8;
-    border-radius: 10px;
-    border: 4px double #cccccc;
-    color: #eeeeee;
-    text-align: center;
-    font-size: 15px;
-    padding: 20px;
-    width: 200px;
-    transition: all 0.5s;
-    cursor: pointer;
-    margin: 5px;
-  }
+  display: inline-block;
+  background-color: #7b38d8;
+  border-radius: 10px;
+  border: 4px double #cccccc;
+  color: #eeeeee;
+  text-align: center;
+  font-size: 15px;
+  padding: 35px;
+  width: 350px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
   
 .buttonGame span {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    transition: 0.5s;
-  }
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
   
 .buttonGame span:after {
-    content: "\00bb";
-    position: absolute;
-    opacity: 0;
-    top: 0;
-    right: -20px;
-    transition: 0.5s;
-  }
+  content: "\00bb";
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
   
 .buttonGame:hover {
-    background-color: #f7c2f9;
-  }
+  background-color: #f7c2f9;
+}
   
 .buttonGame:hover span {
-    padding-right: 25px;
-  }
-  
-.buttonGame:hover span:after {
-    opacity: 1;
-    right: 0;
-  }
+  padding-right: 25px;
+}
 
-body {
-  text-align: center;
+.buttonGame:hover span:after {
+  opacity: 1;
+  right: 0;
 }
 
 #board {
@@ -52,15 +101,45 @@ body {
   border-bottom: 5px solid #9966ff;
 }
 
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: grey;
-}
-
 .button-container {
   margin-top: 20px;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+.loading-dot {
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+  background-color:#7B68EE;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite;
+}
+
+body {
+  text-align: center;
+}
+
+#board2 {
+  font-family: Arial;
+  background-color: rgb(219, 29, 156);
+  border-top: 5px solid #6495ed;
+  border-bottom: 5px solid #6495ed;
 }

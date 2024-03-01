@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState, useRef } from "react"
-import { WebsocketContext } from "../contexts/WebsocketContext"
 import { GameStateFD, GameStatus } from "./GameStateFD";
 import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { Rootstate } from "../../app/store";
+    
+export const WebSocketSG = ({ socket}) => {
 
-export const WebsocketSG = () => {
-
-    const socket = useContext(WebsocketContext);
+    const userid = useSelector((state: Rootstate) => state.user.id);
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
     const navigate = useNavigate();
@@ -18,35 +20,27 @@ export const WebsocketSG = () => {
         gameState.player2Score = scoreP2;
     }
 
-    const displayScore = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#9900ff';
-        context.font = '40px "Press Start 2P", sans-serif';
-        context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
-        context.fillText(gameState.player2Score.toString(), gameState.boardWidth * 4 / 5 - 45, 45);
-    }
-
-    const displayLine = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = '#a35ce6';
-        context.font = '55px "Press Start 2P", sans-serif';
-        for (let i = 10; i < board.height; i += 25) {
-                context.fillRect(board.width / 2 - 10, i, 5, 5);
-            }
-    }
-
+    
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = '#9900ff';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '45 px #7CFC00';
+        else
+            context.fillStyle = '#9900ff';
         context.font = '35px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('CONGRATS YOU WON', board.width / 2, board.height / 2);
     }
-
+    
     const displayFailGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        context.fillStyle = '#9900ff';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '45 px #00BFFF';
+        else
+            context.fillStyle = '#9900ff';
         context.font = '50px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
     }
-
+    
     const partyAbandon = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         if (gameState.player1Abandon === true || gameState.player2Abandon === true)
         {
@@ -61,15 +55,21 @@ export const WebsocketSG = () => {
     
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         context.strokeStyle = 'rgb(190, 154, 240)';
-        context.fillStyle = '65 px #a300e6';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '45 px #1E90FF';
+        else
+            context.fillStyle = '65 px #a300e6';
         context.font = '20px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('YOU GAVE UP', board.width / 2, board.height / 2);
     }
-
+    
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         context.strokeStyle = 'rgb(190, 154, 240)';
-        context.fillStyle =  '45 px #a300e6';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '45 px #FF1493';
+        else
+            context.fillStyle =  '45 px #a300e6';
         context.font = '20px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('ABANDON OF YOUR OPPONENT', board.width / 2, board.height / 2);
@@ -85,7 +85,7 @@ export const WebsocketSG = () => {
             return board;
         }
     }
-
+    
     const createContextCanvas = (board: HTMLCanvasElement) => {
         const context = board.getContext('2d');
         if (context) {
@@ -94,30 +94,63 @@ export const WebsocketSG = () => {
         }
         return null;
     }
-
-    const drawBall = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#cc00ff';
-        context.fillRect(gameState.ball.x, gameState.ball.y, gameState.ball.width, gameState.ball.height);
-        context.fill();
-    }
-
+    
     const ballAgainstPaddle = (velX: number, velY: number) => {
         gameState.ball.velocityX = velX;
         gameState.ball.velocityY = velY;
     }//collisionBall detecting aingsnt machin evenement
-
+    
     const ballAgainstBorder = (velY: number) => {
         gameState.ball.velocityY = velY;
     }//borderCollision detecting borderevenemt
 
+    const displayScore = (context: CanvasRenderingContext2D) => {
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '#FF8C00';
+        else
+            context.fillStyle = '#9900ff';
+        context.font = '40px "Press Start 2P", sans-serif';
+        context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
+        context.fillText(gameState.player2Score.toString(), gameState.boardWidth * 4 / 5 - 45, 45);
+    }
+
+    const displayLine = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '#FF8C00';
+        else
+            context.fillStyle = '#9900ff';
+        context.font = '55px "Press Start 2P", sans-serif';
+        for (let i = 10; i < board.height; i += 25) {
+            context.fillRect(board.width / 2 - 10, i, 5, 5);
+        }
+    }
+    
+    const drawBall = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '#FFFF00';
+        else
+            context.fillStyle = '#9932CC';
+        context.beginPath();
+        context.fillRect(gameState.ball.x, gameState.ball.y, gameState.ball.width, gameState.ball.height);
+        context.fill();
+    }
+    
     const drawPaddle1 = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#9900ff';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '#FF8C00';
+        else
+            context.fillStyle = '#9932CC';
+        context.beginPath();
         context.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.paddle1.width, gameState.paddle1.height);
         context.fill();
     }
 
     const drawPaddle2 = (context: CanvasRenderingContext2D) => {
-        context.fillStyle = '#9900ff';
+        if (gameState.mapChoiceLocked === 2)
+            context.fillStyle = '#FF8C00';
+        else
+            context.fillStyle = '#9932CC';
+        context.beginPath();
         context.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.paddle2.width, gameState.paddle2.height);
         context.fill();
     }
@@ -135,6 +168,7 @@ export const WebsocketSG = () => {
         gameState.paddle2.y = y;
     }
 
+    let time = 0;
     const update = () => {
         const board = createBoardGame();
         if (board) {
@@ -142,7 +176,14 @@ export const WebsocketSG = () => {
             if (context) {
                 context.clearRect(0, 0, board.width, board.height);// Efface le contenu du canvas
                 context.fillStyle = '#9900ff';
+                if (gameState.mapChoiceLocked === 2) {
+                    drawWaves(time, context);
+                }
                 displayScore(context);
+                drawPaddle1(context);
+                displayLine(context, board);
+                drawPaddle2(context);
+                drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
                     gameState.status === GameStatus.finishedGame;
@@ -157,10 +198,7 @@ export const WebsocketSG = () => {
                     // alert("Vous allez être redirigé dans quelques secondes...");
                     setTimeout(getBack, 3000);
                 }
-                drawPaddle1(context);
-                drawPaddle2(context);
-                drawBall(context);
-                displayLine(context, board);
+                time += 0.5;
                 requestAnimationFrame(update);
             }
         }
@@ -173,6 +211,32 @@ export const WebsocketSG = () => {
     const getBack = () => {
         navigate('../')
     }
+
+    const drawWaves = (time: number, context: CanvasRenderingContext2D) => {
+
+        const waveColors = ['#ff6347', '#6495ed', '#00ced1', '#ff69b4', '#32cd32'];
+
+        for (let i = 0; i < waveColors.length; i++) {
+          const offset = i * 20;
+          context.fillStyle = waveColors[i];
+          context.beginPath();
+        //   context.fillStyle = "black";
+  
+          for (let x = 0; x < gameState.boardWidth; x += 10) {
+            const y = Math.sin((x + time + offset) * 0.01) * 50 + gameState.boardHeight / 2;
+            context.lineTo(x, y);
+          }
+          
+        context.lineTo(gameState.boardWidth, gameState.boardHeight);
+        context.lineTo(0, gameState.boardHeight);
+        context.closePath();
+        // context.globalAlpha = 0.5;
+
+        context.fill();
+
+        // context.globalAlpha = 1.0;
+        }
+    };
 
     useEffect(() => {
         ////////////// LOOP FOR FRONTEND /////////////////////////
@@ -199,37 +263,37 @@ export const WebsocketSG = () => {
         socket.on('disconnect', handleDisconnect);
         ///////////////////// SERVEUR RENVOIE donc le FRONTEND ECOUTE : ////////////////////////////
         socket.on('initplayer1', (y: number, idGame: string) => {
-            console.log("paddle 1 y : ", y);
             initiatePaddle1(y, idGame);
         })
 
         socket.on('initplayer2', (y: number, idGame: string) => {
-            console.log("paddle 2 y : ", y);
             initiatePaddle2(y, idGame);
         })
 
         socket.on('ballIsMovingX', (x: number, y: number, idGame: string) => {
-            console.log("ball x : ", x, " | ball y :", y);
             initiateBallX(x, y, idGame);
         })
 
         socket.on('updateScoreP1', (scoreP1: number) => {
-            console.log(" update socre player 1 : ", scoreP1);
             updateScorePlayer1(scoreP1);
         })
 
         socket.on('updateScoreP2', (scoreP2: number) => {
-            console.log(" update socre player 1 : ", scoreP2);
             updateScorePlayer2(scoreP2);
         })
 
-        socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
-            ballAgainstPaddle(velX, velY);
-        })//detecting Ball agaist paddles
+        socket.on('choiceMap', (mapChoice: number) => {
+            console.log("He choosed ", mapChoice);
+            gameState.mapChoiceLocked = mapChoice;
+        })
 
-        socket.on('detectBorder', (velY: number) => {
-            ballAgainstBorder(velY);
-        })//detecting Ball against border wall
+        // socket.on('detectCollisionW/Paddle', (velX: number, velY: number) => {
+        //     ballAgainstPaddle(velX, velY);
+        // })//detecting Ball agaist paddles
+
+        // socket.on('detectBorder', (velY: number) => {
+        //     ballAgainstBorder(velY);
+        // })//detecting Ball against border wall
 
         socket.on('winner', (name: string) => {
             if (name === "one")
@@ -294,27 +358,28 @@ export const WebsocketSG = () => {
             socket.off('detectBorder');
             socket.off('winnerIs');
             socket.off('congrats');
-            // clearInterval(idInterval);
             cancelAnimationFrame(animationId);
         }
     }, [update]);
     
     return (
-        <div className="page-container">
-             <link
+        <div>
+            <link
                 rel="stylesheet"
                 href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-            />
-            <div className="game-container">
-                <canvas id="board"></canvas>
-            </div>
-            <div className="button-container">
-                <button className="buttonGame" onClick={handleAbandon}>
-                    <span>Abandon Game</span>
-                </button>
-            </div>
-    </div>
-  );
+                />
+                <div className="SG mt-4">
+                    <div className="jumbotron mt-4">
+                        <canvas id="board">
+                        </canvas>
+                        <div className="row">
+                            <button className="buttonGame" onClick={handleAbandon}>
+                                <span>Abandon Game</span></button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    );
 }
 
-export default WebsocketSG;
+export default WebSocketSG;

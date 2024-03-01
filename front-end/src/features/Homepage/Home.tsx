@@ -79,6 +79,9 @@ const Home = () => {
 									<th scope="col">#</th>
 									<th scope="col">Winner</th>
 									<th scope="col">Loser</th>
+									<th scope="col">Welo</th>
+									<th scope="col">vs</th>
+									<th scope="col">Lelo</th>
 									<th scope="col">*</th>
 								</tr>
 							</thead>
