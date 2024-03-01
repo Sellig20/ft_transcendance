@@ -7,7 +7,7 @@ import { UsersService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as path from 'path';
-import { IdDto, NameDto } from './dto/user.dto';
+import { IdDto, NameDto, StatusDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -106,8 +106,8 @@ export class UserController {
 	}
 
 	@Patch('/changeStatus')
-	async changeStatus(@Req() req, @Body() body) {
-			
+	async changeStatus(@Req() req, @Body() body: StatusDto) {
+		console.log('status', body)
 		const result = await this.userservice.changeStatus(req.user.id, body.status)
 		return result
 	}

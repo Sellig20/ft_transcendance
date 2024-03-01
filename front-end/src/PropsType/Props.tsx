@@ -23,6 +23,9 @@ export interface Matchs {
 	endTime: string | null;
 	winnerId: number;
 	loserId: number;
+	
 	winnerName: string;
 	loserName: string;
+	loserElo: number;
+	winnerElo: number;
 }

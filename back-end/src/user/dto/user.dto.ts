@@ -13,3 +13,10 @@ export class IdDto {
   @IsNotEmpty()
   id: number;
 }
+
+export class StatusDto {
+
+  @IsString()
+  @IsNotEmpty()
+  status: string;
+}
