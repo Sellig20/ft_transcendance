@@ -4,7 +4,7 @@
   color: #7B68EE;
   text-align: center;
   font-family:'Press Start 2P', sans-serif;
-  font-size: 12px;
+  font-size: 20px;
   /* height: 100vh; */
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
   color: #7B68EE;
   text-align: center;
   font-family:'Press Start 2P', sans-serif;
-  font-size: 12px;
+  font-size: 20px;
   /* height: 100vh; */
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@
   color: #7B68EE;
   align-items: center;
   font-family:'Press Start 2P', sans-serif;
-  font-size: 12px;
+  font-size: 20px;
   /* justify-content: center; */
   /* height: 100vh; */
   display: flex;
@@ -34,16 +34,19 @@
 }
 
 h1 {
-  font-size: 150px;
+  font-size: 190px;
   padding: 120px;
 }
 
-/* p {
-  font-size: 20px;
-  padding: 60px;
-} */
+.myGameText {
+  color: white;
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 13px;
+  padding: 100px;
+}
 
-.jumbotron {
+.myGameSelection {
+
 }
 
 #board {

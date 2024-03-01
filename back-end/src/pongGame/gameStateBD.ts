@@ -75,7 +75,7 @@ export class GameStateBD {
       velocityX: 1,
       velocityY: 2,
       color: "purple",
-      speed: 3,
+      speed: 2,
     };
   }
   export interface PaddleType {
@@ -101,6 +101,7 @@ export class GameStateBD {
     status: playerStatus;
     level: number;
     // userid: number;
+    map: number;
   }
   
   

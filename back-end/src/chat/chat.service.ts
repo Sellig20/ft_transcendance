@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ForbiddenException, BadRequestException } from '@nestjs/common';
+import { connect } from 'http2';
 
 // This should be a real class/interface representing a user entity
 export type User = any;
@@ -12,146 +13,222 @@ export class ChatService {
 	constructor(private prisma: PrismaService) { }
 	
 	async findUserById(userID: number) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				id: userID,
-			},
-			select: {
-				channel_list: {select: {
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userID,
+				},
+				select: {
+					channel_list: {select: {
+						id: true,
+						name: true,
+						personal: true,
+						password: true,
+						public: true,
+						user_list : {select :{
+							id: true,
+							username: true
+						}}
+	
+					}},
+					friends: true,
+					createAt: true,
+					username: true,
 					id: true,
-					name: true,
-					personal: true,
-					password: true,
-					public: true
-
-				}},
-				friends: true,
-				createAt: true,
-				username: true,
-				id: true,
-				blocked_user: true
+					blocked_user: true
+				}
+			})
+			if (user === null)
+			{
+				throw new BadRequestException("error while user not found", {
+					cause: new Error(),
+					description: "error while user not found",
+				});
 			}
-		})
-		return user;
+			return user;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async findSocketUserById(userID: number) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				id: userID,
-			},
-			select: {
-				socket: true
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userID,
+				},
+				select: {
+					socket: true
+				}
+			})
+			if (user === null)
+			{
+				throw new BadRequestException("error while socket not found", {
+					cause: new Error(),
+					description: "error while socket not found",
+				});
 			}
-		})
-		return user;
+			return user;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async setSocket(userID: number, socketToUp: string) {
-		await this.prisma.user.update({
-			where: {
-				id: userID
-			},
-			data: {
-				socket: {
-					push: socketToUp
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID
+				},
+				data: {
+					socket: {
+						push: socketToUp
+					}
 				}
-			}
-		})
+			})
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async setSocketUserById(userID: any, socketToUp: any) {
-		await this.prisma.user.update({
-			where: {
-				id: userID
-			},
-			data: {
-				socket: socketToUp
-			}
-		})
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID
+				},
+				data: {
+					socket: socketToUp
+				}
+			})
+		} catch (error) {
+			throw error
+		}
 	}
-	
+
 	async findAllInfoInChannelById(channelId: number)
 	{
-		const channel = await this.prisma.channel.findFirst({
-			where: {
-				id: channelId
-			},
-			select : {
-				id: true,
-				name: true,
-				messages: true,
-				personal: true,
-				public: true,
-				admins: true,
-				banned: true,
-				owner: true,
-				muted: true,
-				password: true,
-				user_list: {select: {
+		try {
+			const channel = await this.prisma.channel.findFirst({
+				where: {
+					id: channelId
+				},
+				select : {
 					id: true,
-					username: true,
-					friends: true,
-					socket: true,
-					blocked_user: true,
-
-				}}
+					name: true,
+					messages: true,
+					personal: true,
+					public: true,
+					admins: true,
+					banned: true,
+					owner: true,
+					muted: true,
+					password: true,
+					user_list: {select: {
+						id: true,
+						username: true,
+						friends: true,
+						socket: true,
+						blocked_user: true,
+	
+					}}
+				}
+	
+			})
+			if (channel === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
 			}
-
-		})
-		return channel;
+			return channel;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async findAllChannelJoinedByIdUser(userId: number)
 	{
-		const channels = await this.prisma.user.findMany({
-			where: {
-				id: userId
-			},
-			select : {
-				channel_list: {select: {
-					id: true,
-					name: true,
-					personal: true,
-					public: true,
-					banned: true,
-					password: true
-				}}
+		try {
+			const channels = await this.prisma.user.findMany({
+				where: {
+					id: userId
+				},
+				select : {
+					channel_list: {select: {
+						id: true,
+						name: true,
+						personal: true,
+						public: true,
+						banned: true,
+						password: true,
+						user_list: {select: {
+							id: true,
+							username: true,
+							friends: true,
+							blocked_user: true,
+						}}
+					}
+				}
+	
+			}})
+			if (channels === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
 			}
-
-		})
-		return channels;
+			return channels;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async findAllSocketOnChannelByIdChannel(channelId: number)
 	{
-		const channels = await this.prisma.channel.findFirst({
-			where: {
-				id: channelId
-			},
-			select : {
-				user_list: {select: {
-					id: true,
-					username: true,
-					socket: true,
-				}}
+		try {
+			const channels = await this.prisma.channel.findFirst({
+				where: {
+					id: channelId
+				},
+				select : {
+					user_list: {select: {
+						id: true,
+						username: true,
+						socket: true,
+					}}
+				}
+			})
+			if (channels === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
 			}
-
-		})
-		return channels;
+			return channels;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async createMessage(content: string, idUser: number, idChannel: number, sender_name: string)
 	{
-		await this.prisma.message.create({
-			data: {
-				content: content,
-				sender: {connect: {id:idUser}},
-				recipient: {connect: {id:idChannel}},
-				sender_name : sender_name
-			},
-
-		})
+		try {
+			await this.prisma.message.create({
+				data: {
+					content: content,
+					sender: {connect: {id:idUser}},
+					recipient: {connect: {id:idChannel}},
+					sender_name : sender_name
+				},
+	
+			})
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async createChannel(
@@ -162,67 +239,94 @@ export class ChatService {
 		password: string
 	)
 	{
-		const res = await this.prisma.channel.create({
-			data: {
-				name: name,
-				password: password,
-				personal: isPersonal,
-				public: isPublic,
-				user_list: {connect: [{id:idUser}]},
-				owner: idUser,
-			},
-
-		})
-		return res;
+		try {
+			const res = await this.prisma.channel.create({
+				data: {
+					name: name,
+					password: password,
+					personal: isPersonal,
+					public: isPublic,
+					user_list: {connect: [{id:idUser}]},
+					owner: idUser,
+				},
+	
+			})
+			return res;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async leaveChannelById(userID: number, channelID: number) {
-		await this.prisma.user.update({
-			where: {
-				id: userID
-			},
-			data: {
-				channel_list: {disconnect: [{id:channelID}]}
-			}
-		})
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID
+				},
+				data: {
+					channel_list: {disconnect: [{id:channelID}]}
+				}
+			})
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async addBannedUser(userId: number, channelID: number) {
-		await this.prisma.channel.update({
-			where: {
-				id: channelID
-			},
-			data: {
-				banned: {
-					push: [userId]
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelID
+				},
+				data: {
+					banned: {
+						push: [userId]
+					}
 				}
-			}
-		})
+			})
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async blockUserById(userId: number, userToBlock: number) {
-		await this.prisma.user.update({
-			where: {
-				id: userId
-			},
-			data: {
-				blocked_user: {
-					push: [userToBlock]
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					blocked_user: {
+						push: [userToBlock]
+					}
 				}
-			}
-		})
+			})
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async getblockedUserById(userId: number) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				id: userId
-			},
-			select: {
-				blocked_user: true,
-			},
-		})
-		return user;
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userId
+				},
+				select: {
+					blocked_user: true,
+				},
+			})
+			if (user === null)
+			{
+				throw new BadRequestException("error while user not found", {
+					cause: new Error(),
+					description: "error while user not found",
+				});
+			}
+			return user;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async setAdminById(channelId: number, userToSet: number) {
@@ -238,23 +342,31 @@ export class ChatService {
 				}
 			})
 		} catch (error) {
-			throw new BadRequestException("error while set admin", {
-				cause: new Error(),
-				description: "error while set admin",
-			});
+			throw error
 		}
 	}
 
 	async getAdminInChannelById(channelId: number) {
-		const user = await this.prisma.channel.findFirst({
-			where: {
-				id: channelId
-			},
-			select: {
-				admins: true,
-			},
-		})
-		return user;
+		try {
+			const channel = await this.prisma.channel.findFirst({
+				where: {
+					id: channelId
+				},
+				select: {
+					admins: true,
+				},
+			})
+			if (channel === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
+			return channel;
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async getMutedUserInChannelById(channelId: number) {
@@ -267,12 +379,16 @@ export class ChatService {
 					muted: true,
 				}
 			})
+			if (channel === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
 			return (channel)
 		} catch (error) {
-			throw new BadRequestException("error while set admin", {
-				cause: new Error(),
-				description: "error while set admin",
-			});
+			throw error
 		}
 	}
 
@@ -287,112 +403,137 @@ export class ChatService {
 				}
 			})
 		} catch (error) {
-			throw new BadRequestException("error while mute user", {
-				cause: new Error(),
-				description: "error while mute user",
-			});
+			throw error
 		}
 	}
 
-// ---------------------- TEST FUNCTION -------------------------
-
-	async createTest() {
-		const user1: User = await this.prisma.user.create({
-			data: {
-				username: 'robin',
-				email: 'mail1',
-			},
-		})
-
-		const user2: User = await this.prisma.user.create({
-			data: {
-				username: 'louis',
-				email: 'mail2',
-			},
-		})
-
-		const user3: User = await this.prisma.user.create({
-			data: {
-				username: 'jeanne',
-				email: 'mail3',
-			},
-		})
-
-		const channel1: User = await this.prisma.channel.create({
-			data: {
-				name: 'channel1',
-				personal: false,
-				user_list: {connect: [{id:1}, {id:2}, {id:3}]}
-				// user_list: {connect: {id:1}}
-			},
-		})
-
-		const channel2: User = await this.prisma.channel.create({
-			data: {
-				name: 'channel2',
-				personal: true,
-				user_list: {connect: [{id:1}, {id:2}]}
-			},
-		})
-
-		const message1: User = await this.prisma.message.create({
-			data: {
-				content: 'content_message1',
-				sender: {connect: {id:1}},
-				recipient: {connect: {id:2}}
-			},
-		})
-
-		const message2: User = await this.prisma.message.create({
-			data: {
-				content: 'content_message2',
-				sender: {connect: {id:2}},
-				recipient: {connect: {id:2}}
-			},
-		})
-
-		const message3: User = await this.prisma.message.create({
-			data: {
-				content: 'content_message3',
-				sender: {connect: {id:1}},
-				recipient: {connect: {id:1}}
-			},
-		})
-
-		const message4: User = await this.prisma.message.create({
-			data: {
-				content: 'content_message4',
-				sender: {connect: {id:2}},
-				recipient: {connect: {id:1}}
-			},
-		})
-
-		const message5: User = await this.prisma.message.create({
-			data: {
-				content: 'content_message5',
-				sender: {connect: {id:3}},
-				recipient: {connect: {id:1}}
-			},
-		})
-
-		const setfriendship1: User = await this.prisma.user.update({
-			where: {id: 1},
-			data: {
-				friends: {
-					push: [2]
+	async connectUserToChannel(userid: number, channelid: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					user_list: {connect: {id:userid}}
 				}
-			}
-		})
+			})
+		} catch (error) {
+			throw error
+		}
+	}
 
-		const setfriendship2: User = await this.prisma.user.update({
-			where: {id: 2},
-			data: {
-				friends: {
-					push: [1]
+	async setOwner(channelid: number, userid: number) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					owner: {set: userid}
 				}
-			}
-		})
-		
+			})
+		} catch (error) {
+			throw error
+		}
+	}
 
+	async getUserIdByUsername(username: string) {
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: {
+					username: username
+				},
+				select: {
+					id: true
+				}
+			})
+			if (user === null)
+			{
+				throw new BadRequestException("error user not found", {
+					cause: new Error(),
+					description: "error user not found",
+				});
+			}
+			return (user)
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async setpassword(channelid: number, password: string) {
+		try {
+			await this.prisma.channel.update({
+				where: {
+					id: channelid
+				},
+				data: {
+					password: {set: password}
+				}
+			})
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async findAllPublicChannel()
+	{
+		try {
+			const channel = await this.prisma.channel.findMany({
+				where: {
+					public: true
+				},
+				select : {
+					id: true,
+					name: true,
+					personal: true,
+					password: true,
+					public: true,
+				}
+	
+			})
+			if (channel === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
+			return channel;
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async findAllChannelJoinedId(iduser: number)
+	{
+		try {
+			const channels = await this.prisma.user.findFirst({
+				where: {
+					id: 11
+				},
+				select : {
+					channel_list : {
+						select : {
+							id: true,
+							name: true,
+							personal: true,
+							password: true,
+							public: true,
+						}
+					}
+				}
+	
+			})
+			if (channels === null)
+			{
+				throw new BadRequestException("error while channel not found", {
+					cause: new Error(),
+					description: "error while channel not found",
+				});
+			}
+			return channels;
+		} catch (error) {
+			throw error
+		}
 	}
 }
