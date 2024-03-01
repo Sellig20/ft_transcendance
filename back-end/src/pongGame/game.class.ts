@@ -1,13 +1,19 @@
 import  { Server, Socket } from 'socket.io';
 import { GameStateBD, Player, GameStatus} from "./gameStateBD";
-export class Game {
+import { GameService } from './game.service';
+import { GameOverDTO } from './dto';
+import { Injectable } from '@nestjs/common';
 
+export class Game {
+    
     private gameState: GameStateBD;
     private gameId: string;
     private server: Server;
     private player1: Player;
     private player2: Player;
     private mapChoice: number;
+    private gs: GameService
+   
     private initializeGameState(): GameStateBD {
       const gameState = new GameStateBD();
       gameState.paddle1.socket = this.player1.socketId;
@@ -16,17 +22,19 @@ export class Game {
       return gameState;
     }
 
-    constructor(Id: string, server: Server, player1: Player, player2: Player, mapChoice: number) {
+    constructor(Id: string, server: Server, player1: Player, player2: Player, mapChoice: number, gs: GameService) {
         this.player1 = player1;
         this.player2 = player2;
         this.server = server;
         this.gameId = Id;
         this.gameState = this.initializeGameState();
         this.mapChoice = mapChoice;
+        this.gs = gs
     }
 
     actualDataInClassGame() {
         console.log("game id => ", this.gameId);
+        
     }
 
     start() {
@@ -47,7 +55,37 @@ export class Game {
             this.server.to(this.player1.socketId).emit('HeGaveUp', this.gameState.idPlayer1);
             this.server.to(this.player2.socketId).emit('IGaveUp', this.gameState.idPlayer2);
         }
-    }
+    }//a commenter pour tej les fakes data
+	// async onModuleInit() {
+	// 	const fakeusers = await this.prisma.user.findMany({})
+	// 	if (fakeusers.length < 12)
+	// 		await this.generateAndSaveFakeData();
+	// }
+
+	// async generateAndSaveFakeData() {
+
+	// 	const fakeMatch = Array.from({ length: 25 }, () => ({
+	// 		winnerId: Math.floor(Math.random() * 21),
+	// 		loserId: Math.floor(Math.random() * 21),
+	// 		loserElo: 400,
+	// 		winnerElo: 400
+	// 	}));
+
+	// 	const fakeUsers = Array.from({ length: 10 }, () => ({
+	// 		email: faker.internet.email(),
+	// 		username: faker.internet.userName(),
+	// 		win: Math.floor(Math.random() * 10),
+	// 		lose: Math.floor(Math.random() * 10)
+	// 	}));
+
+	// 	for (const user of fakeUsers) {
+	// 		await this.prisma.user.create({ data: user });
+	// 	}
+
+	// 	for (const match of fakeMatch) {
+	// 		await this.prisma.match.create({ data: match });
+	// 	}
+	// }
 
     setCrash(socketClient: string) {
         this.gameState.status = GameStatus.abortedGame;
@@ -86,11 +124,17 @@ export class Game {
         return this.player2.socketId;
     }
 
-    maxScore() {
+    async maxScore() {
         if (this.gameState.player1Score === 3) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
+            console.log("userid 1 winner => ", this.player1.userid);
+            console.log("userid 2 looser => ", this.player2.userid);
+            const data = new GameOverDTO();
+            data.winnerId = this.player1.userid;
+            data.loserId = this.player2.userid;
+            await this.gs.saveMatchs(data);
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
@@ -98,8 +142,16 @@ export class Game {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
+            console.log("userid 1 looser => ", this.player1.userid);
+            console.log("userid 2 winner => ", this.player2.userid);
+            const data = new GameOverDTO();
+            data.winnerId = this.player2.userid;
+            data.loserId = this.player1.userid;
+            console.log(data);
+            await this.gs.saveMatchs(data)
             this.gameState.player2Winner = true;
             this.gameState.player1Looser = true;
+
         }
     }
 
@@ -113,16 +165,16 @@ export class Game {
         this.gameState.ball.color = "red";
     }
 
-    ScoreAndResetBall(direction: number) {
+    async ScoreAndResetBall(direction: number) {
         if (this.gameState.ball.x < 0) {
             this.gameState.player2Score += 1;
-            this.maxScore();
+            await this.maxScore();
             this.sendToPlayer('updateScoreP2', this.gameState.player2Score, this.gameId);
             this.resetBall(1);
         }
         else if (this.gameState.ball.x + this.gameState.ballWidth > this.gameState.boardWidth) {
             this.gameState.player1Score += 1;
-            this.maxScore();
+            await this.maxScore();
             this.sendToPlayer('updateScoreP1', this.gameState.player1Score, this.gameId);
             this.resetBall(-1);
         }
@@ -240,7 +292,7 @@ export class Game {
     }
 
     startGameLoop() {
-        setInterval(() => {
+        setInterval(async () => {
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
                 this.initChoiceMap();
@@ -253,7 +305,7 @@ export class Game {
                 this.initialisationPaddle2();
                 this.detectingBorder();
                 this.detectingCollisionWithPaddle();
-                this.ScoreAndResetBall(1);
+                await this.ScoreAndResetBall(1);
                 this.checkGameStatus();
             }
             else {

@@ -1,11 +1,14 @@
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Rootstate } from '../../app/store';
 
-export const WebSocketPG = ({ socket }) => {
+export const WebSocketPG = ({ socket, userId }) => {
+    // const userid = useSelector((state: Rootstate) => state.user.id);
     
     const navigate = useNavigate();
     const handleRedirectToQueueGate = (mapChoice: number) => {
         console.log("MAP CHOICE => ", mapChoice, " de ", socket.id);
-        socket?.emit('goQueueList', { socketId: socket.id, mapChoice });
+        socket?.emit('goQueueList', { socketId: socket.id, mapChoice, userId});
         navigate('../queue');
     }
 

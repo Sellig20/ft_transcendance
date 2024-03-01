@@ -47,7 +47,7 @@ export default function Game() {
 			<Route path="/" element={
 				<div>
 				
-					<WebSocketPG socket={socket}/>
+					<WebSocketPG socket={socket} userId={userid}/>
 				</div>
 			}/>
 			<Route path="/queue" element={

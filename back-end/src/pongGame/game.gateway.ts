@@ -6,6 +6,9 @@ import { Game } from "./game.class";
 import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 import { OnModuleInit } from "@nestjs/common";
+import { GameService } from "./game.service";
+import { Prisma } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @WebSocketGateway(8002, {
     // namespace: 'game',
@@ -15,11 +18,15 @@ import { OnModuleInit } from "@nestjs/common";
 export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayDisconnect<Socket> {
     @WebSocketServer()
     server: Server;
+
     
+    // private userIdd: number;
     private userArray: Player[] = [];
     games: Game[] = [];
 
-    constructor() {}
+    constructor(
+        private gs: GameService,
+    ) {}
 
     onModuleInit() {
         this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
@@ -30,6 +37,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     handleConnection(client: Socket, ...args: any[]) {
         console.log(`[GAME] Client connected: ${client.id}`);
 		this.server.to(client.id).emit("FIRST", {msg:"who are you"})
+
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
@@ -105,7 +113,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 		const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
 		if (existingUserIndex !== -1)
 		{
-			this.userArray[existingUserIndex].userid = message.userid
+			this.userArray[existingUserIndex].userid = message.userid;
+            console.log("=bibou=> ", this.userArray);
 		}
     }
 
@@ -192,8 +201,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     }
 
     @SubscribeMessage('goQueueList') 
-    handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number}): void {
-        this.addUser(client.id, data.mapChoice);
+    handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number, userId: number}): void {
+        this.addUser(client.id, data.mapChoice, data.userId);
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];
             if (data.socketId === player.socketId && player.status) {//si tu as clique
@@ -208,6 +217,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     toPlay(playersAvailable: Player[], mapChoice: number)
     {
+
         if (playersAvailable.length == 2)
         {
 
@@ -228,18 +238,20 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 else if (mapChoice === 2) {
                     gameIdChoice = gameId + "_2";
                 }
-                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice);
+                
+                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
                 console.log("");
                 console.log("Joueur 1 : ", player1.socketId);
                 console.log("Joueur 2 : ", player2.socketId);
                 console.log("Game id : ", gameIdChoice);
+                console.log("userid => ", player1.userId);
                 console.log("");
                 this.games.push(currentGame);
                 currentGame.actualDataInClassGame();
                 currentGame.start();
-                playersAvailable.length = 0;
-                this.removeUser(player1.socketId);
-                this.removeUser(player2.socketId);
+                // playersAvailable.length = 0;
+                // this.removeUser(player1.socketId);
+                // this.removeUser(player2.socketId);
                 // this.removeGameById(gameIdChoice);
                 if (currentGame.checkGameStatus() === true) {
                     this.removeGameById(gameIdChoice);
@@ -267,7 +279,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         console.log("-------------------------------");
     }
     
-    private addUser(item: string, mapChoice: number): void {
+    private addUser(item: string, mapChoice: number, userI: number): void {
         console.log("[ADD USER : ", item, "] choix : ", mapChoice);
         const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
         if (existingUserIndex === -1) {
@@ -276,7 +288,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 status: playerStatus.isSettling,
                 level: 0,
                 map: mapChoice,
-				userid: null,
+				userid: userI,
             };
             this.userArray.push(newPlayer);
         }

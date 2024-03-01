@@ -1,10 +1,26 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GameDTO } from './dto';
+import { GameDTO, GameOverDTO } from './dto';
+import { log } from 'util';
 
 @Injectable()
 export class GameService {
 	constructor(private prisma: PrismaService) { }
+
+	async saveMatchs(data: GameOverDTO) {
+		console.log(data);
+		
+		await this.saveMatch(data.winnerId, data.loserId);
+		const elo_win = await this.calcElo(data.winnerId, data.loserId, true);
+		const elo_lose = await this.calcElo(data.loserId, data.winnerId, false);
+
+		console.log(elo_win, elo_lose);
+		
+		await this.updateUserInfo(data.winnerId, true, elo_win);
+		await this.updateUserInfo(data.loserId, false, elo_lose);
+
+	}
+
 	async calcElo(me: number, other: number, win: boolean) {
 		const useArr = [me, other]
 		try {
@@ -78,6 +94,7 @@ export class GameService {
 
 			await this.prisma.match.create({data})
 		} catch (error) {
+			
 			throw new BadRequestException("Error in saving match", {
 				cause: new Error(),
 				description: "Error in saving match",
@@ -114,5 +131,9 @@ export class GameService {
 				description: "Error retrieving match history",
 			});
 		}
+	}
+	truc() {
+		console.log('hello ');
+		
 	}
 }

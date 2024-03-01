@@ -5,9 +5,9 @@ import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Rootstate } from "../../app/store";
     
-export const WebSocketSG = ({ socket}) => {
+export const WebSocketSG = ({ socket }) => {
 
-    const userid = useSelector((state: Rootstate) => state.user.id);
+    // const userid = useSelector((state: Rootstate) => state.user.id);
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
     const navigate = useNavigate();
@@ -197,7 +197,6 @@ export const WebSocketSG = ({ socket}) => {
                 drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
-                    console.log("coucou 3");
                 }
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
@@ -207,13 +206,9 @@ export const WebSocketSG = ({ socket}) => {
                     console.log('OVER DE SG');
                 }
                 partyAbandon(context, board);
-                console.log("coucou 1");
-                console.log("Game status juste avnt le if : ", gameState.status);
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
                     gameState.status === GameStatus.over)
                 {
-                    console.log("coucou 2");
-                    // alert("Vous allez être redirigé dans quelques secondes...");
                     console.log("ca va bouger 3 2 1...");
                     setTimeout(getBack, 1000);
                 }
@@ -224,7 +219,6 @@ export const WebSocketSG = ({ socket}) => {
     };
 
     const handleAbandon = () => {
-        console.log("ABANDONDDDD")
         socket?.emit('Abandon', socket?.id);
     }
 
@@ -283,6 +277,7 @@ export const WebSocketSG = ({ socket}) => {
         socket?.on('disconnect', handleDisconnect)
 
         ///////////////////// SERVEUR RENVOIE donc le FRONTEND ECOUTE : ////////////////////////////
+
         socket?.on('initplayer1', (y: number, idGame: string) => {
             initiatePaddle1(y, idGame);
         })
@@ -366,7 +361,7 @@ export const WebSocketSG = ({ socket}) => {
         })
 
         return () => {
-            console.log("unregistering events for ", socket.id);
+            // console.log("unregistering events for ", socket.id);
             socket.emit('IsFinished', socket.id);
             socket?.off('connect');
             socket?.off('disconnect');

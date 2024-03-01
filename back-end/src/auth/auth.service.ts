@@ -16,37 +16,37 @@ export class AuthService {
 		private prisma: PrismaService
 	) { }
 
-	//a commenter pour tej les fakes data
-	async onModuleInit() {
-		const fakeusers = await this.prisma.user.findMany({})
-		if (fakeusers.length < 12)
-			await this.generateAndSaveFakeData();
-	}
+	// //a commenter pour tej les fakes data
+	// async onModuleInit() {
+	// 	const fakeusers = await this.prisma.user.findMany({})
+	// 	if (fakeusers.length < 12)
+	// 		await this.generateAndSaveFakeData();
+	// }
 
-	async generateAndSaveFakeData() {
+	// async generateAndSaveFakeData() {
 
-		const fakeMatch = Array.from({ length: 25 }, () => ({
-			winnerId: Math.floor(Math.random() * 21),
-			loserId: Math.floor(Math.random() * 21),
-			loserElo: 400,
-			winnerElo: 400
-		}));
+	// 	const fakeMatch = Array.from({ length: 25 }, () => ({
+	// 		winnerId: Math.floor(Math.random() * 21),
+	// 		loserId: Math.floor(Math.random() * 21),
+	// 		loserElo: 400,
+	// 		winnerElo: 400
+	// 	}));
 
-		const fakeUsers = Array.from({ length: 10 }, () => ({
-			email: faker.internet.email(),
-			username: faker.internet.userName(),
-			win: Math.floor(Math.random() * 10),
-			lose: Math.floor(Math.random() * 10)
-		}));
+	// 	const fakeUsers = Array.from({ length: 10 }, () => ({
+	// 		email: faker.internet.email(),
+	// 		username: faker.internet.userName(),
+	// 		win: Math.floor(Math.random() * 10),
+	// 		lose: Math.floor(Math.random() * 10)
+	// 	}));
 
-		for (const user of fakeUsers) {
-			await this.prisma.user.create({ data: user });
-		}
+	// 	for (const user of fakeUsers) {
+	// 		await this.prisma.user.create({ data: user });
+	// 	}
 
-		for (const match of fakeMatch) {
-			await this.prisma.match.create({ data: match });
-		}
-	}
+	// 	for (const match of fakeMatch) {
+	// 		await this.prisma.match.create({ data: match });
+	// 	}
+	// }
 	
 	//peut etre a changer d'endroit ?? c'est une methode de userservice ça 
 
