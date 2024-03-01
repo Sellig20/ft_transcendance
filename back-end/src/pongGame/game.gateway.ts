@@ -29,6 +29,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     handleConnection(client: Socket, ...args: any[]) {
         console.log(`[GAME] Client connected: ${client.id}`);
+		this.server.to(client.id).emit("FIRST", {msg:"who are you"})
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
@@ -98,7 +99,12 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     @SubscribeMessage('FIRST')
     async handleMessageconnection(client: any, message: any) {
-        console.log("FIRST ouistiti", message.userid, client.id)
+        console.log("[FIRST]", client.id,"= client:", message.userid)
+		const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
+		if (existingUserIndex !== -1)
+		{
+			this.userArray[existingUserIndex].userid = message.userid
+		}
     }
 
     @SubscribeMessage('keydown')
@@ -248,6 +254,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 status: playerStatus.isSettling,
                 level: 0,
                 map: mapChoice,
+				userid: null,
             };
             this.userArray.push(newPlayer);
         }

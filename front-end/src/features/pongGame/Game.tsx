@@ -17,6 +17,20 @@ export default function Game() {
 		setSocket(newSocket)
 	}
 
+	const firstListener = (
+		messageprop: any
+	) => {
+		console.log("envoie des donnee users au server socket...", userid)
+		socket?.emit("FIRST", {userid:userid})
+	};
+
+	useEffect(() => {
+		socket?.on("FIRST", firstListener)
+		return () => {
+			socket?.off("FIRST", firstListener)
+		}
+	}, [firstListener])
+
     useEffect(() => {
 
 		if (count.current === 0)
