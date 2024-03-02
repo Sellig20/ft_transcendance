@@ -252,17 +252,18 @@ export const WebSocketSG = ({ socket }) => {
         const animationId = requestAnimationFrame(update);
         ////////////// AU LANCEMENT DE START GAME //////////////
 
-        const onBeforeUnload = (event) => {
-            // Utilisez window.performance pour détecter si la page est rechargée
-            const isPageRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD;
+        const handleBeforeUnload = (event) => {
+            const navigationEntries = performance.getEntriesByType('navigation');
+            const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
       
-            if (isPageRefresh) {
-              console.log('La page a été rafraîchie.');
-              // Faites quelque chose spécifique au rafraîchissement de la page
-            } 
+            if (navigationEntry && navigationEntry.type === 'reload') {
+              console.log('refreshED BIATCH');
+            } else {
+              console.log('navig autre part');
+            }
           };
       
-          window.addEventListener('beforeunload', onBeforeUnload)
+          window.addEventListener('beforeunload', handleBeforeUnload);
         const handleConnect = () => {
             console.log('Connected in START GAME!');
         }
