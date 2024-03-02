@@ -214,11 +214,11 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         this.removeUser(client.id);
     }
 
-    @SubscribeMessage('goQueueList') 
+    @SubscribeMessage('goQueueList')//evenement de websocketQG
     handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number, userId: number}): void {
-        this.addUser(client.id, data.mapChoice, data.userId);
+        this.addUser(client.id, data.mapChoice, data.userId);//add user dans le userArray
         for (let i = 0; i < this.userArray.length; i++) {
-            const player = this.userArray[i];
+            const player = this.userArray[i];//je regarde chaque user added
             if (data.socketId === player.socketId && player.status) {//si tu as clique
                 player.status = playerStatus.isAvailable;//je te mets en available pour jouer
                 player.socketId = data.socketId;
@@ -226,22 +226,22 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             }
         }
         const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
-        this.toPlay(playersAvailable, data.mapChoice);
+        this.toPlay(playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
     }
     
     toPlay(playersAvailable: Player[], mapChoice: number)
     {
-        if (playersAvailable.length == 2)
+        if (playersAvailable.length == 2)//si ils sont 2
         {
             const [player1, player2] = playersAvailable;
-            if (player1.map === player2.map) {
+            if (player1.map === player2.map) {//si ils ont le MEME choix de map
                 let player1: any = null;
                 let player2: any = null;
                 player1 = playersAvailable[0];
-                player2 = playersAvailable[1];
-                const gameId = uuidv4();
+                player2 = playersAvailable[1];//je les attrape
+                const gameId = uuidv4();//je donne une ID unique a ma game
                 let gameIdChoice: string;
-                if (mapChoice === 1) {
+                if (mapChoice === 1) {//ca c'est inutile faut que je supp
                     gameIdChoice = gameId + "_1";
                 }
                 else if (mapChoice === 2) {
@@ -249,7 +249,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 }
                 
                 const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
-                console.log("");
+                console.log("");//direction game.class la game a ete creee
                 console.log("Joueur 1 : ", player1.socketId);
                 console.log("Joueur 2 : ", player2.socketId);
                 console.log("Game id : ", gameIdChoice);
@@ -257,7 +257,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 console.log("");
                 this.games.push(currentGame);
                 currentGame.actualDataInClassGame();
-                currentGame.start();
+                currentGame.start();//la game commence
                 // playersAvailable.length = 0;
                 // this.removeGameById(gameIdChoice);
                 this.removeUser(player1.socketId);
