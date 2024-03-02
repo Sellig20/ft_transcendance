@@ -8,7 +8,7 @@ export class GameService {
 	constructor(private prisma: PrismaService) { }
 
 	async saveMatchs(data: GameOverDTO) {
-		console.log(data);
+		// console.log(data);
 		
 		await this.saveMatch(data.winnerId, data.loserId);
 		const elo_win = await this.calcElo(data.winnerId, data.loserId, true);

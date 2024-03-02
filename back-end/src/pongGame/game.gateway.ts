@@ -41,10 +41,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
-        console.log("jepasse zizi");
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
-        console.log("oppo crashed handle disconnect function");
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
         this.removeUser(client.id);
     }
@@ -114,7 +112,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 		if (existingUserIndex !== -1)
 		{
 			this.userArray[existingUserIndex].userid = message.userid;
-            console.log("=bibou=> ", this.userArray);
+            console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
 		}
     }
 
@@ -153,6 +151,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
         for (let i = 0; i < this.games.length; i++) {
+            console.log("Ca abandonnnnne")
             const currentGame = this.games[i];
             const d1 = currentGame.getPlayer1Id();
             const d2 = currentGame.getPlayer2Id();
@@ -167,15 +166,13 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('IsFinished')
     handleIsFinished(client: Socket, socketId: string) {
-        console.log("IS FINISHED SOCKET ID MAMEN => ", socketId);
         for (let i = 0; i < this.games.length; i++) {
             const currentGame = this.games[i];
             const d1 = currentGame.getPlayer1Id();
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
-                currentGame.setIsFinished(socketId);
-                // this.removeUser(d1);
-                // this.removeUser(d2);
+                // currentGame.setIsFinished(socketId);
+                this.removeUser(socketId);
             }
         }
     }
@@ -194,9 +191,26 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         }
     }
 
+    @SubscribeMessage('finito')
+    handleFinito(client: Socket) {
+        this.server.to(client.id).emit('user-disconnected');
+        const oppoSocket = this.getOpponentSocket(client.id);
+        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
+        this.removeUser(client.id);
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+                currentGame.setFinito(client.id);
+                // this.removeUser(d1);
+                // this.removeUser(d2);
+            }
+        }
+    }
+
     @SubscribeMessage('quitQueue')
     handleQuitQueue(client: Socket) {
-        console.log("A quitte la quuuuueuuuuuue");
         this.removeUser(client.id);
     }
 
@@ -217,15 +231,10 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     toPlay(playersAvailable: Player[], mapChoice: number)
     {
-
         if (playersAvailable.length == 2)
         {
-
-            const [player1, player2] = playersAvailable; // Utilisez la déstructuration pour extraire les joueurs
-
-        // Assurez-vous que les deux joueurs ont fait le même choix de map
+            const [player1, player2] = playersAvailable;
             if (player1.map === player2.map) {
-                console.log("Ca rentre dans le if pour demarrer la game");
                 let player1: any = null;
                 let player2: any = null;
                 player1 = playersAvailable[0];
@@ -250,20 +259,19 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 currentGame.actualDataInClassGame();
                 currentGame.start();
                 // playersAvailable.length = 0;
-                // this.removeUser(player1.socketId);
-                // this.removeUser(player2.socketId);
+                // this.removeGameById(gameIdChoice);
+                this.removeUser(player1.socketId);
+                this.removeUser(player2.socketId);
                 // this.removeGameById(gameIdChoice);
                 if (currentGame.checkGameStatus() === true) {
                     this.removeGameById(gameIdChoice);
                 }
-        
                 const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
                 const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
         
                 if (indexPlayer1 !== -1) {
                     playersAvailable.splice(indexPlayer1, 1);
                 }
-        
                 if (indexPlayer2 !== -1) {
                     playersAvailable.splice(indexPlayer2, 1);
                 }
@@ -298,14 +306,13 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     private removeUser(userId: string): void {
         const indexToRemove = this.userArray.findIndex(player => player.socketId === userId);
-        console.log("Je supprime du userarray : ", userId);
         if (indexToRemove !== -1) {
             this.userArray.splice(indexToRemove, 1);
         }
+        return ;
     }
 
     private removeGameById = (idToRemove: string) => {
-        console.log("Je supprime : ", idToRemove);
         this.games = this.games.filter((game) => game.getGameId() !== idToRemove);
     };
 }

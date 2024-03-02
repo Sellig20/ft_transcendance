@@ -38,6 +38,7 @@ export class Game {
     }
 
     start() {
+        //STATUS GAME BEGINS
         this.sendToPlayer("prepareForMatch", {}, "jojo");
         this.gameState.status = GameStatus.playingGame;
         this.startGameLoop();
@@ -90,12 +91,9 @@ export class Game {
     setCrash(socketClient: string) {
         this.gameState.status = GameStatus.abortedGame;
     }
-    
-    setIsFinished(socketClient: string) {
-        console.log("Je IS FINISHED la game");
+
+    setFinito(socketClient: string) {
         this.gameState.status = GameStatus.finishedGame;
-        // this.statusAbandon(socketClient);
-        this.sendToPlayer('GameOver', socketClient, this.gameId);
     }
 
     sendToPlayer(event: string, data: any, id: string) {
@@ -125,30 +123,30 @@ export class Game {
     }
 
     async maxScore() {
-        if (this.gameState.player1Score === 3) {
+        if (this.gameState.player1Score === 2) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
             console.log("userid 1 winner => ", this.player1.userid);
             console.log("userid 2 looser => ", this.player2.userid);
-            const data = new GameOverDTO();
-            data.winnerId = this.player1.userid;
-            data.loserId = this.player2.userid;
-            await this.gs.saveMatchs(data);
+            // const data = new GameOverDTO();
+            // data.winnerId = this.player1.userid;
+            // data.loserId = this.player2.userid;
+            // await this.gs.saveMatchs(data);
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
-        else if (this.gameState.player2Score === 3) {
+        else if (this.gameState.player2Score === 2) {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
             console.log("userid 1 looser => ", this.player1.userid);
             console.log("userid 2 winner => ", this.player2.userid);
-            const data = new GameOverDTO();
-            data.winnerId = this.player2.userid;
-            data.loserId = this.player1.userid;
-            console.log(data);
-            await this.gs.saveMatchs(data)
+            // const data = new GameOverDTO();
+            // data.winnerId = this.player2.userid;
+            // data.loserId = this.player1.userid;
+            // console.log(data);
+            // await this.gs.saveMatchs(data)
             this.gameState.player2Winner = true;
             this.gameState.player1Looser = true;
 
@@ -284,6 +282,7 @@ export class Game {
     if (this.gameState.status === GameStatus.abortedGame || 
         this.gameState.status === GameStatus.finishedGame)
         {
+            console.log("GAME IS OVER");
             this.sendToPlayer('gameIsOver', 1, this.gameId);
             return true;
         }
@@ -292,7 +291,8 @@ export class Game {
     }
 
     startGameLoop() {
-        setInterval(async () => {
+        const loop = setInterval(async () => {
+            console.log("game status loop game.class : ", this.gameState.status);
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
                 this.initChoiceMap();
@@ -306,67 +306,15 @@ export class Game {
                 this.detectingBorder();
                 this.detectingCollisionWithPaddle();
                 await this.ScoreAndResetBall(1);
-                this.checkGameStatus();
+                // if (this.checkGameStatus() === true)
+                    // break;
             }
-            else {
-            }
+            else
+                clearInterval(loop);
         }, 10); // 16 ms (environ 60 FPS)
     }
+
+    removeGameById = (idToRemove: string) => {
+        this.gameId = null;
+    };
 }
-
-    // detectingCollisionWithPaddle() {
-    //     const speed = 2;
-    //     if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
-    //         const ballCenterY = this.gameState.ball.y + this.gameState.ball.height / 2;
-    //         const relativeIntersectionY = ballCenterY - this.gameState.paddle1.y;
-    
-    //         const normalizedRelativeIntersectionY = (relativeIntersectionY / this.gameState.paddle1.height) * 2 - 1;
-    //         const bounceAngle = normalizedRelativeIntersectionY * (Math.PI / 4); // 45 degrees
-    
-    //         this.gameState.ball.velocityX = Math.cos(bounceAngle) * speed;
-    //         this.gameState.ball.velocityY = Math.sin(bounceAngle) * speed;
-    
-    //         console.log("COLLISION WITH PADDLE 1");
-    //     } else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
-    //         const ballCenterY = this.gameState.ball.y + this.gameState.ball.height / 2;
-    //         const relativeIntersectionY = ballCenterY - this.gameState.paddle2.y;
-    
-    //         const normalizedRelativeIntersectionY = (relativeIntersectionY / this.gameState.paddle2.height) * 2 - 1;
-    //         const bounceAngle = normalizedRelativeIntersectionY * (Math.PI / 4); // 45 degrees
-    
-    //         this.gameState.ball.velocityX = -Math.cos(bounceAngle) * speed;
-    //         this.gameState.ball.velocityY = Math.sin(bounceAngle) * speed;
-    
-    //         console.log("COLLISION WITH PADDLE 2");
-    //     }
-    // }
-
-
-
-
-
-    
-
-
-    // if ( player.pos.x < ball.pos.x + ball.size.x &&
-    //     player.pos.x + player.size.x > ball.pos.x &&
-    //     player.pos.y < ball.pos.y + ball.size.y &&
-    //     player.size.y + player.pos.y > ball.pos.y ) {
-    //     ball.vel.x = -ball.vel.x;
-    //   }
-   
-    // detectingCollisionWithPaddle() {
-    //     if (this.detect(this.gameState.ball, this.gameState.paddle1)) {
-    //         // if (this.gameState.ball.x <= this.gameState.paddle1.x + this.gameState.paddle1.width) {
-        //             this.gameState.ball.velocityX *= -1;
-        //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
-        //         // }
-        //     }
-        //     else if (this.detect(this.gameState.ball, this.gameState.paddle2)) {
-            //         // if (this.gameState.ball.x + this.gameState.ballWidth >= this.gameState.paddle2.x) {
-                //             this.gameState.ball.velocityX *= -1;
-                //             this.server.emit('detectCollisionW/Paddle', this.gameState.ball.velocityX, this.gameState.ball.velocityY)
-                //         // }
-                //     }
-                // }
-                

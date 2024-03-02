@@ -20,14 +20,11 @@ export const WebSocketSG = ({ socket }) => {
         gameState.player2Score = scoreP2;
     }
 
-    
-    
     const partyAbandon = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         if (gameState.player1Abandon === true || gameState.player2Abandon === true)
         {
             partyIsAbandonned(context, board);
             gameState.status === GameStatus.abortedGame;
-
         }
         if (gameState.player1IsDeserted === true || gameState.player2IsDeserted === true)
         {
@@ -75,6 +72,7 @@ export const WebSocketSG = ({ socket }) => {
         context.font = '30px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('CONGRATS YOU WON', board.width / 2, board.height / 2);
+        setTimeout(getBack, 1000);
     }
     
     const displayFailGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
@@ -86,10 +84,11 @@ export const WebSocketSG = ({ socket }) => {
         context.font = '50px "Press Start 2P", sans-serif';
         context.textAlign = 'center';
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
+        setTimeout(getBack, 1000);
+
     }
     
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        gameState.status === GameStatus.abortedGame;
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #1E90FF';
@@ -102,7 +101,6 @@ export const WebSocketSG = ({ socket }) => {
     
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         gameState.status === GameStatus.abortedGame;
-        console.log("stausss game ", gameState.status);
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #FF1493';
@@ -197,13 +195,12 @@ export const WebSocketSG = ({ socket }) => {
                 drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
+                    console.log("je serais donc bloque en display end?")
                 }
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
-                    gameState.status === GameStatus.finishedGame;
-                }
-                if (gameState.status === GameStatus.over) {
-                    console.log('OVER DE SG');
+                    console.log("je serais donc bloque en display fail?")
+
                 }
                 partyAbandon(context, board);
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
@@ -254,6 +251,18 @@ export const WebSocketSG = ({ socket }) => {
         ////////////// LOOP FOR FRONTEND /////////////////////////
         const animationId = requestAnimationFrame(update);
         ////////////// AU LANCEMENT DE START GAME //////////////
+
+        const onBeforeUnload = (event) => {
+            // Utilisez window.performance pour détecter si la page est rechargée
+            const isPageRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD;
+      
+            if (isPageRefresh) {
+              console.log('La page a été rafraîchie.');
+              // Faites quelque chose spécifique au rafraîchissement de la page
+            } 
+          };
+      
+          window.addEventListener('beforeunload', onBeforeUnload)
         const handleConnect = () => {
             console.log('Connected in START GAME!');
         }
@@ -339,20 +348,40 @@ export const WebSocketSG = ({ socket }) => {
         })
 
         socket?.on('GameOver', (socketClient: string, gameId: string) => {
-            gameState.status = GameStatus.over;
+            // gameState.status = GameStatus.over;
+            socket?.emit('IsFinished', socketClient);
         })
 
+        // socket?.on('oppo-crashed', (socket: string) => {
+        //     // console.log("socket? = ", socket);
+        //     // console.log("paddle 1 sock =", gameState.paddle1.socket);
+        //     // console.log("paddle 2 sock =", gameState.paddle2.socket);
+
+        //     if (socket === gameState.paddle1.socket) {
+        //         gameState.player2IsDeserted = true;
+        //         gameState.status = GameStatus.abortedGame;
+        //         handleCrash();
+        //     }
+        //     else if (socket === gameState.paddle2.socket) {
+        //         gameState.player1IsDeserted = true;
+        //         gameState.status = GameStatus.abortedGame;
+        //         handleCrash();
+        //     }
+        //     // navigate('../')
+        // })
         socket?.on('oppo-crashed', (socket: string) => {
-            // console.log("socket? = ", socket);
-            // console.log("paddle 1 sock =", gameState.paddle1.socket);
-            // console.log("paddle 2 sock =", gameState.paddle2.socket);
+            console.log("socket? = ", socket);
+            console.log("paddle 1 sock =", gameState.paddle1.socket);
+            console.log("paddle 2 sock =", gameState.paddle2.socket);
 
             if (socket === gameState.paddle1.socket) {
+                // console.log("C'est le joueur un car : ", gameState.paddle1.socket);
                 gameState.player2IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
             }
             else if (socket === gameState.paddle2.socket) {
+                // console.log("C'est le joueur deux car : ", gameState.paddle2.socket);
                 gameState.player1IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
@@ -361,8 +390,7 @@ export const WebSocketSG = ({ socket }) => {
         })
 
         return () => {
-            // console.log("unregistering events for ", socket.id);
-            socket.emit('IsFinished', socket.id);
+            console.log("je passe par la");
             socket?.off('connect');
             socket?.off('disconnect');
             window.removeEventListener('keydown', handleKeyDown);
@@ -375,7 +403,16 @@ export const WebSocketSG = ({ socket }) => {
             socket?.off('detectBorder');
             socket?.off('winnerIs');
             socket?.off('congrats');
+            socket?.off('oppo-crashed');
+            socket?.off('GameOver');
+            socket?.off('HeGaveUp');
+            socket?.off('looser');
+            socket?.off('HeGaveUp');
+            socket?.off('IGaveUp');
+            socket?.off('winner');
+            socket?.off('choiceMap');
             gameState.status = GameStatus.finishedGame;
+            socket?.emit('finito');
             // navigate('../');
             cancelAnimationFrame(animationId);
         }
