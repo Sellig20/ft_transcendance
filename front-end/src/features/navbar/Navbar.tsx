@@ -1,9 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../user/user.store';
-import { Socket, io } from "socket.io-client";
-import { Rootstate } from '../../app/store';
-import { useSelector } from 'react-redux';
 import userService from '../user/user.service';
 
 const Navbar = () => {

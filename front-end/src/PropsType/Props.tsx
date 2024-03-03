@@ -1,10 +1,3 @@
-interface MessageProps {
-	id: number
-	content: string
-	sender: string
-	recipient : string
-}
-
 export interface PlayerStats {
 	username: string;
 	img_url: string;
