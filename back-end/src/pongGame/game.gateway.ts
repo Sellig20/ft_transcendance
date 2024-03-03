@@ -22,6 +22,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     // private userIdd: number;
     private userArray: Player[] = [];
+    private playersAvailable: Player[] = [];
     games: Game[] = [];
 
     constructor(
@@ -116,6 +117,33 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 		}
     }
 
+    @SubscribeMessage('refreshInQueue')
+    handleRefreshInQueue(client: Socket) {
+        console.log("la socket de l'emmerdeur = ", client.id);
+        // for (let i = 0; i < this.playersAvailable.length; i++) {
+        //     // console.log(" PLAYERS_AVAILABLE TAB->", this.playersAvailable[i]);
+        //     if (client.id === this.playersAvailable[i].socketId)
+        //     {
+        //         const mapChoiceEmmerdeur = this.playersAvailable[i].map;
+        //         const userIdEmmerdeur = this.playersAvailable[i].userid;
+        //         console.log("ouiouioui");
+        //         // this.server.emit('reloadInQueue');
+        //         this.playersAvailable.splice(i, 1);
+        //         break;
+        //     }
+        // }
+        // for (let i = 0; i < this.userArray.length; i++) {
+        //     // console.log(" USER_ARRAY->", this.userArray[i]);
+        //     if (client.id === this.userArray[i].socketId)
+        //     {
+        //         // console.log("ouiouioui");
+        //         // this.server.emit('reloadInQueue');
+        //         this.userArray.splice(i, 1);
+        //         break;
+        //     }
+        // }
+    }
+
     @SubscribeMessage('keydown')
     handleKeyPressedUpDown(client: Socket, data: {key: string}) {
         const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
@@ -193,6 +221,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('finito')
     handleFinito(client: Socket) {
+        console.log("---- je suis finito de game.gateway");
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
@@ -211,6 +240,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('quitQueue')
     handleQuitQueue(client: Socket) {
+        console.log("Je passe en quitte queue de game.gateway");
         this.removeUser(client.id);
     }
 
@@ -219,14 +249,17 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         this.addUser(client.id, data.mapChoice, data.userId);//add user dans le userArray
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];//je regarde chaque user added
-            if (data.socketId === player.socketId && player.status) {//si tu as clique
+            
+            if (data.userId === player.userid && player.status) {//si tu as clique
+                console.log("data.userId => ", data.userId);
+                console.log("player.userId => ", player.userid);
                 player.status = playerStatus.isAvailable;//je te mets en available pour jouer
                 player.socketId = data.socketId;
                 this.userArray.splice(i, 1, player);//je remets le joueur actualise
             }
         }
-        const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
-        this.toPlay(playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
+        this.playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
+        this.toPlay(this.playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
     }
     
     toPlay(playersAvailable: Player[], mapChoice: number)
@@ -301,6 +334,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             this.userArray.push(newPlayer);
         }
         else {
+            this.userArray[existingUserIndex].socketId = item
         }
     }
     

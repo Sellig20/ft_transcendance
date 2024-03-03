@@ -1,5 +1,5 @@
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const WebSocketQG = ({ socket}) => {
 
@@ -9,17 +9,16 @@ export const WebSocketQG = ({ socket}) => {
         navigate('../');
     }
 
-
-
     useEffect(() => {
         const handlePrepareMatch = () => {
             console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
-
-        socket?.on('prepareForMatch', handlePrepareMatch);
-
-        return () => {
+      
+            socket?.on('prepareForMatch', handlePrepareMatch);
+    return () => {
+            console.log("Unregistering events in Queue gate");
+            // socket?.emit('refreshInQueue' );
             socket?.off('prepareForMatch', handlePrepareMatch);
         };
 

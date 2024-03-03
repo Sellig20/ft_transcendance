@@ -93,6 +93,8 @@ export class Game {
     }
 
     setFinito(socketClient: string) {
+        console.log("---- je suis setFinito de game.class");
+
         this.gameState.status = GameStatus.finishedGame;
     }
 

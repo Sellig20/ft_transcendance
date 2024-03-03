@@ -252,18 +252,19 @@ export const WebSocketSG = ({ socket }) => {
         const animationId = requestAnimationFrame(update);
         ////////////// AU LANCEMENT DE START GAME //////////////
 
-        const handleBeforeUnload = (event) => {
-            const navigationEntries = performance.getEntriesByType('navigation');
-            const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
+        // const handleBeforeUnload = (event) => {
+        //     const navigationEntries = performance.getEntriesByType('navigation');
+        //     const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
       
-            if (navigationEntry && navigationEntry.type === 'reload') {
-              console.log('refreshED BIATCH');
-            } else {
-              console.log('navig autre part');
-            }
-          };
+        //     if (navigationEntry && navigationEntry.type === 'reload') {
+        //       console.log('refreshED BIATCH');
+        //     } else {
+        //       console.log('navig autre part');
+        //     }
+        //   };
       
-          window.addEventListener('beforeunload', handleBeforeUnload);
+        //   window.addEventListener('beforeunload', handleBeforeUnload);
+        
         const handleConnect = () => {
             console.log('Connected in START GAME!');
         }
@@ -371,9 +372,10 @@ export const WebSocketSG = ({ socket }) => {
         //     // navigate('../')
         // })
         socket?.on('oppo-crashed', (socket: string) => {
-            console.log("socket? = ", socket);
-            console.log("paddle 1 sock =", gameState.paddle1.socket);
-            console.log("paddle 2 sock =", gameState.paddle2.socket);
+            // console.log("socket? = ", socket);
+            // console.log("paddle 1 sock =", gameState.paddle1.socket);
+            // console.log("paddle 2 sock =", gameState.paddle2.socket);
+            console.log("---- je suis oppo-crashed de web SG");
 
             if (socket === gameState.paddle1.socket) {
                 // console.log("C'est le joueur un car : ", gameState.paddle1.socket);
@@ -391,7 +393,7 @@ export const WebSocketSG = ({ socket }) => {
         })
 
         return () => {
-            console.log("je passe par la");
+            console.log("Unregistering events SG");
             socket?.off('connect');
             socket?.off('disconnect');
             window.removeEventListener('keydown', handleKeyDown);
