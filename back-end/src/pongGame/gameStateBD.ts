@@ -102,6 +102,7 @@ export class GameStateBD {
     level: number;
     userid: number | null;
     map: number;
+	user2: number;
   }
   
   
