@@ -14,6 +14,9 @@ export const WebSocketPG = ({ socket, userId, page, setPage }) => {
     }
     
     useEffect(() => {
+        if (page === "lobby") {
+            navigate('../');
+        }
         setPage("PG");
     })
 

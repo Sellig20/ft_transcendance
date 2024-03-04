@@ -50,18 +50,17 @@ export default function Game() {
 	    <Routes>
 			<Route path="/" element={
 				<div>
-				
 					<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
 				</div>
 			}/>
 			<Route path="/queue" element={
 				<div>
-					<WebSocketQG socket={socket} page={page}/>
+					<WebSocketQG socket={socket} page={page} setPage={setPage}/>
 				</div>
 			}/>
 			<Route path="/startgame" element={
 				<div>
-					<WebSocketSG socket={socket} page={page}/>
+					<WebSocketSG socket={socket} page={page} setPage={setPage}/>
 				</div>
 			}/>
         </Routes>

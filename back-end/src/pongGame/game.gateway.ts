@@ -7,8 +7,7 @@ import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 import { OnModuleInit } from "@nestjs/common";
 import { GameService } from "./game.service";
-// import { Prisma } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { UsersService } from "src/user/user.service";
 
 @WebSocketGateway(8002, {
     // namespace: 'game',
@@ -27,6 +26,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     constructor(
         private gs: GameService,
+        private us: UsersService
     ) {}
 
     onModuleInit() {
@@ -43,13 +43,14 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     
     handleDisconnect(client: Socket, ...args: any[]) {
         console.log("--- disconnecttttt :")
-        this.server.to(client.id).emit('oppo-crashed')
-
-        // this.server.to(client.id).emit('oppo-crashed')
-
-        // this.displayUserArray();
+        let gI = this.getStrGame(client.id);
+        
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
+        console.log("");
+        console.log("OPPOSANT IS ", oppoSocket);
+        console.log("");
+
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
         this.removeUser(client.id);
     }
@@ -185,7 +186,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
         for (let i = 0; i < this.games.length; i++) {
-            console.log("Ca abandonnnnne")
             const currentGame = this.games[i];
             const d1 = currentGame.getPlayer1Id();
             const d2 = currentGame.getPlayer2Id();
@@ -193,7 +193,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
                 currentGame.statusAbandon(socketId);
             }
         }
-
     }
 
     @SubscribeMessage('IsFinished')
@@ -210,6 +209,9 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('Crash')
     handleCrash(client: Socket, socketId: string): void {
+        console.log("");
+        console.log("----------- ca CRASH -----------")
+        console.log("");
         for (let i = 0; i < this.games.length; i++) {
             const currentGame = this.games[i];
             const d1 = currentGame.getPlayer1Id();
@@ -222,9 +224,13 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('finito')
     handleFinito(client: Socket) {
-        console.log("---- je suis finito de game.gateway");
+        console.log("");
+        console.log("------------------- je suis finito de game.gateway");
+        console.log("");
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
+        console.log("oppo : ", oppoSocket);
+        console.log("moi : ", client.id);
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
         this.removeUser(client.id);
         for (let i = 0; i < this.games.length; i++) {
@@ -233,6 +239,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
                 currentGame.setFinito(client.id);
+                console.log("ma game -----> ", currentGame.getGameId);
             }
         }
     }
@@ -260,7 +267,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         this.toPlay(this.playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
     }
     
-    toPlay(playersAvailable: Player[], mapChoice: number)
+    async toPlay(playersAvailable: Player[], mapChoice: number)
     {
         if (playersAvailable.length == 2)//si ils sont 2
         {
@@ -275,11 +282,11 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             if (player1.map === player2.map && player1.userid != player2.userid) {//si ils ont le MEME choix de map
                 const gameId = uuidv4();//je donne une ID unique a ma game
                 let gameIdChoice: string;
-                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
+                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs, this.us);
                 console.log("");
                 this.games.push(currentGame);
                 currentGame.actualDataInClassGame();
-                currentGame.start();//la game commence
+                await currentGame.start();//la game commence
                 this.removeUser(player1.socketId);
                 this.removeUser(player2.socketId);
                 if (currentGame.checkGameStatus() === true) {

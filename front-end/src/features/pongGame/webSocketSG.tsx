@@ -5,7 +5,7 @@ import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Rootstate } from "../../app/store";
     
-export const WebSocketSG = ({ socket, page}) => {
+export const WebSocketSG = ({ socket, page, setPage}) => {
 
     // const userid = useSelector((state: Rootstate) => state.user.id);
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -184,11 +184,9 @@ export const WebSocketSG = ({ socket, page}) => {
                 drawBall(context, board);
                 if (gameState.player1Winner === true || gameState.player2Winner === true) {
                     displayEndGame(context, board);
-                    console.log("je serais donc bloque en display end?")
                 }
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
-                    console.log("je serais donc bloque en display fail?")
                 }
                 partyAbandon(context, board);
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
@@ -203,6 +201,7 @@ export const WebSocketSG = ({ socket, page}) => {
         }
     };
 
+    
     const handleAbandon = () => {
         socket?.emit('Abandon', socket?.id);
     }
@@ -214,14 +213,14 @@ export const WebSocketSG = ({ socket, page}) => {
     const getBack = () => {
         navigate('../')
     }
-
+    
     const drawWaves = (time: number, context: CanvasRenderingContext2D) => {
-
+        
         const waveColors = ['#ff6347', '#6495ed', '#00ced1', '#ff69b4', '#32cd32'];
-
+        
         for (let i = 0; i < waveColors.length; i++) {
-          const offset = i * 20;
-          context.fillStyle = waveColors[i];
+            const offset = i * 20;
+            context.fillStyle = waveColors[i];
           context.beginPath();
           for (let x = 0; x < gameState.boardWidth; x += 10) {
             const y = Math.sin((x + time + offset) * 0.01) * 50 + gameState.boardHeight / 2;
@@ -232,11 +231,18 @@ export const WebSocketSG = ({ socket, page}) => {
         context.lineTo(0, gameState.boardHeight);
         context.closePath();
         context.fill();
-        }
-    };
+    }
+};
 
     useEffect(() => {
-        ////////////// LOOP FOR FRONTEND /////////////////////////
+
+        if (page === "lobby") {
+            // navigate('../');
+            console.log("if page ==== lobby for ", socket.id);
+            // socket?.emit("goQueueList");
+            // socket?.emit('finitoGame');
+        }
+    ////////////// LOOP FOR FRONTEND /////////////////////////
         const animationId = requestAnimationFrame(update);
         ////////////// AU LANCEMENT DE START GAME //////////////
 
@@ -245,7 +251,7 @@ export const WebSocketSG = ({ socket, page}) => {
         }
 
         const handleDisconnect = () => {
-            console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
+            // console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
         }
 
         if (socket?.connected) {
@@ -326,6 +332,7 @@ export const WebSocketSG = ({ socket, page}) => {
         })
 
         socket?.on('oppo-crashed', (socket: string) => {
+            console.log("+++++++++++++++ MY OPPONENT CRASHED +++++++++++")
             if (socket === gameState.paddle1.socket) {
                 gameState.player2IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;

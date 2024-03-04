@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom";
 
-export const WebSocketQG = ({ socket, page}) => {
+export const WebSocketQG = ({ socket, page, setPage}) => {
 
     const navigate = useNavigate();
     const handleQuitQueue = () => {
@@ -11,10 +11,11 @@ export const WebSocketQG = ({ socket, page}) => {
 
     useEffect(() => {
 
-        if (page === "lobby") {
-            navigate('../');
-        }
-        console.log("DA WOOD :", socket?.id);
+        // if (page === "lobby") {
+            // navigate('../');
+        // }
+        // setPage("QG");
+
         if (socket?.id === null || undefined) {
             console.log("Socket undefined dans le if")
             navigate('../');

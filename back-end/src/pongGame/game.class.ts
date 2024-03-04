@@ -3,6 +3,7 @@ import { GameStateBD, Player, GameStatus} from "./gameStateBD";
 import { GameService } from './game.service';
 import { GameOverDTO } from './dto';
 import { Injectable } from '@nestjs/common';
+import { UsersService } from 'src/user/user.service';
 
 export class Game {
     
@@ -12,7 +13,8 @@ export class Game {
     private player1: Player;
     private player2: Player;
     private mapChoice: number;
-    private gs: GameService
+    private gs: GameService;
+    private us: UsersService;
    
     private initializeGameState(): GameStateBD {
       const gameState = new GameStateBD();
@@ -22,14 +24,15 @@ export class Game {
       return gameState;
     }
 
-    constructor(Id: string, server: Server, player1: Player, player2: Player, mapChoice: number, gs: GameService) {
+    constructor(Id: string, server: Server, player1: Player, player2: Player, mapChoice: number, gs: GameService, us: UsersService) {
         this.player1 = player1;
         this.player2 = player2;
         this.server = server;
         this.gameId = Id;
         this.gameState = this.initializeGameState();
         this.mapChoice = mapChoice;
-        this.gs = gs
+        this.gs = gs;
+        this.us = us;
     }
 
     actualDataInClassGame() {
@@ -37,15 +40,19 @@ export class Game {
         
     }
 
-    start() {
+    async start() {
         //STATUS GAME BEGINS
         this.sendToPlayer("prepareForMatch", {}, "jojo");
         this.gameState.status = GameStatus.playingGame;
+        await this.us.changeStatus(this.player1.userid, "in game");
+        await this.us.changeStatus(this.player2.userid, "in game");
         this.startGameLoop();
     }
 
-    statusAbandon(socketClient: string) {
+    async statusAbandon(socketClient: string) {
         this.gameState.status = GameStatus.abortedGame;
+        await this.us.changeStatus(this.player1.userid, "online");
+        await this.us.changeStatus(this.player2.userid, "online");
         if (socketClient === this.player1.socketId)
         {
             this.server.to(this.player1.socketId).emit('IGaveUp', this.gameState.idPlayer1);
@@ -130,10 +137,12 @@ export class Game {
             this.gameState.status = GameStatus.finishedGame;
             console.log("userid 1 winner => ", this.player1.userid);
             console.log("userid 2 looser => ", this.player2.userid);
-            // const data = new GameOverDTO();
-            // data.winnerId = this.player1.userid;
-            // data.loserId = this.player2.userid;
-            // await this.gs.saveMatchs(data);
+            const data = new GameOverDTO();
+            data.winnerId = this.player1.userid;
+            data.loserId = this.player2.userid;
+            await this.gs.saveMatchs(data);
+            await this.us.changeStatus(this.player1.userid ,"online");
+            await this.us.changeStatus(this.player2.userid ,"online");
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
@@ -143,11 +152,12 @@ export class Game {
             this.gameState.status = GameStatus.finishedGame;
             console.log("userid 1 looser => ", this.player1.userid);
             console.log("userid 2 winner => ", this.player2.userid);
-            // const data = new GameOverDTO();
-            // data.winnerId = this.player2.userid;
-            // data.loserId = this.player1.userid;
-            // console.log(data);
-            // await this.gs.saveMatchs(data)
+            const data = new GameOverDTO();
+            data.winnerId = this.player2.userid;
+            data.loserId = this.player1.userid;
+            await this.us.changeStatus(this.player1.userid ,"online");
+            await this.us.changeStatus(this.player2.userid ,"online");
+            await this.gs.saveMatchs(data)
             this.gameState.player2Winner = true;
             this.gameState.player1Looser = true;
 
@@ -293,7 +303,7 @@ export class Game {
 
     startGameLoop() {
         const loop = setInterval(async () => {
-            // console.log("game status loop game.class : ", this.gameState.status);
+            console.log("game status loop game.class : ", this.gameState.status);
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
                 this.initChoiceMap();
