@@ -18,8 +18,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 	@WebSocketServer()
 	server: Server;
 
-
-	// private userIdd: number;
 	private userArray: Player[] = [];
     private playersAvailable: Player[] = [];
 	private PrivateuserArray = [];
@@ -47,12 +45,27 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
         let gI = this.getStrGame(client.id);
         
         this.server.to(client.id).emit('user-disconnected');
-        const oppoSocket = this.getOpponentSocket(client.id);
-        console.log("");
-        console.log("OPPOSANT IS ", oppoSocket);
-        console.log("");
-
-        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
+        
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const j1 = currentGame.getPlayer1UserID();
+            const j2 = currentGame.getPlayer2UserID();
+            let sample1 = currentGame.getSocketByUserID(j1);
+            let sample2 = currentGame.getSocketByUserID(j2);
+            for (let i = 0; i < this.userArray.length; i++) {
+                console.log("user array is user id number ", this.userArray[i].userid, " for socket : ", this.userArray[i].socketId);
+                if (this.userArray[i].userid === j1)
+                {
+                    this.server.to(sample2).emit('oppo-crashed', sample2)
+                    this.removeUser(sample2);
+                }
+                else if (this.userArray[i].userid === j2)
+                {
+                    this.server.to(sample1).emit('oppo-crashed', sample1)
+                    this.removeUser(sample1);
+                }
+            }
+        }
         this.removeUser(client.id);
     }
 
@@ -119,34 +132,24 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		console.log("[FIRST]", client.id, "= client:", message.userid)
 		this.addUser(client.id, -1, message.userid, -1);
 		this.server.to(client.id).emit("firstFinish", {msg:"vasy"})
-		// const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
-		// if (existingUserIndex !== -1) {
-		// 	this.userArray[existingUserIndex].userid = message.userid;
-        //     console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
-		// }
     }
 
     @SubscribeMessage('refreshInQueue')
     handleRefreshInQueue(client: Socket) {
         console.log("__________________ la socket de l'emmerdeur = ", client.id);
         for (let i = 0; i < this.playersAvailable.length; i++) {
-            // console.log(" PLAYERS_AVAILABLE TAB->", this.playersAvailable[i]);
             if (client.id === this.playersAvailable[i].socketId)
             {
                 const mapChoiceEmmerdeur = this.playersAvailable[i].map;
                 const userIdEmmerdeur = this.playersAvailable[i].userid;
                 console.log("ouiouioui");
-                // this.server.emit('reloadInQueue');
                 this.playersAvailable.splice(i, 1);
                 break;
             }
         }
         for (let i = 0; i < this.userArray.length; i++) {
-            // console.log(" USER_ARRAY->", this.userArray[i]);
             if (client.id === this.userArray[i].socketId)
             {
-                // console.log("ouiouioui");
-                // this.server.emit('reloadInQueue');
                 this.userArray.splice(i, 1);
                 break;
             }
@@ -226,23 +229,47 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
     @SubscribeMessage('finito')
     handleFinito(client: Socket) {
-        console.log("");
-        console.log("------------------- je suis finito de game.gateway");
-        console.log("");
         this.server.to(client.id).emit('user-disconnected');
-        const oppoSocket = this.getOpponentSocket(client.id);
-        console.log("oppo : ", oppoSocket);
-        console.log("moi : ", client.id);
-        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
-        this.removeUser(client.id);
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
-                currentGame.setFinito(client.id);
-                console.log("ma game -----> ", currentGame.getGameId);
+        const oppo = this.getOpponentSocket(client.id);
+        if (!oppo || oppo === null || undefined) {
+            for (let i = 0; i < this.games.length; i++) {
+                const currentGame = this.games[i];
+
+                const j1 = currentGame.getPlayer1UserID();
+                const j2 = currentGame.getPlayer2UserID();
+    
+                let sample1 = currentGame.getSocketByUserID(j1);
+                let sample2 = currentGame.getSocketByUserID(j2);
+    
+                for (let i = 0; i < this.userArray.length; i++) {
+                    if (this.userArray[i].userid === j1)
+                    {
+                        this.server.to(sample2).emit('oppo-crashed', sample2)
+                        currentGame.setFinito();
+                        this.removeUser(sample2);
+                    }
+                    else if (this.userArray[i].userid === j2)
+                    {
+                        this.server.to(sample1).emit('oppo-crashed', sample1)
+                        this.removeUser(sample1);
+                    }
+                }
             }
+            this.removeUser(client.id);
+        }
+        else if (oppo)
+        {
+            for (let i = 0; i < this.games.length; i++) {
+                const currentGame = this.games[i];
+                const d1 = currentGame.getPlayer1Id();
+                const d2 = currentGame.getPlayer2Id();
+                if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+                    currentGame.setFinito();
+                    this.server.to(oppo).emit('oppo-crashed', oppo);
+                    this.removeUser(oppo);
+                }
+            }
+            this.removeUser(client.id);
         }
     }
 
@@ -296,8 +323,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		else
 		{
 			console.log("user", data.userId, "attend son pote pour jouer...")
-			// console.log(playersAvailablePrivate)
-
 		}
     }
     
@@ -318,9 +343,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
                 const gameId = uuidv4();//je donne une ID unique a ma game
                 let gameIdChoice: string;
                 const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs, this.us);
-                console.log("");
                 this.games.push(currentGame);
-                currentGame.actualDataInClassGame();
                 await currentGame.start();//la game commence
                 this.removeUser(player1.socketId);
                 this.removeUser(player2.socketId);

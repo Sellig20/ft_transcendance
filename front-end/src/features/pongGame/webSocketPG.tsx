@@ -4,8 +4,6 @@ import { Rootstate } from '../../app/store';
 import { useEffect } from 'react';
 
 export const WebSocketPG = ({ socket, userId, page, setPage }) => {
-    // const userid = useSelector((state: Rootstate) => state.user.id);
-    
     const navigate = useNavigate();
     const handleRedirectToQueueGate = (mapChoice: number) => {
         console.log("MAP CHOICE => ", mapChoice, " de ", socket.id);

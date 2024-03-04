@@ -21,6 +21,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     }
 
     const partyAbandon = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        console.log("Je passe en partyABandon de SG");
         if (gameState.player1Abandon === true || gameState.player2Abandon === true)
         {
             partyIsAbandonned(context, board);
@@ -76,9 +77,11 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
         setTimeout(getBack, 1000);
     }
-    
+
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
+        console.log("Je passe en party IS ABANDONNEDDDD dessin");
         context.strokeStyle = 'rgb(190, 154, 240)';
+        console.log("Je passe par party is abandonned");
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #1E90FF';
         else
@@ -87,9 +90,9 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
         context.textAlign = 'center';
         context.fillText('YOU GAVE UP', board.width / 2, board.height / 2);
     }
-    
+
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        gameState.status === GameStatus.abortedGame;
+        console.log("Je passe en party IS DESERTED dessin");
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #FF1493';
@@ -172,6 +175,12 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
         if (board) {
             const context = createContextCanvas(board);
             if (context) {
+                if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
+                    gameState.status === GameStatus.over)
+                {
+                    console.log("ca va bouger 3 2 1...");
+                    setTimeout(getBack, 1000);
+                }
                 context.clearRect(0, 0, board.width, board.height);// Efface le contenu du canvas
                 context.fillStyle = '#9900ff';
                 if (gameState.mapChoiceLocked === 2) {
@@ -189,13 +198,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
                     displayFailGame(context, board);
                 }
                 partyAbandon(context, board);
-                if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
-                    gameState.status === GameStatus.over)
-                {
-                    console.log("ca va bouger 3 2 1...");
-                    setTimeout(getBack, 1000);
-                }
-                time += 0.5;
+                time += 2;
                 requestAnimationFrame(update);
             }
         }
@@ -251,7 +254,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
         }
 
         const handleDisconnect = () => {
-            // console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
+            console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
         }
 
         if (socket?.connected) {
@@ -329,6 +332,17 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
 
         socket?.on('GameOver', (socketClient: string, gameId: string) => {
             socket?.emit('IsFinished', socketClient);
+        })
+
+        socket?.on('user-disconnected', () => {
+            if (socket === gameState.paddle1.socket) {
+                gameState.status = GameStatus.abortedGame;
+                handleDisconnect();
+            }
+            else if (socket === gameState.paddle2.socket) {
+                gameState.status = GameStatus.abortedGame;
+                handleDisconnect();
+            }
         })
 
         socket?.on('oppo-crashed', (socket: string) => {

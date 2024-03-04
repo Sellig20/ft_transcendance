@@ -11,10 +11,9 @@ export const WebSocketQG = ({ socket, page, setPage}) => {
 
     useEffect(() => {
 
-        // if (page === "lobby") {
-            // navigate('../');
-        // }
-        // setPage("QG");
+        if (page === "lobby") {
+            navigate('../');
+        }
 
         if (socket?.id === null || undefined) {
             console.log("Socket undefined dans le if")

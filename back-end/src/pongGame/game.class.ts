@@ -99,7 +99,7 @@ export class Game {
         this.gameState.status = GameStatus.abortedGame;
     }
 
-    setFinito(socketClient: string) {
+    setFinito() {
         // console.log("---- je suis setFinito de game.class");
         this.gameState.status = GameStatus.finishedGame;
     }
@@ -128,6 +128,21 @@ export class Game {
 
     getPlayer2Id() : string {
         return this.player2.socketId;
+    }
+
+    getPlayer1UserID() : number {
+        return this.player1.userid;
+    }
+
+    getPlayer2UserID() : number {
+        return this.player2.userid;
+    }
+
+    getSocketByUserID(userId: number) : string {
+        if (userId === this.player1.userid)
+            return this.player1.socketId;
+        else if (userId === this.player2.userid)
+            return this.player2.socketId;
     }
 
     async maxScore() {
