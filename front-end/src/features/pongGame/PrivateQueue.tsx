@@ -1,7 +1,21 @@
-import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react"
+import { useSelector } from "react-redux";
 
-export const WebSocketQG = ({ socket, page, setPage}) => {
+import { useNavigate, useParams } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
+import { Rootstate } from "../../app/store";
+
+export const WebSocketQG = () => {
+
+	const {idP} = useParams();
+	let id1P: number;	
+	if (idP && parseInt(idP)){
+		id1P = parseInt(idP, 10);
+	}
+
+	const [socket, setSocket] = useState<Socket | null>(null)
+    const count = useRef(0)
+    const userid = useSelector((state: Rootstate) => state.user.id);
 
     const navigate = useNavigate();
     const handleQuitQueue = () => {
@@ -9,31 +23,28 @@ export const WebSocketQG = ({ socket, page, setPage}) => {
         navigate('../');
     }
 
+
+
     useEffect(() => {
-
-        // if (page === "lobby") {
-            // navigate('../');
-        // }
-        // setPage("QG");
-
-        if (socket?.id === null || undefined) {
-            console.log("Socket undefined dans le if")
-            navigate('../');
-        }
+		if (count.current === 0)
+		{
+			const newSocket = io(`http://${process.env.HOST_IP}:8002`)
+			setSocket(newSocket);
+		}
+		count.current++;
         const handlePrepareMatch = () => {
             console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
-      
-            socket?.on('prepareForMatch', handlePrepareMatch);
 
-    return () => {
-            console.log("Unregistering events in Queue gate");
+        socket?.on('prepareForMatch', handlePrepareMatch);
+
+        return () => {
             socket?.off('prepareForMatch', handlePrepareMatch);
         };
-
     }, [socket]);
 	
+	socket?.emit("goQueueListPrivate", {socketId: socket.id, mapChoice: 1, userId: userid, user2: id1P})
     return (
         <div>
             <link

@@ -4,6 +4,7 @@ import chatService from '../chat.service'
 import { userInfo } from 'os'
 import { toast } from 'react-toastify';
 import { sha256 } from 'js-sha256';
+import { useNavigate } from 'react-router-dom';
 
 const handleLeave = async (
 	userid: number,
@@ -43,7 +44,7 @@ const handleBan = async (
 };
 
 const handleBlock = async (
-	iduserinfo: number,
+	iduserinfo: numberuseNavigate,
 	userToBan: number,
 	reload: any,
 	channelinfo: any
@@ -87,6 +88,7 @@ const handleMute = async (
 
 };
 
+
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
@@ -95,6 +97,13 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 	userinfo: any,
 	reload: any
 }) => {
+	const navigate = useNavigate();
+	const handleGame = async (
+		idCard: number,
+	) => {
+		navigate(`/game/queuePrivate/${idCard}`)
+	};
+
 	let status = "membre"
 	let idCard = element.id
 	let	yourself = false
@@ -127,7 +136,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
-					<input type="button" value={"PlayWith"} id={element.id}/>
+					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}
@@ -152,7 +161,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
-					<input type="button" value={"PlayWith"} id={element.id}/>
+					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}
@@ -169,7 +178,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					{element.username} ({status})
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
-					<input type="button" value={"PlayWith"} id={element.id}/>
+					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame( idCard)}/>
 				</div>
 			)
 		}
@@ -191,7 +200,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					{element.username} ({status})
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
 					<input type="button" value={"Profil"} id={element.id}/>
-					<input type="button" value={"PlayWith"} id={element.id}/>
+					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}

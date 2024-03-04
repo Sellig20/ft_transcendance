@@ -10,34 +10,35 @@ import { GameService } from "./game.service";
 import { UsersService } from "src/user/user.service";
 
 @WebSocketGateway(8002, {
-    // namespace: 'game',
-    cors: "*"
+	// namespace: 'game',
+	cors: "*"
 })
 
-export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayDisconnect<Socket> {
-    @WebSocketServer()
-    server: Server;
+export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect<Socket> {
+	@WebSocketServer()
+	server: Server;
 
-    
-    // private userIdd: number;
-    private userArray: Player[] = [];
+
+	// private userIdd: number;
+	private userArray: Player[] = [];
     private playersAvailable: Player[] = [];
-    games: Game[] = [];
+	private PrivateuserArray = [];
+	games: Game[] = [];
 
     constructor(
         private gs: GameService,
         private us: UsersService
     ) {}
 
-    onModuleInit() {
-        this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
-            console.log('Connection -> ', socket.id);
-        })
-    }
+	onModuleInit() {
+		this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
+			console.log('Connection -> ', socket.id);
+		})
+	}
 
-    handleConnection(client: Socket, ...args: any[]) {
-        console.log(`[GAME] Client connected: ${client.id}`);
-		this.server.to(client.id).emit("FIRST", {msg:"who are you"})
+	handleConnection(client: Socket, ...args: any[]) {
+		console.log(`[GAME] Client connected: ${client.id}`);
+		this.server.to(client.id).emit("FIRST", { msg: "who are you" })
 
     }
     
@@ -55,73 +56,73 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         this.removeUser(client.id);
     }
 
-    getStrGame(id: string)//trouve la id socket du game
-    {
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const gameId = currentGame.getGameId();
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (id === d1 || id === d2) {//la socket recue correspond a un joueur
-                return gameId;//alors ce joueur est relie a une gameId, la retourner
-            } else {
+	getStrGame(id: string)//trouve la id socket du game
+	{
+		for (let i = 0; i < this.games.length; i++) {
+			const currentGame = this.games[i];
+			const gameId = currentGame.getGameId();
+			const d1 = currentGame.getPlayer1Id();
+			const d2 = currentGame.getPlayer2Id();
+			if (id === d1 || id === d2) {//la socket recue correspond a un joueur
+				return gameId;//alors ce joueur est relie a une gameId, la retourner
+			} else {
 
-            }
-        }
-    }
-
-    getP(id: string)//trouve la id socket des players
-    {
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const gameId = currentGame.getGameId();
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (id === d1) {//la socket recue correspond a un joueur
-                return 1;
-            } else  if (id === d2) {
-                return 2;//ce joueur est enregistre en P1 ou en P2 donc retourner 1 ou 2
-            }
-        }
-    }
-  
-    getGaObj(id: string)//id de la game
-    {
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const gameId = currentGame.getGameId();
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (id === d1 || id === d2) {//la socket recue correspond a un joueur
-                return this.games[i].getGameObject();
-            } else {
-
-            }
-        }
-    }
-
-    getOpponentSocket(mySocket: string) {
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (mySocket === d1) {//la socket recue correspond a un joueur
-                return d2;
-            } else if (mySocket === d2) {
-                return d1;
-            }
-        }
-    }
-    
-    @SubscribeMessage('FIRST')
-    async handleMessageconnection(client: any, message: any) {
-        console.log("[FIRST]", client.id,"= client:", message.userid)
-		const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
-		if (existingUserIndex !== -1)
-		{
-			this.userArray[existingUserIndex].userid = message.userid;
-            console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
+			}
 		}
+	}
+
+	getP(id: string)//trouve la id socket des players
+	{
+		for (let i = 0; i < this.games.length; i++) {
+			const currentGame = this.games[i];
+			const gameId = currentGame.getGameId();
+			const d1 = currentGame.getPlayer1Id();
+			const d2 = currentGame.getPlayer2Id();
+			if (id === d1) {//la socket recue correspond a un joueur
+				return 1;
+			} else if (id === d2) {
+				return 2;//ce joueur est enregistre en P1 ou en P2 donc retourner 1 ou 2
+			}
+		}
+	}
+
+	getGaObj(id: string)//id de la game
+	{
+		for (let i = 0; i < this.games.length; i++) {
+			const currentGame = this.games[i];
+			const gameId = currentGame.getGameId();
+			const d1 = currentGame.getPlayer1Id();
+			const d2 = currentGame.getPlayer2Id();
+			if (id === d1 || id === d2) {//la socket recue correspond a un joueur
+				return this.games[i].getGameObject();
+			} else {
+
+			}
+		}
+	}
+
+	getOpponentSocket(mySocket: string) {
+		for (let i = 0; i < this.games.length; i++) {
+			const currentGame = this.games[i];
+			const d1 = currentGame.getPlayer1Id();
+			const d2 = currentGame.getPlayer2Id();
+			if (mySocket === d1) {//la socket recue correspond a un joueur
+				return d2;
+			} else if (mySocket === d2) {
+				return d1;
+			}
+		}
+	}
+
+	@SubscribeMessage('FIRST')
+	async handleMessageconnection(client: any, message: any) {
+		console.log("[FIRST]", client.id, "= client:", message.userid)
+		this.addUser(client.id, -1, message.userid);
+		// const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
+		// if (existingUserIndex !== -1) {
+		// 	this.userArray[existingUserIndex].userid = message.userid;
+        //     console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
+		// }
     }
 
     @SubscribeMessage('refreshInQueue')
@@ -151,37 +152,37 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         }
     }
 
-    @SubscribeMessage('keydown')
-    handleKeyPressedUpDown(client: Socket, data: {key: string}) {
-        const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
-        let tmp: number = 0;
-        if (data.key === "ArrowUp" && playerSample === 1)
-            tmp = -3;
-        else if (data.key === "ArrowDown" && playerSample === 1)
-            tmp = 3;
-        else if (data.key === "ArrowUp" && playerSample === 2)
-            tmp = -3;
-        else if (data.key === "ArrowDown" && playerSample === 2)
-            tmp = 3;
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const gameId = currentGame.getGameId();
-            const d1 = currentGame.getPlayer1Id();
-            const d2 = currentGame.getPlayer2Id();
-            if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
-                if (playerSample === 1)//JOUEUR DU PADDLE 1 ARROW UP ET DOWN
-                {
-                    this.games[i].updateVelPaddle1(tmp);
-                }
-                else if (playerSample === 2)//JOUEUR DU PADDLE 2 ARROW UP ET DOWN
-                {
-                    this.games[i].updateVelPaddle2(tmp);
-                }
-                else
-                    return ;
-            }
-        }
-    }
+	@SubscribeMessage('keydown')
+	handleKeyPressedUpDown(client: Socket, data: { key: string }) {
+		const playerSample = this.getP(client.id);//attention ne se lance pas si on rafraichit la page
+		let tmp: number = 0;
+		if (data.key === "ArrowUp" && playerSample === 1)
+			tmp = -3;
+		else if (data.key === "ArrowDown" && playerSample === 1)
+			tmp = 3;
+		else if (data.key === "ArrowUp" && playerSample === 2)
+			tmp = -3;
+		else if (data.key === "ArrowDown" && playerSample === 2)
+			tmp = 3;
+		for (let i = 0; i < this.games.length; i++) {
+			const currentGame = this.games[i];
+			const gameId = currentGame.getGameId();
+			const d1 = currentGame.getPlayer1Id();
+			const d2 = currentGame.getPlayer2Id();
+			if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+				if (playerSample === 1)//JOUEUR DU PADDLE 1 ARROW UP ET DOWN
+				{
+					this.games[i].updateVelPaddle1(tmp);
+				}
+				else if (playerSample === 2)//JOUEUR DU PADDLE 2 ARROW UP ET DOWN
+				{
+					this.games[i].updateVelPaddle2(tmp);
+				}
+				else
+					return;
+			}
+		}
+	}
 
     @SubscribeMessage('Abandon')
     handleAbandon(client: Socket, socketId: string): void {
@@ -244,10 +245,10 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         }
     }
 
-    @SubscribeMessage('quitQueue')
-    handleQuitQueue(client: Socket) {
-        this.removeUser(client.id);
-    }
+	@SubscribeMessage('quitQueue')
+	handleQuitQueue(client: Socket) {
+		this.removeUser(client.id);
+	}
 
     @SubscribeMessage('goQueueList')//evenement de websocketQG
     handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number, userId: number}): void {
@@ -266,11 +267,44 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         this.playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
         this.toPlay(this.playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
     }
+
+    @SubscribeMessage('goQueueListPrivate')//evenement de websocketQG
+    handleGoQueueListPrivate(client: Socket, data: {socketId: string, mapChoice: number, userId: number, user2: number}): void {
+        let mapChoice = 1
+		this.addUser(client.id, 1, data.userId, data.user2);//add user dans le userArray
+		let playersAvailablePrivate = []
+        for (let i = 0; i < this.userArray.length; i++) {
+            const player = this.userArray[i];//je regarde chaque user added
+            
+            if (data.userId === player.userid) {//si tu as clique
+                console.log("data.userId => ", data.userId);
+                console.log("player.userId => ", player.userid);
+                player.status = playerStatus.isAvailable;//je te mets en available pour jouer
+                player.socketId = data.socketId;
+                this.userArray.splice(i, 1, player);//je remets le joueur actualise
+				playersAvailablePrivate.push(player)
+            }
+        }
+		// recherche si ton pote t'attend
+		for (let i = 0; i < this.userArray.length; i++) {
+            if (this.userArray[i].user2 === data.userId)
+				playersAvailablePrivate.push(this.userArray[i])
+        }
+		if (playersAvailablePrivate.length === 2)
+			this.toPlay(playersAvailablePrivate, mapChoice);//j'ai pris deux joueurs available direction juste en dessous
+		else
+		{
+			console.log("user", data.userId, "attend son pote pour jouer...")
+			console.log(playersAvailablePrivate)
+
+		}
+    }
     
     async toPlay(playersAvailable: Player[], mapChoice: number)
     {
         if (playersAvailable.length == 2)//si ils sont 2
         {
+			// console.log(playersAvailable)
             let player1: any = null;
             let player2: any = null;
             player1 = playersAvailable[0];
@@ -313,22 +347,29 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         console.log("-------------------------------");
     }
     
-    private addUser(item: string, mapChoice: number, userI: number): void {
+    private addUser(item: string, mapChoice: number, userI: number, user2?: number): void {
         console.log("[ADD USER : ", item, "] choix : ", mapChoice);
+		let usr = -1
+		if (user2 !== undefined)
+			usr = user2
         const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
         if (existingUserIndex === -1) {//si le user n'existe pas encore, alors le creer
             const newPlayer: Player = {
-                socketId: item,
-                status: playerStatus.isSettling,
-                level: 0,
-                map: mapChoice,
+				socketId: item,
+				status: playerStatus.isSettling,
+				level: 0,
+				map: mapChoice,
 				userid: userI,
-            };
+				user2: usr
+			};
+			console.log(item)
             this.userArray.push(newPlayer);
         }
         else {
             console.log("Ecrasement de socket avec la nouvelle socket du joueur : ", this.userArray[existingUserIndex].userid);
             this.userArray[existingUserIndex].socketId = item//sinn il existe deja donc on ecrase sa socket avec la nouvelle socket
+			this.userArray[existingUserIndex].user2 = usr
+			this.userArray[existingUserIndex].map = mapChoice
         }
     }
     
@@ -340,7 +381,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
         return ;
     }
 
-    private removeGameById = (idToRemove: string) => {
-        this.games = this.games.filter((game) => game.getGameId() !== idToRemove);
-    };
+	private removeGameById = (idToRemove: string) => {
+		this.games = this.games.filter((game) => game.getGameId() !== idToRemove);
+	};
 }
