@@ -9,10 +9,13 @@ import WebSocketQG from './webSocketQG';
 import { Route, Routes, useParams } from "react-router-dom";
 import PrivateQueue from "./PrivateQueue";
 
+
 export default function Game() {
 
 	
     const [socket, setSocket] = useState<Socket | null>(null)
+	const [page, setPage] = useState<any | null>(null)
+
     const count = useRef(0)
     const userid = useSelector((state: Rootstate) => state.user.id);
 
@@ -21,6 +24,7 @@ export default function Game() {
 
     const first = (newSocket: Socket) => {
 		setSocket(newSocket)
+		setPage("lobby");
 	}
 
 	const firstListener = (
@@ -56,12 +60,12 @@ export default function Game() {
 			<Route path="/" element={
 				<div>
 				
-					<WebSocketPG socket={socket} userId={userid}/>
+					<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
 				</div>
 			}/>
 			<Route path="/queue" element={
 				<div>
-					<WebSocketQG socket={socket}/>
+					<WebSocketQG socket={socket} page={page}/>
 				</div>
 			}/>
 			<Route path="/queuePrivate/:idP" element={
@@ -71,7 +75,7 @@ export default function Game() {
 			}/>
 			<Route path="/startgame" element={
 				<div>
-					<WebSocketSG socket={socket}/>
+					<WebSocketSG socket={socket} page={page}/>
 				</div>
 			}/>
         </Routes>

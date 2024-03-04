@@ -1,8 +1,9 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Rootstate } from '../../app/store';
+import { useEffect } from 'react';
 
-export const WebSocketPG = ({ socket, userId }) => {
+export const WebSocketPG = ({ socket, userId, page, setPage }) => {
     // const userid = useSelector((state: Rootstate) => state.user.id);
     
     const navigate = useNavigate();
@@ -11,6 +12,10 @@ export const WebSocketPG = ({ socket, userId }) => {
         socket?.emit('goQueueList', { socketId: socket.id, mapChoice, userId});
         navigate('../queue');
     }
+    
+    useEffect(() => {
+        setPage("PG");
+    })
 
     const handleSelectGame = () => {
         navigate('../../home');

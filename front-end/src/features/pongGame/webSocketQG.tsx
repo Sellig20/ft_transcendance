@@ -1,7 +1,7 @@
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom";
 
-export const WebSocketQG = ({ socket}) => {
+export const WebSocketQG = ({ socket, page}) => {
 
     const navigate = useNavigate();
     const handleQuitQueue = () => {
@@ -9,17 +9,25 @@ export const WebSocketQG = ({ socket}) => {
         navigate('../');
     }
 
-
-
     useEffect(() => {
+
+        if (page === "lobby") {
+            navigate('../');
+        }
+        console.log("DA WOOD :", socket?.id);
+        if (socket?.id === null || undefined) {
+            console.log("Socket undefined dans le if")
+            navigate('../');
+        }
         const handlePrepareMatch = () => {
             console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
+      
+            socket?.on('prepareForMatch', handlePrepareMatch);
 
-        socket?.on('prepareForMatch', handlePrepareMatch);
-
-        return () => {
+    return () => {
+            console.log("Unregistering events in Queue gate");
             socket?.off('prepareForMatch', handlePrepareMatch);
         };
 

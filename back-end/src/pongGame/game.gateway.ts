@@ -7,7 +7,7 @@ import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 import { OnModuleInit } from "@nestjs/common";
 import { GameService } from "./game.service";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @WebSocketGateway(8002, {
@@ -22,6 +22,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
 	// private userIdd: number;
 	private userArray: Player[] = [];
+    private playersAvailable: Player[] = [];
 	private PrivateuserArray = [];
 	games: Game[] = [];
 
@@ -39,14 +40,20 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		console.log(`[GAME] Client connected: ${client.id}`);
 		this.server.to(client.id).emit("FIRST", { msg: "who are you" })
 
-	}
+    }
+    
+    handleDisconnect(client: Socket, ...args: any[]) {
+        console.log("--- disconnecttttt :")
+        this.server.to(client.id).emit('oppo-crashed')
 
-	handleDisconnect(client: Socket, ...args: any[]) {
-		this.server.to(client.id).emit('user-disconnected');
-		const oppoSocket = this.getOpponentSocket(client.id);
-		this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
-		this.removeUser(client.id);
-	}
+        // this.server.to(client.id).emit('oppo-crashed')
+
+        // this.displayUserArray();
+        this.server.to(client.id).emit('user-disconnected');
+        const oppoSocket = this.getOpponentSocket(client.id);
+        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
+        this.removeUser(client.id);
+    }
 
 	getStrGame(id: string)//trouve la id socket du game
 	{
@@ -112,9 +119,36 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
 		if (existingUserIndex !== -1) {
 			this.userArray[existingUserIndex].userid = message.userid;
-			console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
+            console.log("!!!!!!!!!!!!!client socket :", client.id, " | userid :", message.userid)
 		}
-	}
+    }
+
+    @SubscribeMessage('refreshInQueue')
+    handleRefreshInQueue(client: Socket) {
+        console.log("__________________ la socket de l'emmerdeur = ", client.id);
+        for (let i = 0; i < this.playersAvailable.length; i++) {
+            // console.log(" PLAYERS_AVAILABLE TAB->", this.playersAvailable[i]);
+            if (client.id === this.playersAvailable[i].socketId)
+            {
+                const mapChoiceEmmerdeur = this.playersAvailable[i].map;
+                const userIdEmmerdeur = this.playersAvailable[i].userid;
+                console.log("ouiouioui");
+                // this.server.emit('reloadInQueue');
+                this.playersAvailable.splice(i, 1);
+                break;
+            }
+        }
+        for (let i = 0; i < this.userArray.length; i++) {
+            // console.log(" USER_ARRAY->", this.userArray[i]);
+            if (client.id === this.userArray[i].socketId)
+            {
+                // console.log("ouiouioui");
+                // this.server.emit('reloadInQueue');
+                this.userArray.splice(i, 1);
+                break;
+            }
+        }
+    }
 
 	@SubscribeMessage('keydown')
 	handleKeyPressedUpDown(client: Socket, data: { key: string }) {
@@ -148,227 +182,157 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		}
 	}
 
-	@SubscribeMessage('Abandon')
-	handleAbandon(client: Socket, socketId: string): void {
-		for (let i = 0; i < this.games.length; i++) {
-			console.log("Ca abandonnnnne")
-			const currentGame = this.games[i];
-			const d1 = currentGame.getPlayer1Id();
-			const d2 = currentGame.getPlayer2Id();
-			if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
-				currentGame.statusAbandon(socketId);
-				// this.removeUser(d1);
-				// this.removeUser(d2);
-			}
-		}
+    @SubscribeMessage('Abandon')
+    handleAbandon(client: Socket, socketId: string): void {
+        for (let i = 0; i < this.games.length; i++) {
+            console.log("Ca abandonnnnne")
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                currentGame.statusAbandon(socketId);
+            }
+        }
 
 	}
 
-	@SubscribeMessage('IsFinished')
-	handleIsFinished(client: Socket, socketId: string) {
-		for (let i = 0; i < this.games.length; i++) {
-			const currentGame = this.games[i];
-			const d1 = currentGame.getPlayer1Id();
-			const d2 = currentGame.getPlayer2Id();
-			if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
-				// currentGame.setIsFinished(socketId);
-				this.removeUser(socketId);
-			}
-		}
-	}
+    @SubscribeMessage('IsFinished')
+    handleIsFinished(client: Socket, socketId: string) {
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                this.removeUser(socketId);
+            }
+        }
+    }
 
-	@SubscribeMessage('Crash')
-	handleCrash(client: Socket, socketId: string): void {
-		for (let i = 0; i < this.games.length; i++) {
-			const currentGame = this.games[i];
-			const d1 = currentGame.getPlayer1Id();
-			const d2 = currentGame.getPlayer2Id();
-			if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
-				currentGame.setCrash(socketId);
-				// this.removeUser(d1);
-				// this.removeUser(d2);
-			}
-		}
-	}
+    @SubscribeMessage('Crash')
+    handleCrash(client: Socket, socketId: string): void {
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
+                currentGame.setCrash(socketId);
+            }
+        }
+    }
 
-	@SubscribeMessage('finito')
-	handleFinito(client: Socket) {
-		this.server.to(client.id).emit('user-disconnected');
-		const oppoSocket = this.getOpponentSocket(client.id);
-		this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
-		this.removeUser(client.id);
-		for (let i = 0; i < this.games.length; i++) {
-			const currentGame = this.games[i];
-			const d1 = currentGame.getPlayer1Id();
-			const d2 = currentGame.getPlayer2Id();
-			if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
-				currentGame.setFinito(client.id);
-				// this.removeUser(d1);
-				// this.removeUser(d2);
-			}
-		}
-	}
+    @SubscribeMessage('finito')
+    handleFinito(client: Socket) {
+        console.log("---- je suis finito de game.gateway");
+        this.server.to(client.id).emit('user-disconnected');
+        const oppoSocket = this.getOpponentSocket(client.id);
+        this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
+        this.removeUser(client.id);
+        for (let i = 0; i < this.games.length; i++) {
+            const currentGame = this.games[i];
+            const d1 = currentGame.getPlayer1Id();
+            const d2 = currentGame.getPlayer2Id();
+            if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+                currentGame.setFinito(client.id);
+            }
+        }
+    }
 
 	@SubscribeMessage('quitQueue')
 	handleQuitQueue(client: Socket) {
 		this.removeUser(client.id);
 	}
 
-	@SubscribeMessage('goQueueList')//evenement de websocketQG
-	handleGoQueueList(client: Socket, data: { socketId: string, mapChoice: number, userId: number }): void {
-		this.addUser(client.id, data.mapChoice, data.userId, -1);//add user dans le userArray
-		for (let i = 0; i < this.userArray.length; i++) {
-			const player = this.userArray[i];//je regarde chaque user added
-			if (data.socketId === player.socketId && player.status && player.user2 === -1) {//si tu as clique
-				player.status = playerStatus.isAvailable;//je te mets en available pour jouer
-				player.socketId = data.socketId;
-				this.userArray.splice(i, 1, player);//je remets le joueur actualise
-			}
-		}
-		const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
-		this.toPlay(playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
-	}
+    @SubscribeMessage('goQueueList')//evenement de websocketQG
+    handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number, userId: number}): void {
+        this.addUser(client.id, data.mapChoice, data.userId);//add user dans le userArray
+        for (let i = 0; i < this.userArray.length; i++) {
+            const player = this.userArray[i];//je regarde chaque user added
+            
+            if (data.userId === player.userid && player.status) {//si tu as clique
+                console.log("data.userId => ", data.userId);
+                console.log("player.userId => ", player.userid);
+                player.status = playerStatus.isAvailable;//je te mets en available pour jouer
+                player.socketId = data.socketId;
+                this.userArray.splice(i, 1, player);//je remets le joueur actualise
+            }
+        }
+        this.playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
+        this.toPlay(this.playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
+    }
+    
+    toPlay(playersAvailable: Player[], mapChoice: number)
+    {
+        if (playersAvailable.length == 2)//si ils sont 2
+        {
+            let player1: any = null;
+            let player2: any = null;
+            player1 = playersAvailable[0];
+            player2 = playersAvailable[1];//je les attrape
+            console.log("");
+            console.log("player 1 is ", player1.socketId, " user id : ", player1.userid);
+            console.log("player 2 is ", player2.socketId, " user id : ", player2.userid);
+            console.log("");
+            if (player1.map === player2.map && player1.userid != player2.userid) {//si ils ont le MEME choix de map
+                const gameId = uuidv4();//je donne une ID unique a ma game
+                let gameIdChoice: string;
+                const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
+                console.log("");
+                this.games.push(currentGame);
+                currentGame.actualDataInClassGame();
+                currentGame.start();//la game commence
+                this.removeUser(player1.socketId);
+                this.removeUser(player2.socketId);
+                if (currentGame.checkGameStatus() === true) {
+                    this.removeGameById(gameIdChoice);
+                }
+                const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
+                const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
+        
+                if (indexPlayer1 !== -1) {
+                    playersAvailable.splice(indexPlayer1, 1);
+                }
+                if (indexPlayer2 !== -1) {
+                    playersAvailable.splice(indexPlayer2, 1);
+                }
+            }
+        }
+    }
 
-	// @SubscribeMessage('goQueueListPrivate')//evenement de websocketQG
-	// handleGoQueueListPrivate(client: Socket, data: { socketId: string, mapChoice: number, userId: number, user2: number }): void {
-	// 	this.addUser(client.id, data.mapChoice, data.userId, -1);//add user dans le userArray
-	// 	for (let i = 0; i < this.userArray.length; i++) {
-	// 		const player = this.userArray[i];//je regarde chaque user added
-	// 		if (data.socketId === player.socketId && player.status && player.user2 === -1) {//si tu as clique
-	// 			player.status = playerStatus.isAvailable;//je te mets en available pour jouer
-	// 			player.socketId = data.socketId;
-	// 			this.userArray.splice(i, 1, player);//je remets le joueur actualise
-	// 		}
-	// 	}
-	// 	const playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
-	// 	this.toPlay(playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
-	// }
-
-	@SubscribeMessage('goQueueListPrivate')
-	handleGoQueueListPrivate(client: Socket, data: { mapChoice: number, userId: number, user2: number }): void {
-		this.addUserPrivate(client.id, 1, data.userId, data.user2);
-		for (let i = 0; i < this.PrivateuserArray.length; i++) {
-			const player = this.PrivateuserArray[i];
-			if(client.id === player.socketId)
-			{
-				this.PrivateuserArray[i].status = playerStatus.isAvailable
-			}
-		}
-
-		console.log(this.PrivateuserArray)
-		const playersAvailable = this.PrivateuserArray.filter(player => player.userid === data.user2);
-		this.toPlay(playersAvailable, 1);//j'ai pris deux joueurs available direction juste en dessous
-	}
-
-	toPlay(playersAvailable: Player[], mapChoice: number) {
-		if (playersAvailable.length == 2)//si ils sont 2
-		{
-			const [player1, player2] = playersAvailable;
-			if (player1.map === player2.map) {//si ils ont le MEME choix de map
-				let player1: any = null;
-				let player2: any = null;
-				player1 = playersAvailable[0];
-				player2 = playersAvailable[1];//je les attrape
-				const gameId = uuidv4();//je donne une ID unique a ma game
-				let gameIdChoice: string;
-				if (mapChoice === 1) {//ca c'est inutile faut que je supp
-					gameIdChoice = gameId + "_1";
-				}
-				else if (mapChoice === 2) {
-					gameIdChoice = gameId + "_2";
-				}
-
-				const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
-				console.log("");//direction game.class la game a ete creee
-				console.log("Joueur 1 : ", player1.socketId);
-				console.log("Joueur 2 : ", player2.socketId);
-				console.log("Game id : ", gameIdChoice);
-				console.log("userid => ", player1.userId);
-				console.log("");
-				this.games.push(currentGame);
-				currentGame.actualDataInClassGame();
-				currentGame.start();//la game commence
-				// playersAvailable.length = 0;
-				// this.removeGameById(gameIdChoice);
-				this.removeUser(player1.socketId);
-				this.removeUser(player2.socketId);
-				// this.removeGameById(gameIdChoice);
-				if (currentGame.checkGameStatus() === true) {
-					this.removeGameById(gameIdChoice);
-				}
-				const indexPlayer1 = playersAvailable.findIndex(player => player.socketId === player1.socketId);
-				const indexPlayer2 = playersAvailable.findIndex(player => player.socketId === player2.socketId);
-
-				if (indexPlayer1 !== -1) {
-					playersAvailable.splice(indexPlayer1, 1);
-				}
-				if (indexPlayer2 !== -1) {
-					playersAvailable.splice(indexPlayer2, 1);
-				}
-			}
-		}
-	}
-
-	private displayUserArray(): void {
-		console.log("-------------------------------");
-		this.userArray.forEach((player: Player) => {
-			console.log(`Player userID: ${player.userid}, Status: ${player.status}, User2: ${player.user2}`);
-		});
-		console.log("-------------------------------");
-	}
-
-	private addUser(item: string, mapChoice: number, userI: number, user2: number): void {
-		console.log("[ADD USER : ", item, "] choix : ", mapChoice);
-		const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
-		if (existingUserIndex === -1) {
-			const newPlayer: Player = {
+    private displayUserArray(): void {
+        console.log("-------------------------------");
+        this.userArray.forEach((player: Player) => {
+            console.log(`Player ID: ${player.socketId}, Status: ${player.status}`);
+        });
+        console.log("-------------------------------");
+    }
+    
+    private addUser(item: string, mapChoice: number, userI: number): void {
+        console.log("[ADD USER : ", item, "] choix : ", mapChoice);
+        const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
+        if (existingUserIndex === -1) {//si le user n'existe pas encore, alors le creer
+            const newPlayer: Player = {
 				socketId: item,
 				status: playerStatus.isSettling,
 				level: 0,
 				map: mapChoice,
 				userid: userI,
-				user2: user2
+				user2: -1
 			};
-			this.userArray.push(newPlayer);
-		}
-		else {
-		}
-	}
-
-	private addUserPrivate(item: string, mapChoice: number, userI: number, user2: number): void {
-		console.log("[ADD USER : ", item, "] choix : ", mapChoice);
-		const existingUserIndex = this.PrivateuserArray.findIndex(player => player.userid === userI);
-		if (existingUserIndex === -1) {
-			const newPlayer: any = {
-				socketId: item,
-				status: playerStatus.isSettling,
-				level: 0,
-				map: mapChoice,
-				userid: userI,
-				user2: user2
-			};
-			this.PrivateuserArray.push(newPlayer);
-		}
-		else {
-			const player = this.PrivateuserArray.findIndex(player => player.userid === userI);
-			this.PrivateuserArray[player] = {
-				socketId: item,
-				status: playerStatus.isSettling,
-				level: 0,
-				map: mapChoice,
-				userid: userI,
-				user2: user2
-			};
-		}
-	}
-
-	private removeUser(userId: string): void {
-		const indexToRemove = this.userArray.findIndex(player => player.socketId === userId);
-		if (indexToRemove !== -1) {
-			this.userArray.splice(indexToRemove, 1);
-		}
-		return;
-	}
+            this.userArray.push(newPlayer);
+        }
+        else {
+            console.log("Ecrasement de socket avec la nouvelle socket du joueur : ", this.userArray[existingUserIndex].userid);
+            this.userArray[existingUserIndex].socketId = item//sinn il existe deja donc on ecrase sa socket avec la nouvelle socket
+        }
+    }
+    
+    private removeUser(userId: string): void {
+        const indexToRemove = this.userArray.findIndex(player => player.socketId === userId);
+        if (indexToRemove !== -1) {
+            this.userArray.splice(indexToRemove, 1);
+        }
+        return ;
+    }
 
 	private removeGameById = (idToRemove: string) => {
 		this.games = this.games.filter((game) => game.getGameId() !== idToRemove);
