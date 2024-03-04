@@ -7,7 +7,7 @@ import { playerStatus, GameStatus } from "./gameStateBD";
 import { v4 as uuidv4 } from 'uuid';
 import { OnModuleInit } from "@nestjs/common";
 import { GameService } from "./game.service";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @WebSocketGateway(8002, {
@@ -42,6 +42,12 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     }
     
     handleDisconnect(client: Socket, ...args: any[]) {
+        console.log("--- disconnecttttt :")
+        this.server.to(client.id).emit('oppo-crashed')
+
+        // this.server.to(client.id).emit('oppo-crashed')
+
+        // this.displayUserArray();
         this.server.to(client.id).emit('user-disconnected');
         const oppoSocket = this.getOpponentSocket(client.id);
         this.server.to(oppoSocket).emit('oppo-crashed', oppoSocket)
@@ -119,29 +125,29 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
 
     @SubscribeMessage('refreshInQueue')
     handleRefreshInQueue(client: Socket) {
-        console.log("la socket de l'emmerdeur = ", client.id);
-        // for (let i = 0; i < this.playersAvailable.length; i++) {
-        //     // console.log(" PLAYERS_AVAILABLE TAB->", this.playersAvailable[i]);
-        //     if (client.id === this.playersAvailable[i].socketId)
-        //     {
-        //         const mapChoiceEmmerdeur = this.playersAvailable[i].map;
-        //         const userIdEmmerdeur = this.playersAvailable[i].userid;
-        //         console.log("ouiouioui");
-        //         // this.server.emit('reloadInQueue');
-        //         this.playersAvailable.splice(i, 1);
-        //         break;
-        //     }
-        // }
-        // for (let i = 0; i < this.userArray.length; i++) {
-        //     // console.log(" USER_ARRAY->", this.userArray[i]);
-        //     if (client.id === this.userArray[i].socketId)
-        //     {
-        //         // console.log("ouiouioui");
-        //         // this.server.emit('reloadInQueue');
-        //         this.userArray.splice(i, 1);
-        //         break;
-        //     }
-        // }
+        console.log("__________________ la socket de l'emmerdeur = ", client.id);
+        for (let i = 0; i < this.playersAvailable.length; i++) {
+            // console.log(" PLAYERS_AVAILABLE TAB->", this.playersAvailable[i]);
+            if (client.id === this.playersAvailable[i].socketId)
+            {
+                const mapChoiceEmmerdeur = this.playersAvailable[i].map;
+                const userIdEmmerdeur = this.playersAvailable[i].userid;
+                console.log("ouiouioui");
+                // this.server.emit('reloadInQueue');
+                this.playersAvailable.splice(i, 1);
+                break;
+            }
+        }
+        for (let i = 0; i < this.userArray.length; i++) {
+            // console.log(" USER_ARRAY->", this.userArray[i]);
+            if (client.id === this.userArray[i].socketId)
+            {
+                // console.log("ouiouioui");
+                // this.server.emit('reloadInQueue');
+                this.userArray.splice(i, 1);
+                break;
+            }
+        }
     }
 
     @SubscribeMessage('keydown')
@@ -185,8 +191,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
                 currentGame.statusAbandon(socketId);
-                // this.removeUser(d1);
-                // this.removeUser(d2);
             }
         }
 
@@ -199,7 +203,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d1 = currentGame.getPlayer1Id();
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
-                // currentGame.setIsFinished(socketId);
                 this.removeUser(socketId);
             }
         }
@@ -213,8 +216,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (socketId === d1 || socketId === d2) {//la socket recue correspond a un joueur
                 currentGame.setCrash(socketId);
-                // this.removeUser(d1);
-                // this.removeUser(d2);
             }
         }
     }
@@ -232,15 +233,12 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             const d2 = currentGame.getPlayer2Id();
             if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
                 currentGame.setFinito(client.id);
-                // this.removeUser(d1);
-                // this.removeUser(d2);
             }
         }
     }
 
     @SubscribeMessage('quitQueue')
     handleQuitQueue(client: Socket) {
-        console.log("Je passe en quitte queue de game.gateway");
         this.removeUser(client.id);
     }
 
@@ -266,36 +264,24 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     {
         if (playersAvailable.length == 2)//si ils sont 2
         {
-            const [player1, player2] = playersAvailable;
-            if (player1.map === player2.map) {//si ils ont le MEME choix de map
-                let player1: any = null;
-                let player2: any = null;
-                player1 = playersAvailable[0];
-                player2 = playersAvailable[1];//je les attrape
+            let player1: any = null;
+            let player2: any = null;
+            player1 = playersAvailable[0];
+            player2 = playersAvailable[1];//je les attrape
+            console.log("");
+            console.log("player 1 is ", player1.socketId, " user id : ", player1.userid);
+            console.log("player 2 is ", player2.socketId, " user id : ", player2.userid);
+            console.log("");
+            if (player1.map === player2.map && player1.userid != player2.userid) {//si ils ont le MEME choix de map
                 const gameId = uuidv4();//je donne une ID unique a ma game
                 let gameIdChoice: string;
-                if (mapChoice === 1) {//ca c'est inutile faut que je supp
-                    gameIdChoice = gameId + "_1";
-                }
-                else if (mapChoice === 2) {
-                    gameIdChoice = gameId + "_2";
-                }
-                
                 const currentGame = new Game(gameIdChoice, this.server, player1, player2, mapChoice, this.gs);
-                console.log("");//direction game.class la game a ete creee
-                console.log("Joueur 1 : ", player1.socketId);
-                console.log("Joueur 2 : ", player2.socketId);
-                console.log("Game id : ", gameIdChoice);
-                console.log("userid => ", player1.userId);
                 console.log("");
                 this.games.push(currentGame);
                 currentGame.actualDataInClassGame();
                 currentGame.start();//la game commence
-                // playersAvailable.length = 0;
-                // this.removeGameById(gameIdChoice);
                 this.removeUser(player1.socketId);
                 this.removeUser(player2.socketId);
-                // this.removeGameById(gameIdChoice);
                 if (currentGame.checkGameStatus() === true) {
                     this.removeGameById(gameIdChoice);
                 }
@@ -323,7 +309,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
     private addUser(item: string, mapChoice: number, userI: number): void {
         console.log("[ADD USER : ", item, "] choix : ", mapChoice);
         const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
-        if (existingUserIndex === -1) {
+        if (existingUserIndex === -1) {//si le user n'existe pas encore, alors le creer
             const newPlayer: Player = {
                 socketId: item,
                 status: playerStatus.isSettling,
@@ -334,7 +320,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection,OnGatewayD
             this.userArray.push(newPlayer);
         }
         else {
-            this.userArray[existingUserIndex].socketId = item
+            console.log("Ecrasement de socket avec la nouvelle socket du joueur : ", this.userArray[existingUserIndex].userid);
+            this.userArray[existingUserIndex].socketId = item//sinn il existe deja donc on ecrase sa socket avec la nouvelle socket
         }
     }
     

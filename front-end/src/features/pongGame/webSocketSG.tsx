@@ -5,7 +5,7 @@ import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Rootstate } from "../../app/store";
     
-export const WebSocketSG = ({ socket }) => {
+export const WebSocketSG = ({ socket, page}) => {
 
     // const userid = useSelector((state: Rootstate) => state.user.id);
     const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -30,7 +30,6 @@ export const WebSocketSG = ({ socket }) => {
         {
             partyIsDeserted(context, board);
             gameState.status === GameStatus.abortedGame;
-
         }
     }
     
@@ -53,16 +52,7 @@ export const WebSocketSG = ({ socket }) => {
         }
         return null;
     }
-    
-    // const ballAgainstPaddle = (velX: number, velY: number) => {
-    //     gameState.ball.velocityX = velX;
-    //     gameState.ball.velocityY = velY;
-    // }//collisionBall detecting aingsnt machin evenement
-    
-    // const ballAgainstBorder = (velY: number) => {
-    //     gameState.ball.velocityY = velY;
-    // }//borderCollision detecting borderevenemt
-    
+
     const displayEndGame = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
         gameState.status === GameStatus.finishedGame;
         if (gameState.mapChoiceLocked === 2)
@@ -85,7 +75,6 @@ export const WebSocketSG = ({ socket }) => {
         context.textAlign = 'center';
         context.fillText('LOOOOOSER', board.width / 2, board.height / 2);
         setTimeout(getBack, 1000);
-
     }
     
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
@@ -116,9 +105,9 @@ export const WebSocketSG = ({ socket }) => {
             context.fillStyle = '#FF8C00';
         else
             context.fillStyle = '#9900ff';
-            context.font = '40px "Press Start 2P", sans-serif';
-            context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
-            context.fillText(gameState.player2Score.toString(), gameState.boardWidth * 4 / 5 - 45, 45);
+        context.font = '40px "Press Start 2P", sans-serif';
+        context.fillText(gameState.player1Score.toString(), gameState.boardWidth / 5, 45);
+        context.fillText(gameState.player2Score.toString(), gameState.boardWidth * 4 / 5 - 45, 45);
     }
 
     const displayLine = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
@@ -200,7 +189,6 @@ export const WebSocketSG = ({ socket }) => {
                 if (gameState.player1Looser === true || gameState.player2Looser === true) {
                     displayFailGame(context, board);
                     console.log("je serais donc bloque en display fail?")
-
                 }
                 partyAbandon(context, board);
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
@@ -252,27 +240,12 @@ export const WebSocketSG = ({ socket }) => {
         const animationId = requestAnimationFrame(update);
         ////////////// AU LANCEMENT DE START GAME //////////////
 
-        // const handleBeforeUnload = (event) => {
-        //     const navigationEntries = performance.getEntriesByType('navigation');
-        //     const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
-      
-        //     if (navigationEntry && navigationEntry.type === 'reload') {
-        //       console.log('refreshED BIATCH');
-        //     } else {
-        //       console.log('navig autre part');
-        //     }
-        //   };
-      
-        //   window.addEventListener('beforeunload', handleBeforeUnload);
-        
         const handleConnect = () => {
             console.log('Connected in START GAME!');
         }
 
         const handleDisconnect = () => {
             console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
-
-            // socket?.emit('quitInGame');
         }
 
         if (socket?.connected) {
@@ -283,7 +256,6 @@ export const WebSocketSG = ({ socket }) => {
             socket?.emit('keydown', {key: event.code})
         }; 
 
-        // socket?.on('connect', handleConnect);
         window.addEventListener('keydown', handleKeyDown);
         socket?.on('disconnect', handleDisconnect)
 
@@ -350,46 +322,20 @@ export const WebSocketSG = ({ socket }) => {
         })
 
         socket?.on('GameOver', (socketClient: string, gameId: string) => {
-            // gameState.status = GameStatus.over;
             socket?.emit('IsFinished', socketClient);
         })
 
-        // socket?.on('oppo-crashed', (socket: string) => {
-        //     // console.log("socket? = ", socket);
-        //     // console.log("paddle 1 sock =", gameState.paddle1.socket);
-        //     // console.log("paddle 2 sock =", gameState.paddle2.socket);
-
-        //     if (socket === gameState.paddle1.socket) {
-        //         gameState.player2IsDeserted = true;
-        //         gameState.status = GameStatus.abortedGame;
-        //         handleCrash();
-        //     }
-        //     else if (socket === gameState.paddle2.socket) {
-        //         gameState.player1IsDeserted = true;
-        //         gameState.status = GameStatus.abortedGame;
-        //         handleCrash();
-        //     }
-        //     // navigate('../')
-        // })
         socket?.on('oppo-crashed', (socket: string) => {
-            // console.log("socket? = ", socket);
-            // console.log("paddle 1 sock =", gameState.paddle1.socket);
-            // console.log("paddle 2 sock =", gameState.paddle2.socket);
-            console.log("---- je suis oppo-crashed de web SG");
-
             if (socket === gameState.paddle1.socket) {
-                // console.log("C'est le joueur un car : ", gameState.paddle1.socket);
                 gameState.player2IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
             }
             else if (socket === gameState.paddle2.socket) {
-                // console.log("C'est le joueur deux car : ", gameState.paddle2.socket);
                 gameState.player1IsDeserted = true;
                 gameState.status = GameStatus.abortedGame;
                 handleCrash();
             }
-            // navigate('../')
         })
 
         return () => {
@@ -416,7 +362,6 @@ export const WebSocketSG = ({ socket }) => {
             socket?.off('choiceMap');
             gameState.status = GameStatus.finishedGame;
             socket?.emit('finito');
-            // navigate('../');
             cancelAnimationFrame(animationId);
         }
     }, [update]);

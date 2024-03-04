@@ -93,8 +93,7 @@ export class Game {
     }
 
     setFinito(socketClient: string) {
-        console.log("---- je suis setFinito de game.class");
-
+        // console.log("---- je suis setFinito de game.class");
         this.gameState.status = GameStatus.finishedGame;
     }
 
@@ -294,7 +293,7 @@ export class Game {
 
     startGameLoop() {
         const loop = setInterval(async () => {
-            console.log("game status loop game.class : ", this.gameState.status);
+            // console.log("game status loop game.class : ", this.gameState.status);
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
                 this.initChoiceMap();
