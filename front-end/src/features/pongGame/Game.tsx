@@ -19,9 +19,6 @@ export default function Game() {
     const count = useRef(0)
     const userid = useSelector((state: Rootstate) => state.user.id);
 
-
-
-
     const first = (newSocket: Socket) => {
 		setSocket(newSocket)
 		setPage("lobby");
