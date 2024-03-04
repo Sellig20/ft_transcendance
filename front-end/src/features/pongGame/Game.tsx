@@ -66,7 +66,7 @@ export default function Game() {
 			}/>
 			<Route path="/queuePrivate/:idP" element={
 				<div>
-					<PrivateQueue />
+					<PrivateQueue socket={socket}/>
 				</div>
 			}/>
 			<Route path="/startgame" element={

@@ -117,7 +117,8 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 	@SubscribeMessage('FIRST')
 	async handleMessageconnection(client: any, message: any) {
 		console.log("[FIRST]", client.id, "= client:", message.userid)
-		this.addUser(client.id, -1, message.userid);
+		this.addUser(client.id, -1, message.userid, -1);
+		this.server.to(client.id).emit("firstFinish", {msg:"vasy"})
 		// const existingUserIndex = this.userArray.findIndex(player => player.socketId === message.userid);
 		// if (existingUserIndex !== -1) {
 		// 	this.userArray[existingUserIndex].userid = message.userid;
@@ -252,7 +253,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
     @SubscribeMessage('goQueueList')//evenement de websocketQG
     handleGoQueueList(client: Socket, data: {socketId: string, mapChoice: number, userId: number}): void {
-        this.addUser(client.id, data.mapChoice, data.userId);//add user dans le userArray
+        this.addUser(client.id, data.mapChoice, data.userId, -1);//add user dans le userArray
         for (let i = 0; i < this.userArray.length; i++) {
             const player = this.userArray[i];//je regarde chaque user added
             
@@ -264,7 +265,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
                 this.userArray.splice(i, 1, player);//je remets le joueur actualise
             }
         }
-        this.playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable);
+        this.playersAvailable = this.userArray.filter(player => player.status === playerStatus.isAvailable && player.user2 === -1);
         this.toPlay(this.playersAvailable, data.mapChoice);//j'ai pris deux joueurs available direction juste en dessous
     }
 
@@ -280,12 +281,12 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
                 console.log("data.userId => ", data.userId);
                 console.log("player.userId => ", player.userid);
                 player.status = playerStatus.isAvailable;//je te mets en available pour jouer
-                player.socketId = data.socketId;
                 this.userArray.splice(i, 1, player);//je remets le joueur actualise
 				playersAvailablePrivate.push(player)
             }
         }
 		// recherche si ton pote t'attend
+		console.log(this.userArray)
 		for (let i = 0; i < this.userArray.length; i++) {
             if (this.userArray[i].user2 === data.userId)
 				playersAvailablePrivate.push(this.userArray[i])
@@ -295,7 +296,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 		else
 		{
 			console.log("user", data.userId, "attend son pote pour jouer...")
-			console.log(playersAvailablePrivate)
+			// console.log(playersAvailablePrivate)
 
 		}
     }
@@ -347,32 +348,29 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
         console.log("-------------------------------");
     }
     
-    private addUser(item: string, mapChoice: number, userI: number, user2?: number): void {
+    private addUser(item: string, mapChoice: number, userI: number, user2: number): void {
         console.log("[ADD USER : ", item, "] choix : ", mapChoice);
-		let usr = -1
-		if (user2 !== undefined)
-			usr = user2
-        const existingUserIndex = this.userArray.findIndex(player => player.socketId === item);
-        if (existingUserIndex === -1) {//si le user n'existe pas encore, alors le creer
+        const existingUserIndex = this.userArray.findIndex(player => player.userid === userI);
+		if (existingUserIndex === -1) {//si le user n'existe pas encore, alors le creer
             const newPlayer: Player = {
 				socketId: item,
 				status: playerStatus.isSettling,
 				level: 0,
 				map: mapChoice,
 				userid: userI,
-				user2: usr
+				user2: user2
 			};
-			console.log(item)
             this.userArray.push(newPlayer);
         }
         else {
+			if (this.userArray[existingUserIndex].user2)
             console.log("Ecrasement de socket avec la nouvelle socket du joueur : ", this.userArray[existingUserIndex].userid);
-            this.userArray[existingUserIndex].socketId = item//sinn il existe deja donc on ecrase sa socket avec la nouvelle socket
-			this.userArray[existingUserIndex].user2 = usr
+            this.userArray[existingUserIndex].socketId = item //sinn il existe deja donc on ecrase sa socket avec la nouvelle socket
+			this.userArray[existingUserIndex].user2 = user2
 			this.userArray[existingUserIndex].map = mapChoice
         }
     }
-    
+
     private removeUser(userId: string): void {
         const indexToRemove = this.userArray.findIndex(player => player.socketId === userId);
         if (indexToRemove !== -1) {
