@@ -1,7 +1,5 @@
-import React from 'react'
-import { useState, useEffect, useRef} from 'react'
+import { useRef} from 'react'
 import chatService from '../chat.service'
-import { userInfo } from 'os'
 import { toast } from 'react-toastify';
 import { sha256 } from 'js-sha256';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +9,7 @@ const handleLeave = async (
 	channelid: number,
 	reload: any
 ) => {
-	const res = await chatService.leaveChannelById(Number(userid), Number(channelid))
+	await chatService.leaveChannelById(Number(userid), Number(channelid))
 	// console.log(res)
 	reload();
 
@@ -44,10 +42,9 @@ const handleBan = async (
 };
 
 const handleBlock = async (
-	iduserinfo: numberuseNavigate,
+	iduserinfo: number,
 	userToBan: number,
 	reload: any,
-	channelinfo: any
 ) => {
 	const res = await chatService.blockUserById(Number(iduserinfo), Number(userToBan))
 	if (res === null)
@@ -59,25 +56,23 @@ const handleBlock = async (
 };
 
 const handleSetadmin = async (
-	iduserinfo: number,
+	channelid: any,
 	userToSet: number,
 	reload: any,
-	channelinfo: any
 ) => {
-	const res = await chatService.setAdminById(Number(channelinfo.id), Number(userToSet))
+	const res = await chatService.setAdminById(Number(channelid.id), Number(userToSet))
 	if (res === null)
 	{
 		return;
 	}
-	reload(channelinfo.id);
+	reload(channelid.id);
 
 };
 
 const handleMute = async (
-	iduserinfo: number,
+	channelinfo: any,
 	userToMute: number,
 	reload: any,
-	channelinfo: any
 ) => {
 	const res = await chatService.muteById(Number(channelinfo.id), Number(userToMute))
 	if (res === null)
@@ -136,11 +131,11 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(channelinfo, idCard, reload)}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
 					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
@@ -162,10 +157,10 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
 					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
@@ -182,7 +177,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
 					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame( idCard)}/>
 				</div>
@@ -204,7 +199,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
+					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
 					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
@@ -214,15 +209,13 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 
 }
 
-const InviteUser = ({ channelinfo, userinfo, reload } : {
+const InviteUser = ({ channelinfo, reload } : {
 	channelinfo: any,
-	userinfo: any,
 	reload: any
 }) => {
 
 	const buttonHandler = async (
 		channelinfo: any,
-		userinfo: any,
 		reload: any,
 	) => {
 		if (inputMessageRef.current.value === "")
@@ -233,26 +226,23 @@ const InviteUser = ({ channelinfo, userinfo, reload } : {
 		inputMessageRef.current.value = "";
 	};
 
-	const inputMessageRef = useRef("");
+	const inputMessageRef = useRef<any>("");
 
 	return (
 		<div>
 			<input type="text" name="inputSend" placeholder="username to invite" id="inputSend" ref={inputMessageRef}/>
-			<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>add to channel</button>
+			<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, reload)}>add to channel</button>
 		</div>
 	)
 }
 
-const ChangePassword = ({ channelinfo, userinfo, reload } : {
+const ChangePassword = ({ channelinfo, userinfo, reload} : {
 	channelinfo: any,
 	userinfo: any,
 	reload: any
 }) => {
 
 	const buttonHandler = async (
-		channelinfo: any,
-		userinfo: any,
-		reload: any,
 	) => {
 		// console.log(inputPasswordRef.current.value)
 		let hashed = ""
@@ -268,13 +258,13 @@ const ChangePassword = ({ channelinfo, userinfo, reload } : {
 		inputPasswordRef.current.value = "";
 	};
 
-	const inputPasswordRef = useRef("");
+	const inputPasswordRef = useRef<any>("");
 	if (userinfo.id === channelinfo.owner)
 	{
 		return (
 			<div>
 				<input type="password" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
-				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo, reload)}>change password</button>
+				<button type="button" name='buttonSend' onClick={() => buttonHandler()}>change password</button>
 			</div>
 		)
 	}
@@ -319,7 +309,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 				<br />
 				<input type="button" value={"LEAVE CHANNEL"} id={userinfo.id} onClick={() => handleLeave(userinfo.id, channelinfo.id, reload)}/>
 				<ChangePassword channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
-				<InviteUser channelinfo={channelinfo} userinfo={userinfo} reload={reload}/>
+				<InviteUser channelinfo={channelinfo} reload={reload}/>
 				{
 					channelinfo.user_list.map((element: any, index:any) => {
 						return (

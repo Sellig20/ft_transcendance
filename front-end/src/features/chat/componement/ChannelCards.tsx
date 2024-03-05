@@ -1,20 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import chatService from '../chat.service';
-
-const whatColor = ({password, ispublic, personal} : {
-	password: string,
-	ispublic: boolean,
-	personal: boolean
-}) => {
-	let color = "card bg-primary-subtle";
-	if (!password)
-		color = "card bg-danger"
-	if (ispublic == true)
-		color = "card bg-success"
-	else if (personal === true)
-		color = "card bg-dark-subtle"
-	return (color)
-}
 
 const Card = ({ name, isPerso, id, password, ispublic, channelInfo, userid} : {
 	name: string,
@@ -45,7 +30,7 @@ const Card = ({ name, isPerso, id, password, ispublic, channelInfo, userid} : {
 		color = "card bg-success-subtle"
 		mode = "(mp)"
 		console.log(id)
-		channelInfo.map((element: any, index : any) => {
+		channelInfo.map((element: any) => {
 			// console.log("perso",element)
 			if(id === element.id)
 			{
@@ -97,7 +82,7 @@ export const ChannelPublic = ({userid, clickHandler, channelInfo} : {
 	}, [])
 
 	let channelNotJoined : any = []
-	public_channels.map((element: any, index : any) => {
+	public_channels.map((element: any) => {
 		var val = element.id
 		// console.log(element.name)
 		

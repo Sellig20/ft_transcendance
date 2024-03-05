@@ -185,7 +185,7 @@ export class ChatController {
 			let data = {}
 			const time_to_mute = 60000
 	
-			console.log(time_now, muted)
+			// console.log(time_now, muted)
 			if (muted === null)
 			{
 				// peut ajouter

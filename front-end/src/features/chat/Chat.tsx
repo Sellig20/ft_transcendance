@@ -18,7 +18,6 @@ export function Chat() {
 	const [messageSocket, setMessageSocket] = useState<any>([]);
 
 	const inputMessageRef = useRef(null);
-	const inputFriendRef = useRef(null);
 
 	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
@@ -58,6 +57,12 @@ export function Chat() {
 			if (finded === false)
 			{
 				setchannelSelect(null)
+			}
+			else
+			{
+				const messageChann = await chatService.findAllInfoInChannelById(channelSelect.id)
+				if(messageChann !== null)
+					setchannelSelect(messageChann)
 			}
 		}
 	}
@@ -100,7 +105,7 @@ export function Chat() {
 		if (messageprop.channelid === channelSelect.id)
 		{
 			const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
-			if (messageChann === "") //	le channel existe pas
+			if (messageChann === null) //	le channel existe pas
 			{
 				reload();
 				return ;
@@ -109,7 +114,7 @@ export function Chat() {
 		}
 	};
 
-	const messageListener = (
+	const messageListener = async (
 		messageprop: any
 	) => {
 		if (channelSelect === undefined)
@@ -117,14 +122,16 @@ export function Chat() {
 		if (channelSelect.id === messageprop.from_channel)
 		{
 			console.log("msg recu:", messageprop)
-			reload(messageprop.from_channel)
+			// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.from_channel))
+			reload()
+			// reload()
+			// reload(messageprop.from_channel)
 			// setMessageSocket(messageprop)
 			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
 
 	const firstListener = (
-		messageprop: any
 	) => {
 		console.log("envoie des donnee users au server socket...", userid)
 		socket?.emit("FIRST", {userid:userid})
@@ -184,7 +191,7 @@ export function Chat() {
 			return ;
 		}
 		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -221,7 +228,7 @@ export function Chat() {
 			return ;
 		}
 		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -234,7 +241,6 @@ export function Chat() {
 			toast.error("error already joined")
 			return ;
 		}
-		console.log("ccacacacacacacacacacacac")
 		const res3 = await chatService.inviteUserId(channelinfo.id, userid)
 		if (res3 === null)
 		{
@@ -256,7 +262,7 @@ export function Chat() {
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel} userid={userid}/>
 					<ChannelPublic userid={userid} clickHandler={handleChannelPublic} channelInfo={channelJoined}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
+					<CreateChannel reload={reload} iduser={userid} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
