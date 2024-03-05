@@ -2,7 +2,6 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import login from './login.service'
 import usePageCloseDetection from '../hook/usePageClose';
-import userService from '../user/user.service';
 
 const ProtectedRoute: React.FC = () => {
 

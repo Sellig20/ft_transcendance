@@ -1,8 +1,5 @@
-import React from 'react'
-import { useState, useEffect, useRef} from 'react'
 import { ChannelDescription } from './ChannelDescription';
 
-import chatService from '../chat.service'
 
 
 const Message = ({content, sender, sender_name, userinfo} : {

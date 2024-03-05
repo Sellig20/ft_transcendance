@@ -18,7 +18,6 @@ export function Chat() {
 	const [messageSocket, setMessageSocket] = useState<any>([]);
 
 	const inputMessageRef = useRef(null);
-	const inputFriendRef = useRef(null);
 
 	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
@@ -124,7 +123,6 @@ export function Chat() {
 	};
 
 	const firstListener = (
-		messageprop: any
 	) => {
 		console.log("envoie des donnee users au server socket...", userid)
 		socket?.emit("FIRST", {userid:userid})
@@ -184,7 +182,7 @@ export function Chat() {
 			return ;
 		}
 		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -221,7 +219,7 @@ export function Chat() {
 			return ;
 		}
 		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -256,7 +254,7 @@ export function Chat() {
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel} userid={userid}/>
 					<ChannelPublic userid={userid} clickHandler={handleChannelPublic} channelInfo={channelJoined}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
+					<CreateChannel reload={reload} iduser={userid} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>
