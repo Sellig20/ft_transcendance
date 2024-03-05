@@ -56,23 +56,23 @@ const handleBlock = async (
 };
 
 const handleSetadmin = async (
+	channelid: any,
 	userToSet: number,
 	reload: any,
-	channelinfo: any
 ) => {
-	const res = await chatService.setAdminById(Number(channelinfo.id), Number(userToSet))
+	const res = await chatService.setAdminById(Number(channelid.id), Number(userToSet))
 	if (res === null)
 	{
 		return;
 	}
-	reload(channelinfo.id);
+	reload(channelid.id);
 
 };
 
 const handleMute = async (
+	channelinfo: any,
 	userToMute: number,
 	reload: any,
-	channelinfo: any
 ) => {
 	const res = await chatService.muteById(Number(channelinfo.id), Number(userToMute))
 	if (res === null)
@@ -131,8 +131,8 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(userinfo.id, idCard, reload)}/>
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(channelinfo, idCard, reload)}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
@@ -157,7 +157,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
@@ -236,15 +236,13 @@ const InviteUser = ({ channelinfo, reload } : {
 	)
 }
 
-const ChangePassword = ({ channelinfo, userinfo} : {
+const ChangePassword = ({ channelinfo, userinfo, reload} : {
 	channelinfo: any,
 	userinfo: any,
 	reload: any
 }) => {
 
 	const buttonHandler = async (
-		channelinfo: any,
-		reload: any,
 	) => {
 		// console.log(inputPasswordRef.current.value)
 		let hashed = ""
@@ -266,7 +264,7 @@ const ChangePassword = ({ channelinfo, userinfo} : {
 		return (
 			<div>
 				<input type="password" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
-				<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, userinfo)}>change password</button>
+				<button type="button" name='buttonSend' onClick={() => buttonHandler()}>change password</button>
 			</div>
 		)
 	}
