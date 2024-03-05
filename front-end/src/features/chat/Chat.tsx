@@ -58,6 +58,12 @@ export function Chat() {
 			{
 				setchannelSelect(null)
 			}
+			else
+			{
+				const messageChann = await chatService.findAllInfoInChannelById(channelSelect.id)
+				if(messageChann !== null)
+					setchannelSelect(messageChann)
+			}
 		}
 	}
 	
@@ -99,7 +105,7 @@ export function Chat() {
 		if (messageprop.channelid === channelSelect.id)
 		{
 			const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
-			if (messageChann === "") //	le channel existe pas
+			if (messageChann === null) //	le channel existe pas
 			{
 				reload();
 				return ;
@@ -108,7 +114,7 @@ export function Chat() {
 		}
 	};
 
-	const messageListener = (
+	const messageListener = async (
 		messageprop: any
 	) => {
 		if (channelSelect === undefined)
@@ -116,7 +122,10 @@ export function Chat() {
 		if (channelSelect.id === messageprop.from_channel)
 		{
 			console.log("msg recu:", messageprop)
-			reload(messageprop.from_channel)
+			// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.from_channel))
+			reload()
+			// reload()
+			// reload(messageprop.from_channel)
 			// setMessageSocket(messageprop)
 			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
@@ -232,7 +241,6 @@ export function Chat() {
 			toast.error("error already joined")
 			return ;
 		}
-		console.log("ccacacacacacacacacacacac")
 		const res3 = await chatService.inviteUserId(channelinfo.id, userid)
 		if (res3 === null)
 		{
