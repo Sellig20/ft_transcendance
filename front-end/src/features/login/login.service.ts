@@ -13,13 +13,11 @@ const getLoginStatus = async () => {
 	let req;
 	try {
 		req = await api.get('auth/login');
+		console.log(req.data);
 	} catch (error) {
-		if (localStorage.getItem("token"))
-			localStorage.removeItem("token")
+		console.log("in error");
 		return null;
 	}
-	console.log(req.data);
-	
 	return req.data
 }
 

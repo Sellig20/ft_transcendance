@@ -9,7 +9,7 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt2') {
 	constructor(private readonly userService: UsersService) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			ignoreExpiration: true, //a changer en false pour reelle utilisation
+			// ignoreExpiration: true, //a changer en false pour reelle utilisation
 			secretOrKey: jwtConstants.secret,
 		});
   }
