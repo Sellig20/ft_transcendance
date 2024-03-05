@@ -6,15 +6,23 @@ import './style.css'
 import WebSocketPG from './webSocketPG';
 import WebSocketSG from './webSocketSG';
 import WebSocketQG from './webSocketQG';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
+import PrivateQueue from "./PrivateQueue";
+import ProtectedRoute from "../login/ProtectedRoute";
+
 
 export default function Game() {
+
+	
     const [socket, setSocket] = useState<Socket | null>(null)
+	const [page, setPage] = useState<any | null>(null)
+
     const count = useRef(0)
     const userid = useSelector((state: Rootstate) => state.user.id);
 
     const first = (newSocket: Socket) => {
 		setSocket(newSocket)
+		setPage("lobby");
 	}
 
 	const firstListener = (
@@ -39,27 +47,36 @@ export default function Game() {
 			first(newSocket);
 		}
 		count.current++;
+
 		
 	}, [])
 
+
+
 	return (
 	    <Routes>
-			<Route path="/" element={
-				<div>
-				
-					<WebSocketPG socket={socket} userId={userid}/>
-				</div>
-			}/>
-			<Route path="/queue" element={
-				<div>
-					<WebSocketQG socket={socket}/>
-				</div>
-			}/>
-			<Route path="/startgame" element={
-				<div>
-					<WebSocketSG socket={socket}/>
-				</div>
-			}/>
+			<Route element={<ProtectedRoute />} >	
+				<Route path="/" element={
+					<div>
+						<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
+					</div>
+				}/>
+				<Route path="/queue" element={
+					<div>
+						<WebSocketQG socket={socket} page={page} setPage={setPage}/>
+					</div>
+				}/>
+				<Route path="/queuePrivate/:idP" element={
+					<div>
+						<PrivateQueue socket={socket}/>
+					</div>
+				}/>
+				<Route path="/startgame" element={
+					<div>
+						<WebSocketSG socket={socket} page={page} setPage={setPage}/>
+					</div>
+				}/>
+			</Route>
         </Routes>
     );
 }

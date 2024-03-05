@@ -93,7 +93,9 @@ export class AuthController {
 	}
 
 	@Get('login')
-	salope(@Req() req) {
-		return req.user;
+	test_token(@Req() req) {
+		console.log('ping from test connection');
+		
+		return {msg: "co ok"};
 	}
 }

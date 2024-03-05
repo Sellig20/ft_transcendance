@@ -12,9 +12,12 @@ const ProtectedRoute: React.FC = () => {
 	usePageCloseDetection(() => {
 	});
 
-	useEffect(() => {
+	useEffect(() => {	
+		console.log("hello");
 		if (count.current === 0)
 			login.getLoginStatus().then( rep => {
+	
+		
 				if (!rep)
 					navigate('/')
 				else 
