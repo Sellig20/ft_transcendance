@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { Socket, io } from "socket.io-client";
 import { Rootstate } from "../../app/store";
 
 export const WebSocketQG = ({socket}) => {

@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef} from 'react'
-import React from 'react'
+import { useState, useRef} from 'react'
 import chatService from '../chat.service'
 import { sha256 } from 'js-sha256';
 import { toast } from 'react-toastify';
@@ -21,10 +20,8 @@ const Password = ({ passwordRef, isPassword} : {
 	}
 }
 
-export const CreateChannel = ({iduser, userinfo, setuserinfo, reload, setChannelSelected} : {
+export const CreateChannel = ({iduser, reload, setChannelSelected} : {
 	iduser: any,
-	userinfo: any,
-	setuserinfo: any,
 	reload: any,
 	setChannelSelected: any
 }) => {
