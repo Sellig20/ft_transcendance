@@ -89,6 +89,7 @@ const handleMute = async (
 };
 
 
+
 const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } : {
 	channelinfo: any,
 	element: any,
@@ -98,6 +99,11 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 	reload: any
 }) => {
 	const navigate = useNavigate();
+	const handleProfil = async (
+		userToProfil: number,
+	) => {
+		navigate(`/user/${userToProfil}`)
+	};
 	const handleGame = async (
 		idCard: number,
 	) => {
@@ -135,7 +141,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Profil"} id={element.id}/>
+					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
@@ -160,7 +166,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Profil"} id={element.id}/>
+					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
@@ -177,7 +183,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 				<div>
 					{element.username} ({status})
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Profil"} id={element.id}/>
+					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame( idCard)}/>
 				</div>
 			)
@@ -199,7 +205,7 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 				<div>
 					{element.username} ({status})
 					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload, channelinfo)}/>
-					<input type="button" value={"Profil"} id={element.id}/>
+					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
 					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
 				</div>
 			)

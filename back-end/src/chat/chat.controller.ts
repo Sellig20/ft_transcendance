@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Req, Res, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Param, Body, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import hash from 'src/auth/utils/hash';
 import { ForbiddenException, BadRequestException } from '@nestjs/common';
 import { info } from 'console';
+import { BanChannelById, BlockUserById, ChangePassword, CreateChannelDto, InviteUser, InviteUserId, LeaveChannelById, MuteById, SetAdminById } from './dto';
 
 
 @Controller('chat')
@@ -13,43 +14,20 @@ export class ChatController {
 		private ChatService: ChatService
 	) { }
 
-	// @Get()
-	// async getAnyUser() {
-	// 	return await this.prisma.user.findMany();
-	// }
-
-	// @Get('/login')
-	// async getOnConnection(@Req() req) {
-
-	// 	const id_from_res = req.user.id
-	// 	let userfront = new FrontUserDto();
-	// 	const temp = await this.prisma.user.findFirst({
-	// 		where: {
-	// 			id: id_from_res
-	// 		}
-	// 	})
-	// 	userfront.email = temp.email;
-	// 	userfront.id = temp.id;
-	// 	userfront.username = temp.username;
-	// 	userfront.tfa_status = temp.TFA_activated
-		
-	// 	return userfront
-	// }
-
-
 	@Get('/test/:id')
-	async hello(@Param() param) {
+	async hello(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findUserById(Number(param.id));
+			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)
 		}
 	}
 	
 	@Get('/getUserById/:id')
-	async getUserById(@Param() param) {
+	async getUserById(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findUserById(Number(param.id));
+			console.log(id)
+			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)
 		}
@@ -57,9 +35,9 @@ export class ChatController {
 
 	// find toutes les infos du channel(id) + tous les messages
 	@Get('/findAllInfoInChannelById/:id')
-	async findAllInfoInChannelById(@Param() param) {
+	async findAllInfoInChannelById(@Param('id', ParseIntPipe) id) {
 		try {
-			const res = await this.ChatService.findAllInfoInChannelById(Number(param.id));
+			const res = await this.ChatService.findAllInfoInChannelById(Number(id));
 			return (res)
 		} catch (error) {
 			throw error
@@ -68,9 +46,9 @@ export class ChatController {
 
 	// find tous les channels joined par le user(id)
 	@Get('/findAllChannelJoinedByIdUser/:id')
-	async findAllChannelJoinedByIdUser(@Param() param) {
+	async findAllChannelJoinedByIdUser(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findAllChannelJoinedByIdUser(Number(param.id));
+			return await this.ChatService.findAllChannelJoinedByIdUser(Number(id));
 		} catch (error) {
 			return (error)
 		}
@@ -78,16 +56,16 @@ export class ChatController {
 
 	// find toutes les socket actuellement connecte au channel(id)
 	@Get('/findAllSocketOnChannelByIdChannel/:id')
-	async findAllSocketOnChannelByIdChannel(@Param() param) {
+	async findAllSocketOnChannelByIdChannel(@Param('id', ParseIntPipe) id) {
 		try {
-			return await this.ChatService.findAllSocketOnChannelByIdChannel(Number(param.id));
+			return await this.ChatService.findAllSocketOnChannelByIdChannel(Number(id));
 		} catch (error) {
 			return (error)
 		}
 	}
 
 	@Post('/createChannel')
-	async createChannel(@Body() body) {
+	async createChannel(@Body() body: CreateChannelDto) {
 		let password_final;
 		if (body.password === undefined || body.password === null || body.password === "")
 			password_final = null
@@ -102,11 +80,10 @@ export class ChatController {
 	}
 
 	@Post('/leaveChannelById')
-	async leaveChannelById(@Body() body) {
+	async leaveChannelById(@Body() body: LeaveChannelById) {
 		// verifier si le userid est le owner 
 		// console.log("sdfsdfsdfsdfsdfsfsf", infochann, body.channelid)
 		try {
-			let owner_id = null
 			let is_alone = false
 			const infochann = await this.ChatService.findAllInfoInChannelById(body.channelid);
 			if(infochann.owner === body.userid)
@@ -144,7 +121,7 @@ export class ChatController {
 	}
 
 	@Post('/banChannelById')
-	async banChannelById(@Body() body) {
+	async banChannelById(@Body() body: BanChannelById) {
 		try {
 			await this.ChatService.leaveChannelById(body.userid, body.channelid)
 			let channelinfo = await this.ChatService.findAllInfoInChannelById(body.channelid)
@@ -163,7 +140,7 @@ export class ChatController {
 	}
 
 	@Post('/blockUserById')
-	async blockUserById(@Body() body) {
+	async blockUserById(@Body() body: BlockUserById) {
 		try {
 			const res = await this.ChatService.getblockedUserById(body.userid)
 			if (res.blocked_user.indexOf(body.userToBlock) !== -1)
@@ -180,7 +157,7 @@ export class ChatController {
 	}
 
 	@Post('/setAdminById')
-	async setAdminById(@Body() body) {
+	async setAdminById(@Body() body: SetAdminById) {
 		try {
 			const res1 = await this.ChatService.getAdminInChannelById(body.channelId)
 			if (res1.admins.indexOf(body.userToSet) === -1)
@@ -200,7 +177,7 @@ export class ChatController {
 	}
 
 	@Post('/muteById')
-	async muteById(@Body() body) {
+	async muteById(@Body() body: MuteById) {
 		try {
 			let muted_users = await this.ChatService.getMutedUserInChannelById(body.channelId)
 			let muted = muted_users.muted
@@ -245,7 +222,7 @@ export class ChatController {
 
 	// invite des user en fonction de leurs username
 	@Post('/inviteUser')
-	async inviteUser(@Body() body){
+	async inviteUser(@Body() body: InviteUser){
 		try {
 			let found;
 			found = false
@@ -287,7 +264,7 @@ export class ChatController {
 
 	// invite des user en fonction de leurs user ID
 	@Post('/inviteUserId')
-	async inviteUserId(@Body() body){
+	async inviteUserId(@Body() body: InviteUserId){
 		try {
 			let found;
 			found = false
@@ -325,7 +302,7 @@ export class ChatController {
 	}
 
 	@Post('/changePassword')
-	async changePassword(@Body() body){
+	async changePassword(@Body() body: ChangePassword){
 		try {
 			if (body.password === undefined || body.password === null)
 			{
@@ -352,9 +329,9 @@ export class ChatController {
 	}
 
 	@Get('/findAllChannelJoinedId/:iduser')
-	async findAllChannelJoinedId(@Param() param) {
+	async findAllChannelJoinedId(@Param('iduser', ParseIntPipe) iduser) {
 		try {
-			return await this.ChatService.findAllChannelJoinedId(Number(param.iduser));
+			return await this.ChatService.findAllChannelJoinedId(Number(iduser));
 		} catch (error) {
 			return (error)
 		}
