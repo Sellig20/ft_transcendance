@@ -18,6 +18,8 @@ const getLoginStatus = async () => {
 			localStorage.removeItem("token")
 		return null;
 	}
+	console.log(req.data);
+	
 	return req.data
 }
 

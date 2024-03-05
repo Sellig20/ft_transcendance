@@ -1,12 +1,11 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../user/user.store';
-import { Socket, io } from "socket.io-client";
-import { Rootstate } from '../../app/store';
-import { useSelector } from 'react-redux';
 import userService from '../user/user.service';
 
+
 const Navbar = () => {
+
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -14,8 +13,9 @@ const Navbar = () => {
 	const handleLogout = async () => {
 		// disconnect la socket ici mais j'ai la flemme la
 		// const so = useSelector((state: Rootstate) => state.user.socket);
-		// console.log(so)
 		await userService.changeUserStatus("offline");
+		console.log("status in logout");
+		
 		dispatch(logout());
 		localStorage.removeItem("token");
 		navigate('/');

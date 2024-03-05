@@ -8,6 +8,7 @@ import WebSocketSG from './webSocketSG';
 import WebSocketQG from './webSocketQG';
 import { Route, Routes, useParams } from "react-router-dom";
 import PrivateQueue from "./PrivateQueue";
+import ProtectedRoute from "../login/ProtectedRoute";
 
 
 export default function Game() {
@@ -54,26 +55,28 @@ export default function Game() {
 
 	return (
 	    <Routes>
-			<Route path="/" element={
-				<div>
-					<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
-				</div>
-			}/>
-			<Route path="/queue" element={
-				<div>
-					<WebSocketQG socket={socket} page={page} setPage={setPage}/>
-				</div>
-			}/>
-			<Route path="/queuePrivate/:idP" element={
-				<div>
-					<PrivateQueue socket={socket}/>
-				</div>
-			}/>
-			<Route path="/startgame" element={
-				<div>
-					<WebSocketSG socket={socket} page={page} setPage={setPage}/>
-				</div>
-			}/>
+			<Route element={<ProtectedRoute />} >	
+				<Route path="/" element={
+					<div>
+						<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
+					</div>
+				}/>
+				<Route path="/queue" element={
+					<div>
+						<WebSocketQG socket={socket} page={page} setPage={setPage}/>
+					</div>
+				}/>
+				<Route path="/queuePrivate/:idP" element={
+					<div>
+						<PrivateQueue socket={socket}/>
+					</div>
+				}/>
+				<Route path="/startgame" element={
+					<div>
+						<WebSocketSG socket={socket} page={page} setPage={setPage}/>
+					</div>
+				}/>
+			</Route>
         </Routes>
     );
 }

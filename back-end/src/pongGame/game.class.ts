@@ -146,7 +146,7 @@ export class Game {
     }
 
     async maxScore() {
-        if (this.gameState.player1Score === 2) {
+        if (this.gameState.player1Score === 11) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
@@ -161,7 +161,7 @@ export class Game {
             this.gameState.player1Winner = true;
             this.gameState.player2Looser = true;
         }
-        else if (this.gameState.player2Score === 2) {
+        else if (this.gameState.player2Score === 11) {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
@@ -298,10 +298,14 @@ export class Game {
             flag1 = false;
             flag2 = false;
         }
-        if (flag8 === false && flag1 && flag2)
+        if (flag8 === false && flag1 && flag2) {
             this.gameState.currentLevel = 1.5;
-        else if (flag8 && flag1 && flag2)
+            this.gameState.playerVelocityY = 1.4;
+        }
+        else if (flag8 && flag1 && flag2) {
             this.gameState.currentLevel = 1.9;
+            this.gameState.playerVelocityY = 1.8;
+        }
     }
 
     checkGameStatus(): boolean {

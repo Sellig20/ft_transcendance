@@ -40,33 +40,77 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
     }
     
-    handleDisconnect(client: Socket, ...args: any[]) {
-        console.log("--- disconnecttttt :")
-        let gI = this.getStrGame(client.id);
-        
+    async handleDisconnect(client: Socket, ...args: any[]) {
         this.server.to(client.id).emit('user-disconnected');
-        
-        for (let i = 0; i < this.games.length; i++) {
-            const currentGame = this.games[i];
-            const j1 = currentGame.getPlayer1UserID();
-            const j2 = currentGame.getPlayer2UserID();
-            let sample1 = currentGame.getSocketByUserID(j1);
-            let sample2 = currentGame.getSocketByUserID(j2);
-            for (let i = 0; i < this.userArray.length; i++) {
-                console.log("user array is user id number ", this.userArray[i].userid, " for socket : ", this.userArray[i].socketId);
-                if (this.userArray[i].userid === j1)
-                {
-                    this.server.to(sample2).emit('oppo-crashed', sample2)
-                    this.removeUser(sample2);
-                }
-                else if (this.userArray[i].userid === j2)
-                {
-                    this.server.to(sample1).emit('oppo-crashed', sample1)
-                    this.removeUser(sample1);
+        console.log("------------disconnect game.gateway---------");
+        const oppo = this.getOpponentSocket(client.id);
+        if (!oppo || oppo === null || undefined) {
+            for (let i = 0; i < this.games.length; i++) {
+                const currentGame = this.games[i];
+
+                const j1 = currentGame.getPlayer1UserID();
+                const j2 = currentGame.getPlayer2UserID();
+
+                this.us.changeStatus(j2 ,"online");
+                this.us.changeStatus(j1 ,"online");
+    
+                let sample1 = currentGame.getSocketByUserID(j1);
+                let sample2 = currentGame.getSocketByUserID(j2);
+    
+                for (let i = 0; i < this.userArray.length; i++) {
+                    if (this.userArray[i].userid === j1)
+                    {
+                        if (!(await this.us.checkStatus(j1) === "offline")) {      
+                            this.us.changeStatus(j1 ,"online");
+                            console.log("disconenct if 1");
+
+                        }
+                        this.server.to(sample2).emit('oppo-crashed', sample2)
+                        currentGame.setFinito();
+                        this.removeUser(sample2);
+                    }
+                    else if (this.userArray[i].userid === j2)
+                    {
+                        if (!(await this.us.checkStatus(j2) === "offline")) {      
+                            this.us.changeStatus(j2 ,"online");
+                            console.log("disconnect if 2");
+
+                        }
+                        this.server.to(sample1).emit('oppo-crashed', sample1)
+                        this.removeUser(sample1);
+                    }
                 }
             }
+            this.removeUser(client.id);
         }
-        this.removeUser(client.id);
+        else if (oppo)
+        {
+            console.log("----disconenct else--------");
+            for (let i = 0; i < this.games.length; i++) {
+                const currentGame = this.games[i];
+                const j1 = currentGame.getPlayer1UserID();
+                const j2 = currentGame.getPlayer2UserID();
+
+                // this.us.changeStatus(j2 ,"online");
+                // this.us.changeStatus(j1 ,"online");
+                if (!(await this.us.checkStatus(j2) === "offline") && !(await this.us.checkStatus(j1) === "offline")) {  
+                    this.us.changeStatus(j1 ,"online");
+                    this.us.changeStatus(j2 ,"online");
+                    console.log("statu 1 ", (await this.us.checkStatus(j1)));
+                    console.log("statu 2 ", (await this.us.checkStatus(j2)));
+
+                    console.log("disconnect else ");
+                }
+                const d1 = currentGame.getPlayer1Id();
+                const d2 = currentGame.getPlayer2Id();
+                if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
+                    this.server.to(oppo).emit('oppo-crashed', oppo);
+                    currentGame.setFinito();
+                    this.removeUser(oppo);
+                }
+            }
+            this.removeUser(client.id);
+        }
     }
 
 	getStrGame(id: string)//trouve la id socket du game
@@ -228,8 +272,9 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
     }
 
     @SubscribeMessage('finito')
-    handleFinito(client: Socket) {
+    async handleFinito(client: Socket) {
         this.server.to(client.id).emit('user-disconnected');
+        console.log("------------finitooooo game.gateway---------");
         const oppo = this.getOpponentSocket(client.id);
         if (!oppo || oppo === null || undefined) {
             for (let i = 0; i < this.games.length; i++) {
@@ -244,12 +289,22 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
                 for (let i = 0; i < this.userArray.length; i++) {
                     if (this.userArray[i].userid === j1)
                     {
+                        if (!(await this.us.checkStatus(j1) === "offline")) {      
+                            this.us.changeStatus(j1 ,"online");
+                            console.log("Je rentre dans !await IF 1  de finito");
+
+                        }
                         this.server.to(sample2).emit('oppo-crashed', sample2)
                         currentGame.setFinito();
                         this.removeUser(sample2);
                     }
                     else if (this.userArray[i].userid === j2)
                     {
+                        if (!(await this.us.checkStatus(j2) === "offline")) {      
+                            this.us.changeStatus(j2 ,"online");
+                            console.log("Je rentre dans !await IF 2 de finito");
+
+                        }
                         this.server.to(sample1).emit('oppo-crashed', sample1)
                         this.removeUser(sample1);
                     }
@@ -261,11 +316,24 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
         {
             for (let i = 0; i < this.games.length; i++) {
                 const currentGame = this.games[i];
+                const j1 = currentGame.getPlayer1UserID();
+                const j2 = currentGame.getPlayer2UserID();
+                // console.log("-----------------");
+                if (!(await this.us.checkStatus(j2) === "offline") && !(await this.us.checkStatus(j1) === "offline")) {  
+                    this.us.changeStatus(j1 ,"online");
+                    this.us.changeStatus(j2 ,"online");
+                    console.log("statu 1 ", (await this.us.checkStatus(j1)));
+                    console.log("statu 2 ", (await this.us.checkStatus(j2)));
+
+                    console.log("Je rentre dans !await  ELSEEE de finito");
+                }
+                console.log("status call socket online");
+                
                 const d1 = currentGame.getPlayer1Id();
                 const d2 = currentGame.getPlayer2Id();
                 if (client.id === d1 || client.id === d2) {//la socket recue correspond a un joueur
-                    currentGame.setFinito();
                     this.server.to(oppo).emit('oppo-crashed', oppo);
+                    currentGame.setFinito();
                     this.removeUser(oppo);
                 }
             }
