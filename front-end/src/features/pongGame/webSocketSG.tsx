@@ -240,7 +240,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     useEffect(() => {
 
         if (page === "lobby") {
-            // navigate('../');
+            navigate('../');
             console.log("if page ==== lobby for ", socket.id);
             // socket?.emit("goQueueList");
             // socket?.emit('finitoGame');
