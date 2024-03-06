@@ -101,6 +101,7 @@ export class GameStateFD {
     status: playerStatus;
     level: number;
     map: number;
+    userid: number | null;
   }
   
   
