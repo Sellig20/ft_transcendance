@@ -131,13 +131,13 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"setAdmin"} id={element.id} onClick={() => handleSetadmin(channelinfo, idCard, reload)}/>
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
-					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
-					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
-					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
+					<input type="button" value={"setAdmin"} onClick={() => handleSetadmin(channelinfo, idCard, reload)}/>
+					<input type="button" value={"Mute (1min)"} onClick={() => handleMute(channelinfo, idCard, reload)}/>
+					<input type="button" value={"kick"} onClick={() => handleKick(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Ban"} onClick={() => handleBan(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Block"} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"Profil"} onClick={() => handleProfil(idCard)}/>
+					<input type="button" value={"PlayWith"} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}
@@ -157,12 +157,12 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Mute (1min)"} id={element.id} onClick={() => handleMute(channelinfo, idCard, reload)}/>
-					<input type="button" value={"kick"} id={element.id} onClick={() => handleKick(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Ban"} id={element.id} onClick={() => handleBan(idCard, channelinfo, reload)}/>
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
-					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
-					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
+					<input type="button" value={"Mute (1min)"} onClick={() => handleMute(channelinfo, idCard, reload)}/>
+					<input type="button" value={"kick"} onClick={() => handleKick(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Ban"} onClick={() => handleBan(idCard, channelinfo, reload)}/>
+					<input type="button" value={"Block"} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"Profil"} onClick={() => handleProfil(idCard)}/>
+					<input type="button" value={"PlayWith"} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}
@@ -177,9 +177,9 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
-					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
-					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame( idCard)}/>
+					<input type="button" value={"Block"} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"Profil"}  onClick={() => handleProfil(idCard)}/>
+					<input type="button" value={"PlayWith"} onClick={() => handleGame( idCard)}/>
 				</div>
 			)
 		}
@@ -199,9 +199,9 @@ const UserCard = ({ channelinfo, element, isOwner, isAdmin, userinfo, reload } :
 			return (
 				<div>
 					{element.username} ({status})
-					<input type="button" value={"Block"} id={element.id} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
-					<input type="button" value={"Profil"} id={element.id} onClick={() => handleProfil(idCard)}/>
-					<input type="button" value={"PlayWith"} id={element.id} onClick={() => handleGame(idCard)}/>
+					<input type="button" value={"Block"} onClick={() => handleBlock(userinfo.id, idCard, reload)}/>
+					<input type="button" value={"Profil"} onClick={() => handleProfil(idCard)}/>
+					<input type="button" value={"PlayWith"} onClick={() => handleGame(idCard)}/>
 				</div>
 			)
 		}
@@ -230,7 +230,7 @@ const InviteUser = ({ channelinfo, reload } : {
 
 	return (
 		<div>
-			<input type="text" name="inputSend" placeholder="username to invite" id="inputSend" ref={inputMessageRef}/>
+			<input type="text" name="inputSend" placeholder="username to invite" ref={inputMessageRef}/>
 			<button type="button" name='buttonSend' onClick={() => buttonHandler(channelinfo, reload)}>add to channel</button>
 		</div>
 	)
@@ -263,7 +263,7 @@ const ChangePassword = ({ channelinfo, userinfo, reload} : {
 	{
 		return (
 			<div>
-				<input type="password" name="inputSend" placeholder="new password" id="inputSend" ref={inputPasswordRef}/>
+				<input type="password" name="inputSend" placeholder="new password" ref={inputPasswordRef}/>
 				<button type="button" name='buttonSend' onClick={() => buttonHandler()}>change password</button>
 			</div>
 		)
@@ -292,7 +292,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 				{
 					channelinfo.user_list.map((element: any, index:any) => {
 						return (
-							<div key={index}>
+							<div key={element.id}>
 								<UserCard channelinfo={channelinfo} element={element} isOwner={isOwner} isAdmin={isAdmin} userinfo={userinfo} reload={reload}/>
 							</div>
 						)

@@ -45,7 +45,7 @@ const Card = ({ name, isPerso, id, password, ispublic, channelInfo, userid} : {
 			}
 		})
 		return (
-			<div key={id}>
+			<div>
 				<div className={color}>
 					{name} {mode}
 				</div>
@@ -53,7 +53,7 @@ const Card = ({ name, isPerso, id, password, ispublic, channelInfo, userid} : {
 		)
 	}
 	return (
-		<div key={id}>
+		<div>
 			<div className={color}>
 				{name} {mode}
 			</div>
@@ -86,7 +86,7 @@ export const ChannelPublic = ({userid, clickHandler, channelInfo} : {
 		var val = element.id
 		// console.log(element.name)
 		
-		const found = joined_channels.channel_list.find((x: { id: string; }) => x.id === val);
+		// const found = joined_channels.channel_list.find((x: { id: string; }) => x.id === val);
 
 		channelNotJoined.push(element)
 		// if (found === undefined)

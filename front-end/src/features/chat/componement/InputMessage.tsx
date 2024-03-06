@@ -39,14 +39,14 @@ export const InputMessage = ({ channelinfo, inputMessageRef, buttonHandler, lock
 	{
 		return (
 			<div className="d-flex justify-content-end">
-				<input type="password" className="form-control" name="inputSend" id="inputSend" ref={inputPasswordRef}/>
+				<input type="password" className="form-control" name="inputSend" ref={inputPasswordRef}/>
 				<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={() => handlepassword()}>Enter</button>
 			</div>
 		)
 	}
 	return (
 			<div className="d-flex justify-content-end">
-				<input type="text" className="form-control" name="inputSend" id="inputSend" ref={inputMessageRef}/>
+				<input type="text" className="form-control" name="inputSend" ref={inputMessageRef}/>
 				<button type="button" className="btn btn-primary btn-lg" name='buttonSend' onClick={buttonHandler}>Send</button>
 			</div>
 	);

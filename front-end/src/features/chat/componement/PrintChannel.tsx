@@ -99,7 +99,7 @@ export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo, locke
 			{
 				channel.messages.map((element: any, index:any) => {
 					return (
-						<div key={index}>
+						<div key={element.id}>
 							<Message content={element.content} sender={element.userId} sender_name={element.sender_name} userinfo={userinfo}/>
 						</div>
 					)

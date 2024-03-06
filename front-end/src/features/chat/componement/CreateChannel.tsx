@@ -11,7 +11,7 @@ const Password = ({ passwordRef, isPassword} : {
 	if (isPassword === true)
 	{
 		return (
-			<input type="password" className="form-control" name="password" id="password" placeholder="password" ref={passwordRef}/>
+			<input type="password" className="form-control" name="password" placeholder="password" ref={passwordRef}/>
 		)
 	}
 	else
@@ -120,7 +120,7 @@ export const CreateChannel = ({iduser, reload, setChannelSelected} : {
 			<input type="checkbox" name="checkboxPassword" onChange={hpassword} checked={checkboxPassword}/> password
 			<br />
 			{/* <input type="checkbox" checked={checkboxProtected}/> protected */}
-			<input type="text" className="form-control" name="inputchannel" id="inputchannel" placeholder="name" ref={inputNameRef}/>
+			<input type="text" className="form-control" name="inputchannel" placeholder="name" ref={inputNameRef}/>
 			<Password passwordRef={inputPasswordRef} isPassword={checkboxPassword}/>
 			<button type="button" className="btn btn-primary btn-lg" name='buttonAddFriend' onClick={() => handlerSubmite()}>create</button>
 		</div>
