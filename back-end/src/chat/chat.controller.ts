@@ -26,7 +26,7 @@ export class ChatController {
 	@Get('/getUserById/:id')
 	async getUserById(@Param('id', ParseIntPipe) id) {
 		try {
-			console.log(id)
+			// console.log(id)
 			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)

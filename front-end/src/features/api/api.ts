@@ -30,7 +30,7 @@ api.interceptors.response.use(
 		})
 	}
     if (error.response && error.response.data) {
-		console.log(error.response.data);
+		//console.log(error.response.data);
 		
 		let notif;
 		if (error.response.data.statusCode === 400 && error.response.data.message instanceof Array)

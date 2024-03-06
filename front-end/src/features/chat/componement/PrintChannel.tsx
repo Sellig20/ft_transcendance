@@ -85,20 +85,12 @@ export const PrintChannel = ({ channelinfo, newMessages, reload, userinfo, locke
 			</div>
 		);
 	}
-	console.log("[DEBUG] channel_messages loaded !", channelinfo);
+	// console.log("[DEBUG] channel_messages loaded !", channelinfo);
 	const channel = channelinfo
 	if (newMessages.length !== 0)
 		channel.messages.push(newMessages)
 	// console.log("channel", channel.messages)
-	console.log("channel message", newMessages)
-	// if (channel.messages.length === 0)
-	// {
-	// 	return(
-	// 		<div>
-	// 			send message to start conversation !
-	// 		</div>
-	// 	);
-	// }
+	// console.log("channel message", newMessages)
 	return (
 		<div>
 			<div>

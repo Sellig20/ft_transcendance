@@ -282,7 +282,7 @@ export const ChannelDescription = ({ channelinfo, userinfo, reload} : {
 		isOwner = true
 	if(isOwner === false && channelinfo.admins.length !== 0 && channelinfo.admins.indexOf(userinfo.id) !== -1)
 		isAdmin = true
-	console.log("channelinfoooo", channelinfo)
+	// console.log("channelinfoooo", channelinfo)
 	if (channelinfo.personal === true)
 	{
 		return (

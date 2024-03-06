@@ -21,7 +21,7 @@ export const InputMessage = ({ channelinfo, inputMessageRef, buttonHandler, lock
 			psw_input = sha256(psw_input);
 			if (psw_input === channelinfo.password)
 			{
-				console.log("acces to channel via password");
+				// console.log("acces to channel via password");
 				setLocked(false)
 			}
 			else

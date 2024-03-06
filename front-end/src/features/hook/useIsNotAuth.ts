@@ -13,11 +13,11 @@ function useIsNotAuth() {
 	useEffect(() => {
 		if (count.current === 0) {
 			if (user) {
-				console.log('user: ', user)
+				// console.log('user: ', user)
 				navigate('/home');
 			}
 			else {
-				console.log('you are not connected, user: ', user);
+				// console.log('you are not connected, user: ', user);
 				return;
 			}
 		}

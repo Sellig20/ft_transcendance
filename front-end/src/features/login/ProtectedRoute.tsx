@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC = () => {
 	});
 
 	useEffect(() => {	
-		console.log("hello");
+		// console.log("hello");
 		if (count.current === 0)
 			login.getLoginStatus().then( rep => {
 	

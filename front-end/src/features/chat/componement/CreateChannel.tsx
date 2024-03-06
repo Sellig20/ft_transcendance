@@ -63,7 +63,7 @@ export const CreateChannel = ({iduser, reload, setChannelSelected} : {
 	) => {
 		let	isPublic = true
 		let psw = ""
-		console.log(inputNameRef.current)
+		// console.log(inputNameRef.current)
 		if (inputNameRef.current === null)
 			return ;
 		let channel_name = inputNameRef.current.value
@@ -90,20 +90,15 @@ export const CreateChannel = ({iduser, reload, setChannelSelected} : {
 		}
 		else if (mode == "public")
 		{
-			console.log("mode public")
+			// console.log("mode public")
 			isPublic = true
 		}
 		else if (mode == "private")
 		{
-			console.log("mode private")
+			// console.log("mode private")
 			isPublic = false
 		}
-		// if (channel_password === undefined && mode !== "password")
-		// 	channel_password = null
-		// console.log("clique: ", mode, channel_password, channel_name)
-		// inputNameRef.current = null
-		// inputPasswordRef.current = null
-		console.log("end", inputPasswordRef, inputNameRef)
+		// console.log("end", inputPasswordRef, inputNameRef)
 		inputNameRef.current.value = ""
 		const res = await chatService.createChannel(channel_name, false, isPublic, iduser, psw)
 		if (res === null)

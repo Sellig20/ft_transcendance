@@ -94,7 +94,7 @@ export class AuthController {
 
 	@Get('login')
 	test_token(@Req() req) {
-		console.log('ping from test connection');
+		// console.log('ping from test connection');
 		
 		return {msg: "co ok"};
 	}

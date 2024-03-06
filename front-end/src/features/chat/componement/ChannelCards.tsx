@@ -29,12 +29,12 @@ const Card = ({ name, isPerso, id, password, ispublic, channelInfo, userid} : {
 	{
 		color = "card bg-success-subtle"
 		mode = "(mp)"
-		console.log(id)
+		// console.log(id)
 		channelInfo.map((element: any) => {
 			// console.log("perso",element)
 			if(id === element.id)
 			{
-				console.log(element.user_list)
+				// console.log(element.user_list)
 				if (element.user_list[0].id !== userid)
 				{
 					name = element.user_list[0].username
@@ -88,16 +88,16 @@ export const ChannelPublic = ({userid, clickHandler, channelInfo} : {
 		
 		const found = joined_channels.channel_list.find((x: { id: string; }) => x.id === val);
 
-		if (found === undefined)
-		{
-			channelNotJoined.push(element)
-		}
+		channelNotJoined.push(element)
+		// if (found === undefined)
+		// {
+		// }
 	})
 	
 	// console.log("tesssssssssssss", public_channels, joined_channels.channel_list, channelNotJoined)
 	return (
 		<div>
-			public channels not joined:
+			public channels:
 			<br />
 			{
 				channelNotJoined.map((element: any) => {
@@ -119,14 +119,14 @@ export const ChannelCards = ({ channelInfo, clickHandler, userid} : {
 }) => {
 	if (channelInfo === undefined)
 	{
-		console.log("[DEBUG] channelIdInfo pending...");
+		// console.log("[DEBUG] channelIdInfo pending...");
 		return(
 			<div>
 				pending...
 			</div>
 		);
 	}
-	console.log("[DEBUG] channelIdInfo loaded !", channelInfo);
+	// console.log("[DEBUG] channelIdInfo loaded !", channelInfo);
 	const nbrChannel = channelInfo.length;
 	if (nbrChannel === 0)
 	{

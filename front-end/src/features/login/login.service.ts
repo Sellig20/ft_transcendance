@@ -4,7 +4,7 @@ import {userOnConnection} from './IUser'
 
 const getUser = async (): Promise<userOnConnection> => {
 	const request = await api.get('user/login');
-	console.log(request);
+	// console.log(request);
 	
 	return request.data
 }
@@ -18,7 +18,7 @@ const getLoginStatus = async () => {
 			localStorage.removeItem("token")
 		return null;
 	}
-	console.log(req.data);
+	// console.log(req.data);
 	
 	return req.data
 }
@@ -26,7 +26,7 @@ const getLoginStatus = async () => {
 const postTFAauth = async (code: string, userId: number) => {
 	try {
 		const req = await api.post('auth/2fa/authenticate', { TFACode: code, idFront: userId });
-		console.log(req.data);
+		// console.log(req.data);
 		return req.data.access_token;
 	} catch (error) {
 		return null;
