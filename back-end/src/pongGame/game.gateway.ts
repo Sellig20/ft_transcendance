@@ -246,7 +246,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
             let s2 = this.returnNewSocket(j2);
             if (s1 !== "undefined" && s2 === client.id) {
                 currentGame.setFinito();
-                console.log("------1--------");
                 this.server.to(s1).emit('user-disconnected-j1', s1, j1);
                 if (!(await this.us.checkStatus(j1) === "offline")) {      
                     this.us.changeStatus(j1 ,"online");
@@ -254,8 +253,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
             }
             else if (s2 !== "undefined" && s2 === client.id) {
                 currentGame.setFinito();
-                console.log("------2--------");
-
                 this.server.to(s2).emit('user-disconnected-j2', s2, j2);
                 if (!(await this.us.checkStatus(j2) === "offline")) {      
                     this.us.changeStatus(j2 ,"online");
