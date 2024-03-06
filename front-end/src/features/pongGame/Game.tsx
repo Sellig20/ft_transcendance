@@ -54,7 +54,6 @@ export default function Game() {
 
 	return (
 	    <Routes>
-			<Route element={<ProtectedRoute />} >	
 				<Route path="/" element={
 					<div>
 						<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
@@ -75,7 +74,6 @@ export default function Game() {
 						<WebSocketSG socket={socket} page={page} setPage={setPage}/>
 					</div>
 				}/>
-			</Route>
         </Routes>
     );
 }

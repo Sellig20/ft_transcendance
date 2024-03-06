@@ -21,8 +21,8 @@ const App = () => {
 	return (
 		<div>
 			<Router>
-				{isAuth && <Navbar/>}
 				<ToastContainer/>
+				{isAuth && <Navbar/>}
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />
