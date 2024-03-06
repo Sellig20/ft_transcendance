@@ -14,7 +14,7 @@ export class GameService {
 		const elo_win = await this.calcElo(data.winnerId, data.loserId, true);
 		const elo_lose = await this.calcElo(data.loserId, data.winnerId, false);
 
-		console.log(elo_win, elo_lose);
+		// console.log(elo_win, elo_lose);
 		
 		await this.updateUserInfo(data.winnerId, true, elo_win);
 		await this.updateUserInfo(data.loserId, false, elo_lose);

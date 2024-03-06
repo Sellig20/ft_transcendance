@@ -14,7 +14,7 @@ const Navbar = () => {
 		// disconnect la socket ici mais j'ai la flemme la
 		// const so = useSelector((state: Rootstate) => state.user.socket);
 		await userService.changeUserStatus("offline");
-		console.log("status in logout");
+		// console.log("status in logout");
 		
 		dispatch(logout());
 		localStorage.removeItem("token");
