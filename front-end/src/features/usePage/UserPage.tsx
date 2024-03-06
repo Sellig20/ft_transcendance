@@ -36,8 +36,8 @@ const UserPage = () => {
 			setAvatar(url)
 			setLoading(false);
 		})
-			.catch((error) => {
-				console.log(error);
+			.catch(() => {
+				// console.log(error);
 			})
 		return () => {
 			if (avatar) {

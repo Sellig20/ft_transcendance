@@ -16,8 +16,8 @@ const Repertory = () => {
 				setUsers(res2);
 				setLoading(false);
 			})
-			.catch((error) => {
-				console.log(error);
+			.catch(() => {
+				// console.log(error);
 			})
 
 	}, [friends])

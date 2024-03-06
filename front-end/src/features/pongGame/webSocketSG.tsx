@@ -5,10 +5,10 @@ import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Rootstate } from "../../app/store";
     
-export const WebSocketSG = ({ socket, page, setPage}) => {
+export const WebSocketSG = ({ socket, page, setPage, userid}) => {
 
     // const userid = useSelector((state: Rootstate) => state.user.id);
-    const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
+    // const canvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [gameState, setGameState2] = useState<GameStateFD>(new GameStateFD());
     const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     const createContextCanvas = (board: HTMLCanvasElement) => {
         const context = board.getContext('2d');
         if (context) {
-            canvasContextRef.current = context;
+            // canvasContextRef.current = context;
             return context;
         }
         return null;
@@ -79,9 +79,9 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     }
 
     const partyIsAbandonned = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        console.log("Je passe en party IS ABANDONNEDDDD dessin");
+        // console.log("Je passe en party IS ABANDONNEDDDD dessin");
         context.strokeStyle = 'rgb(190, 154, 240)';
-        console.log("Je passe par party is abandonned");
+        // console.log("Je passe par party is abandonned");
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #1E90FF';
         else
@@ -92,7 +92,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     }
 
     const partyIsDeserted = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        console.log("Je passe en party IS DESERTED dessin");
+        // console.log("Je passe en party IS DESERTED dessin");
         context.strokeStyle = 'rgb(190, 154, 240)';
         if (gameState.mapChoiceLocked === 2)
             context.fillStyle = '45 px #FF1493';
@@ -240,10 +240,9 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
     useEffect(() => {
 
         if (page === "lobby") {
-            navigate('../');
-            console.log("if page ==== lobby for ", socket.id);
-            // socket?.emit("goQueueList");
-            // socket?.emit('finitoGame');
+            // navigate('../');
+            socket?.emit("FIRST", {userid:userid})
+            // socket?.emit('receiveLobby', socket.id);
         }
     ////////////// LOOP FOR FRONTEND /////////////////////////
         const animationId = requestAnimationFrame(update);
@@ -254,7 +253,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
         }
 
         const handleDisconnect = () => {
-            console.log("a quittey la zooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooone");
+            navigate('../');
         }
 
         if (socket?.connected) {
@@ -334,29 +333,28 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
             socket?.emit('IsFinished', socketClient);
         })
 
-        socket?.on('user-disconnected', () => {
-            if (socket === gameState.paddle1.socket) {
-                gameState.status = GameStatus.abortedGame;
-                handleDisconnect();
-            }
-            else if (socket === gameState.paddle2.socket) {
-                gameState.status = GameStatus.abortedGame;
-                handleDisconnect();
-            }
+        socket?.on('user-disconnected-j1', (socket: string, userid: number) => {
+            gameState.player1Abandon = true;
+            gameState.status = GameStatus.abortedGame;
+            handleDisconnect();
         })
 
-        socket?.on('oppo-crashed', (socket: string) => {
-            console.log("+++++++++++++++ MY OPPONENT CRASHED +++++++++++")
-            if (socket === gameState.paddle1.socket) {
-                gameState.player2IsDeserted = true;
-                gameState.status = GameStatus.abortedGame;
-                handleCrash();
-            }
-            else if (socket === gameState.paddle2.socket) {
-                gameState.player1IsDeserted = true;
-                gameState.status = GameStatus.abortedGame;
-                handleCrash();
-            }
+        socket?.on('user-disconnected-j2', (socket: string, userid: number) => {
+            gameState.player2Abandon = true;
+            gameState.status = GameStatus.abortedGame;
+            handleDisconnect();
+        })
+
+        socket?.on('oppo-crashed-j1', (socket: string) => {
+            gameState.player2IsDeserted = true;
+            gameState.status = GameStatus.abortedGame;
+            handleCrash();
+        })
+            
+        socket?.on('oppo-crashed-j2', (socket: string) => {
+            gameState.player1IsDeserted = true;
+            gameState.status = GameStatus.abortedGame;
+            handleCrash();
         })
 
         return () => {
@@ -382,7 +380,7 @@ export const WebSocketSG = ({ socket, page, setPage}) => {
             socket?.off('winner');
             socket?.off('choiceMap');
             gameState.status = GameStatus.finishedGame;
-            socket?.emit('finito');
+            socket?.emit('finito', userid);
             cancelAnimationFrame(animationId);
         }
     }, [update]);

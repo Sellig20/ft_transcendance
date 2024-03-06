@@ -35,9 +35,10 @@ export class Game {
         this.us = us;
     }
 
-    actualDataInClassGame() {
-        console.log("game id => ", this.gameId);
-        
+    deletePlayers() {
+        this.player1 = null;
+        this.player2 = null;
+        this.gameId = null;
     }
 
     async start() {
@@ -63,44 +64,13 @@ export class Game {
             this.server.to(this.player1.socketId).emit('HeGaveUp', this.gameState.idPlayer1);
             this.server.to(this.player2.socketId).emit('IGaveUp', this.gameState.idPlayer2);
         }
-    }//a commenter pour tej les fakes data
-	// async onModuleInit() {
-	// 	const fakeusers = await this.prisma.user.findMany({})
-	// 	if (fakeusers.length < 12)
-	// 		await this.generateAndSaveFakeData();
-	// }
-
-	// async generateAndSaveFakeData() {
-
-	// 	const fakeMatch = Array.from({ length: 25 }, () => ({
-	// 		winnerId: Math.floor(Math.random() * 21),
-	// 		loserId: Math.floor(Math.random() * 21),
-	// 		loserElo: 400,
-	// 		winnerElo: 400
-	// 	}));
-
-	// 	const fakeUsers = Array.from({ length: 10 }, () => ({
-	// 		email: faker.internet.email(),
-	// 		username: faker.internet.userName(),
-	// 		win: Math.floor(Math.random() * 10),
-	// 		lose: Math.floor(Math.random() * 10)
-	// 	}));
-
-	// 	for (const user of fakeUsers) {
-	// 		await this.prisma.user.create({ data: user });
-	// 	}
-
-	// 	for (const match of fakeMatch) {
-	// 		await this.prisma.match.create({ data: match });
-	// 	}
-	// }
+    }
 
     setCrash(socketClient: string) {
         this.gameState.status = GameStatus.abortedGame;
     }
 
     setFinito() {
-        // console.log("---- je suis setFinito de game.class");
         this.gameState.status = GameStatus.finishedGame;
     }
 
@@ -145,13 +115,18 @@ export class Game {
             return this.player2.socketId;
     }
 
+    getOpponent(socket: string) : string {
+        if (socket === this.player1.socketId)
+            return this.player2.socketId;
+        else if (socket === this.player2.socketId)
+            return this.player1.socketId;
+    }
+
     async maxScore() {
         if (this.gameState.player1Score === 11) {
             this.server.to(this.player1.socketId).emit('winner', "one");
             this.server.to(this.player2.socketId).emit('looser', "two");
             this.gameState.status = GameStatus.finishedGame;
-            console.log("userid 1 winner => ", this.player1.userid);
-            console.log("userid 2 looser => ", this.player2.userid);
             const data = new GameOverDTO();
             data.winnerId = this.player1.userid;
             data.loserId = this.player2.userid;
@@ -165,8 +140,6 @@ export class Game {
             this.server.to(this.player2.socketId).emit('winner', "two");
             this.server.to(this.player1.socketId).emit('looser', "one");
             this.gameState.status = GameStatus.finishedGame;
-            console.log("userid 1 looser => ", this.player1.userid);
-            console.log("userid 2 winner => ", this.player2.userid);
             const data = new GameOverDTO();
             data.winnerId = this.player2.userid;
             data.loserId = this.player1.userid;
@@ -175,7 +148,6 @@ export class Game {
             await this.gs.saveMatchs(data)
             this.gameState.player2Winner = true;
             this.gameState.player1Looser = true;
-
         }
     }
 
@@ -312,7 +284,6 @@ export class Game {
     if (this.gameState.status === GameStatus.abortedGame || 
         this.gameState.status === GameStatus.finishedGame)
         {
-            console.log("GAME IS OVER");
             this.sendToPlayer('gameIsOver', 1, this.gameId);
             return true;
         }
@@ -322,7 +293,6 @@ export class Game {
 
     startGameLoop() {
         const loop = setInterval(async () => {
-            console.log("game status loop game.class : ", this.gameState.status);
             if ((this.gameState.status !== GameStatus.finishedGame) 
             && (this.gameState.status !== GameStatus.abortedGame)) {
                 this.initChoiceMap();
@@ -336,11 +306,11 @@ export class Game {
                 this.detectingBorder();
                 this.detectingCollisionWithPaddle();
                 await this.ScoreAndResetBall(1);
-                // if (this.checkGameStatus() === true)
-                    // break;
             }
-            else
+            else {
                 clearInterval(loop);
+                console.log("clear interval !!!!!!!!!");
+            }
         }, 10); // 16 ms (environ 60 FPS)
     }
 

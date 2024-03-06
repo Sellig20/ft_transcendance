@@ -57,7 +57,7 @@ const UserSetting = () => {
 		if(event.target.files && event.target.files[0])
 		{
 			setImage(URL.createObjectURL(event.target.files[0]));
-			console.log(event.target.files[0]);
+			// console.log(event.target.files[0]);
 			
 			setFile(event.target.files[0]);
 		}

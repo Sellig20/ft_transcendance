@@ -13,9 +13,9 @@ const getLoginStatus = async () => {
 	let req;
 	try {
 		req = await api.get('auth/login');
-		console.log(req.data);
+		// console.log(req.data);
 	} catch (error) {
-		console.log("in error");
+		// console.log("in error");
 		return null;
 	}
 	return req.data
