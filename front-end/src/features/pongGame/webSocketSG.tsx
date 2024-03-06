@@ -21,7 +21,7 @@ export const WebSocketSG = ({ socket, page, setPage, userid}) => {
     }
 
     const partyAbandon = (context: CanvasRenderingContext2D, board: HTMLCanvasElement) => {
-        console.log("Je passe en partyABandon de SG");
+        // console.log("Je passe en partyABandon de SG");
         if (gameState.player1Abandon === true || gameState.player2Abandon === true)
         {
             partyIsAbandonned(context, board);
@@ -178,7 +178,7 @@ export const WebSocketSG = ({ socket, page, setPage, userid}) => {
                 if (gameState.status === GameStatus.abortedGame || gameState.status === GameStatus.finishedGame || 
                     gameState.status === GameStatus.over)
                 {
-                    console.log("ca va bouger 3 2 1...");
+                    // console.log("ca va bouger 3 2 1...");
                     setTimeout(getBack, 1000);
                 }
                 context.clearRect(0, 0, board.width, board.height);// Efface le contenu du canvas
@@ -249,7 +249,7 @@ export const WebSocketSG = ({ socket, page, setPage, userid}) => {
         ////////////// AU LANCEMENT DE START GAME //////////////
 
         const handleConnect = () => {
-            console.log('Connected in START GAME!');
+            // console.log('Connected in START GAME!');
         }
 
         const handleDisconnect = () => {
@@ -257,7 +257,7 @@ export const WebSocketSG = ({ socket, page, setPage, userid}) => {
         }
 
         if (socket?.connected) {
-            console.log(`je suis ${socket.id} dans start gate .tsx`);
+            // console.log(`je suis ${socket.id} dans start gate .tsx`);
         }
 
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -358,7 +358,7 @@ export const WebSocketSG = ({ socket, page, setPage, userid}) => {
         })
 
         return () => {
-            console.log("Unregistering events SG");
+            // console.log("Unregistering events SG");
             socket?.off('connect');
             socket?.off('disconnect');
             window.removeEventListener('keydown', handleKeyDown);

@@ -309,7 +309,7 @@ export class Game {
             }
             else {
                 clearInterval(loop);
-                console.log("clear interval !!!!!!!!!");
+                // console.log("clear interval !!!!!!!!!");
             }
         }, 10); // 16 ms (environ 60 FPS)
     }

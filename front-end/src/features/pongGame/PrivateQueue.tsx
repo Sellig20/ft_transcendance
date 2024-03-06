@@ -25,7 +25,7 @@ export const WebSocketQG = ({socket}) => {
 
     useEffect(() => {
         const handlePrepareMatch = () => {
-            console.log("prepare match in queue gate");
+            // console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
 

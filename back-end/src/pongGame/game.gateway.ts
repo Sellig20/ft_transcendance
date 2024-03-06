@@ -28,12 +28,12 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
 	onModuleInit() {
 		this.server.on('-- ON MODULE INIT -- connection : ', (socket) => {
-			console.log('Connection -> ', socket.id);
+			// console.log('Connection -> ', socket.id);
 		})
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		console.log(`[GAME] Client connected: ${client.id}`);
+		// console.log(`[GAME] Client connected: ${client.id}`);
 		this.server.to(client.id).emit("FIRST", { msg: "who are you" })
 
     }
@@ -112,7 +112,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 
 	@SubscribeMessage('FIRST')
 	async handleMessageconnection(client: any, message: any) {
-		console.log("[FIRST]", client.id, "= client:", message.userid)
+		// console.log("[FIRST]", client.id, "= client:", message.userid)
 		this.addUser(client.id, -1, message.userid, -1);
 		this.server.to(client.id).emit("firstFinish", {msg:"vasy"})
     }
@@ -124,7 +124,6 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
             {
                 const mapChoiceEmmerdeur = this.playersAvailable[i].map;
                 const userIdEmmerdeur = this.playersAvailable[i].userid;
-                console.log("ouiouioui");
                 this.playersAvailable.splice(i, 1);
                 break;
             }
@@ -306,7 +305,7 @@ export class gatewayPong implements OnModuleInit, OnGatewayConnection, OnGateway
 			this.toPlay(playersAvailablePrivate, mapChoice);//j'ai pris deux joueurs available direction juste en dessous
 		else
 		{
-			console.log("user", data.userId, "attend son pote pour jouer...")
+			// console.log("user", data.userId, "attend son pote pour jouer...")
 		}
     }
     

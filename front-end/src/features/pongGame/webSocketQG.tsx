@@ -16,18 +16,18 @@ export const WebSocketQG = ({ socket, page, setPage}) => {
         }
 
         if (socket?.id === null || undefined) {
-            console.log("Socket undefined dans le if")
+            // console.log("Socket undefined dans le if")
             navigate('../');
         }
         const handlePrepareMatch = () => {
-            console.log("prepare match in queue gate");
+            // console.log("prepare match in queue gate");
             navigate("/game/startGame")
         }
       
             socket?.on('prepareForMatch', handlePrepareMatch);
 
     return () => {
-            console.log("Unregistering events in Queue gate");
+            // console.log("Unregistering events in Queue gate");
             socket?.off('prepareForMatch', handlePrepareMatch);
         };
 

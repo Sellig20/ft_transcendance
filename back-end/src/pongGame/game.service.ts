@@ -132,8 +132,4 @@ export class GameService {
 			});
 		}
 	}
-	truc() {
-		console.log('hello ');
-		
-	}
 }

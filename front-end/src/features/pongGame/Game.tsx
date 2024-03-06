@@ -27,7 +27,7 @@ export default function Game() {
 
 	const firstListener = (
 	) => {
-		console.log("envoie des donnee users au server socket...", userid)
+		// console.log("envoie des donnee users au server socket...", userid)
 		socket?.emit("FIRST", {userid:userid})
 	};
 
@@ -50,8 +50,6 @@ export default function Game() {
 		
 	}, [])
 
-
-
 	return (
 	    <Routes>
 				<Route path="/" element={
@@ -71,7 +69,7 @@ export default function Game() {
 				}/>
 				<Route path="/startgame" element={
 					<div>
-						<WebSocketSG socket={socket} page={page} setPage={setPage}/>
+						<WebSocketSG socket={socket} page={page} setPage={setPage} userid={userid}/>
 					</div>
 				}/>
         </Routes>
