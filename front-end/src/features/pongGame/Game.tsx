@@ -6,7 +6,7 @@ import './style.css'
 import WebSocketPG from './webSocketPG';
 import WebSocketSG from './webSocketSG';
 import WebSocketQG from './webSocketQG';
-import { Route, Routes, useParams } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import PrivateQueue from "./PrivateQueue";
 import ProtectedRoute from "../login/ProtectedRoute";
 
@@ -26,7 +26,6 @@ export default function Game() {
 	}
 
 	const firstListener = (
-		messageprop: any
 	) => {
 		console.log("envoie des donnee users au server socket...", userid)
 		socket?.emit("FIRST", {userid:userid})
@@ -55,7 +54,6 @@ export default function Game() {
 
 	return (
 	    <Routes>
-			<Route element={<ProtectedRoute />} >	
 				<Route path="/" element={
 					<div>
 						<WebSocketPG socket={socket} userId={userid} page={page} setPage={setPage}/>
@@ -76,7 +74,6 @@ export default function Game() {
 						<WebSocketSG socket={socket} page={page} setPage={setPage}/>
 					</div>
 				}/>
-			</Route>
         </Routes>
     );
 }

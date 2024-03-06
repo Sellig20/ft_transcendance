@@ -26,7 +26,7 @@ export class ChatController {
 	@Get('/getUserById/:id')
 	async getUserById(@Param('id', ParseIntPipe) id) {
 		try {
-			console.log(id)
+			// console.log(id)
 			return await this.ChatService.findUserById(Number(id));
 		} catch (error) {
 			return (error)
@@ -185,7 +185,7 @@ export class ChatController {
 			let data = {}
 			const time_to_mute = 60000
 	
-			console.log(time_now, muted)
+			// console.log(time_now, muted)
 			if (muted === null)
 			{
 				// peut ajouter

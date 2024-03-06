@@ -1,34 +1,34 @@
 import { Outlet, useNavigate } from 'react-router-dom';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import login from './login.service'
 import usePageCloseDetection from '../hook/usePageClose';
-import userService from '../user/user.service';
+import { useDispatch } from 'react-redux';
+import { logout } from '../user/user.store';
 
 const ProtectedRoute: React.FC = () => {
 
-	const count = useRef(0);
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 	const [loading, setLoading] = useState(true);
 
 	usePageCloseDetection(() => {
 	});
 
-	useEffect(() => {	
-		console.log("hello");
-		if (count.current === 0)
-			login.getLoginStatus().then( rep => {
-	
-		
-				if (!rep)
-					navigate('/')
-				else 
-					setLoading(false)
+	useEffect(() => {
+		login.getLoginStatus().then(rep => {
+			if (!rep) {
+				if (localStorage.getItem("token"))
+					localStorage.removeItem("token")
+				dispatch(logout());
+				navigate('/')
+			}
+			else
+				setLoading(false)
 		});
-		count.current++;
 	})
-	return(
+	return (
 		<>
-			{!loading && <Outlet/>}
+			{!loading && <Outlet />}
 		</>
 	) 
 				

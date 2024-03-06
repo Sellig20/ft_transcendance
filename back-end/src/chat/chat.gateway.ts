@@ -99,12 +99,12 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     }
     
     async handleConnection(client: Socket, ...args: any[]) {
-        console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
+        // console.log(`[HANDLE CONNECTION] Client connected: ${client.id}`);
         this.server.to(client.id).emit("FIRST", {msg:"who are you"})
     }
 
     async handleDisconnect(client: Socket){
-        console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
+        // console.log(`[HANDLE DISCONNECT] Client disconnected: ${client.id}`);
         this.removeUser(client.id);
         this.printAllUser(this.userArray);
         // emit la question de qui tu es ??????
@@ -114,11 +114,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
     @SubscribeMessage('MP')
     async handleMessage(client: any, message: any)
     {
-        // console.log(client.name)
-        // console.log(message)
-        console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
-        // this.server.emit("MP", {content:message.data, to:message.to, from:client.id});   
-        // this.server.to(message.recipient).emit("MP", message.data);
+        // console.log("from_socket:", message.from_socket, message.from_user_name, "-->", message.data, ", to:", message.to);
         
         let res = await this.findSocketChannels(message.to)
         res.map((item, index) => {
@@ -137,7 +133,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
 
     @SubscribeMessage('FIRST')
     async handleMessageconnection(client: any, message: any) {
-        console.log("FIRST", message.userid, client.id)
+        // console.log("FIRST", message.userid, client.id)
         await this.chatService.setSocket(Number(message.userid), client.id)
         client.name = message.userid
         this.addUser(message.userid, client.id);
@@ -146,7 +142,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection<Socket> {
 
     @SubscribeMessage('RELOAD')
     async handleReload(client: any, message: any) {
-        console.log("reload all the user", message.channelid)
+        // console.log("reload all the user", message.channelid)
         // await this.findSocketChannels(message.channelid).then(res => {
         //     res.map((item, index) => {
         //         // console.log("envoie de '", message.data, "' to socketid :", item)

@@ -18,7 +18,6 @@ export function Chat() {
 	const [messageSocket, setMessageSocket] = useState<any>([]);
 
 	const inputMessageRef = useRef(null);
-	const inputFriendRef = useRef(null);
 
 	const [channelLocked, setChannelLocked] = useState<boolean>(false); // channel locked
 	const [channelJoined, setChannelJoined] = useState<any>(); // channel disponible
@@ -46,7 +45,7 @@ export function Chat() {
 		if (userinfo === null)
 			return ;
 		setUserinfo(userinfo)
-		console.log("[FROM DB] userinfo:", userinfo)
+		// console.log("[FROM DB] userinfo:", userinfo)
 		setChannelJoined(userinfo.channel_list)
 		if (channelSelect !== undefined && channelSelect !== null) // si plus acces au channelselected alors reset la variable
 		{
@@ -58,6 +57,12 @@ export function Chat() {
 			if (finded === false)
 			{
 				setchannelSelect(null)
+			}
+			else
+			{
+				const messageChann = await chatService.findAllInfoInChannelById(channelSelect.id)
+				if(messageChann !== null)
+					setchannelSelect(messageChann)
 			}
 		}
 	}
@@ -85,7 +90,7 @@ export function Chat() {
 		value: string
 	) => {
 		socket?.emit("MP", {from_socket: socket?.id, from_user: userinfo.id, from_user_name: userinfo.username, data:value, to:channelSelect.id})
-		console.log("value:", value);
+		// console.log("value:", value);
 	}
 
 	const reloadListener = async (
@@ -95,12 +100,12 @@ export function Chat() {
 		// setchannelSelect(messageChann)
 		
 		reload();
-		if (channelSelect === undefined)
+		if (!channelSelect)
 			return ;
 		if (messageprop.channelid === channelSelect.id)
 		{
 			const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.channelid))
-			if (messageChann === "") //	le channel existe pas
+			if (messageChann === null) //	le channel existe pas
 			{
 				reload();
 				return ;
@@ -109,24 +114,26 @@ export function Chat() {
 		}
 	};
 
-	const messageListener = (
+	const messageListener = async (
 		messageprop: any
 	) => {
 		if (channelSelect === undefined)
 			return ;
 		if (channelSelect.id === messageprop.from_channel)
 		{
-			console.log("msg recu:", messageprop)
-			reload(messageprop.from_channel)
+			// console.log("msg recu:", messageprop)
+			// const messageChann = await chatService.findAllInfoInChannelById(Number(messageprop.from_channel))
+			reload()
+			// reload()
+			// reload(messageprop.from_channel)
 			// setMessageSocket(messageprop)
 			// setMessageSocket({content: messageprop.data, userId: messageprop.from_user, sender_name: messageprop.from_user_name})
 		}
 	};
 
 	const firstListener = (
-		messageprop: any
 	) => {
-		console.log("envoie des donnee users au server socket...", userid)
+		// console.log("envoie des donnee users au server socket...", userid)
 		socket?.emit("FIRST", {userid:userid})
 	};
 
@@ -161,7 +168,7 @@ export function Chat() {
 			return ;
 
 		const input = inputMessageRef.current.value
-		console.log("socket id:", socket?.id);
+		// console.log("socket id:", socket?.id);
 		if (input != "")
 		{
 			send(input);
@@ -176,15 +183,15 @@ export function Chat() {
 		let found;
 		found = false;
 		setMessageSocket([])
-		console.log("clicked on a channel, id_channel =", channelinfo.id);
+		// console.log("clicked on a channel, id_channel =", channelinfo.id);
 		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
 		if (messageChann === null) //	le channel existe pas
 		{
 			reload();
 			return ;
 		}
-		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		// console.log(messageChann)
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -213,15 +220,15 @@ export function Chat() {
 		let found;
 		found = false;
 		setMessageSocket([])
-		console.log("clicked on a channel, id_channel =", channelinfo.id);
+		// console.log("clicked on a channel, id_channel =", channelinfo.id);
 		const messageChann = await chatService.findAllInfoInChannelById(Number(channelinfo.id))
 		if (messageChann === null) //	le channel existe pas
 		{
 			reload();
 			return ;
 		}
-		console.log(messageChann)
-		messageChann.user_list.map((element: any, index:any) => {
+		// console.log(messageChann)
+		messageChann.user_list.map((element: any) => {
 			if (element.id === userid)
 			{
 				found = true
@@ -234,7 +241,13 @@ export function Chat() {
 			toast.error("error already joined")
 			return ;
 		}
-		console.log("ccacacacacacacacacacacac")
+		// verifie qu'il est toujours public
+		const res4 = await chatService.findAllInfoInChannelById(channelinfo.id)
+		if (res4 === null || res4.public !== true)
+		{
+			reload()
+			return ;
+		}
 		const res3 = await chatService.inviteUserId(channelinfo.id, userid)
 		if (res3 === null)
 		{
@@ -256,7 +269,7 @@ export function Chat() {
 				<div id='panel' className='w-25'>
 					<ChannelCards channelInfo={channelJoined} clickHandler={handleChannel} userid={userid}/>
 					<ChannelPublic userid={userid} clickHandler={handleChannelPublic} channelInfo={channelJoined}/>
-					<CreateChannel reload={reload} iduser={userid} userinfo={userinfo} setuserinfo={setUserinfo} setChannelSelected={setchannelSelect}/>
+					<CreateChannel reload={reload} iduser={userid} setChannelSelected={setchannelSelect}/>
 				</div>
 				{/* <div id='chat' className='bg-danger w-75'> */}
 				<div id='chat' className='bg-secondary w-75'>

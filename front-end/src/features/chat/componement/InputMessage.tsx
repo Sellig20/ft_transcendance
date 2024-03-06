@@ -1,11 +1,10 @@
 import React from 'react'
-import { useState, useEffect, useRef} from 'react'
-import chatService from '../chat.service'
+import { useRef} from 'react'
 // import sha256 from 'crypto-js/sha256';
 import { sha256 } from 'js-sha256';
 import { toast } from 'react-toastify';
 
-export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, buttonHandler, locked, setLocked} : {
+export const InputMessage = ({ channelinfo, inputMessageRef, buttonHandler, locked, setLocked} : {
 	channelinfo: any
 	newMessages: any
 	inputMessageRef: React.MutableRefObject<null>,
@@ -22,7 +21,7 @@ export const InputMessage = ({ channelinfo, newMessages, inputMessageRef, button
 			psw_input = sha256(psw_input);
 			if (psw_input === channelinfo.password)
 			{
-				console.log("acces to channel via password");
+				// console.log("acces to channel via password");
 				setLocked(false)
 			}
 			else
